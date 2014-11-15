@@ -6,3 +6,10 @@ simvent.js is a javascript library for mathematicals simulation in the field of 
 Devlopement state
 -----------------
 simvent.js is actualy in it's early devlopement state. Having started as a amateur (me) personnal project, the source code is mostly uncomented and variables names are in french.
+
+API
+---
+
+PoumonCool
+
+Modelise a lung with linear compliance with CO2 exalation.
