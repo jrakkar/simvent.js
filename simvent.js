@@ -1,6 +1,6 @@
 var ssv = {} // SSV pour Simplified SimVent
 
-ssv. PoumonCool = function(){
+ssv.PoumonCool = function(){
 
 	// Propriété statiques
 	this.echantillonnage = 0.001; // Secondes
