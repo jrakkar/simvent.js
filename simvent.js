@@ -1,6 +1,11 @@
-var ssv = {} // SSV pour Simplified SimVent
+var sv = {}
 
-ssv.PoumonCool = function(){
+sv.log = function(lung, vent){
+	return {
+	};
+}
+
+sv.SimpleLung = function(){
 
 	// Propriété statiques
 	this.echantillonnage = 0.001; // Secondes
@@ -69,7 +74,7 @@ ssv.PoumonCool = function(){
 };
 
 
-ssv.GenerateurPression = function(){
+sv.PresureControler = function(){
 	this.Pinspi = 10;
 	this.PEP = 0;
 	this.Ti = 1;
@@ -131,4 +136,52 @@ ssv.GenerateurPression = function(){
 		return {ventd: ventd, respd:respd};
 	};
 
+};
+
+sv.VDR = {
+	time: 0, //The pseudo internal clock of the ventilator
+	Tvent: 15, //The length of time the lung will be ventilated
+	Tic: 1, // Convective inspiratory time
+	Tec: 1, // Convective expiratory time
+	Tip: 1, // Percussive expiratory time
+	Tep: 1, // Percussive expiratory time
+};
+
+sv.VDR.log = function(lung){
+	return {
+	};
+}
+
+sv.VDR.ventilate = function(lung){
+
+	timeData = [];
+
+	while (this.time < this.ventTime){
+
+		var tStopConv = this.time + this.Tec;
+		while (this.time < tStopConv){
+			
+			// This is the "percussive" flow algorythme
+			
+			var tStopPerc = this.time + this.Tep;
+			while (this.time < tStopPerc){
+				Fip = this.Fimh;
+				Fop = this.Fop(Tip);
+				Pao = (Fop * lung.Raw) + lung.Palv
+				lung.Vt += Fop * this.Tsamp;
+			}
+
+			var tStopPerc = this.time + this.Tip;
+			while (this.time < tStopPerc){
+			}
+		}
+
+		var tStopConv = this.time + this.Tic;
+		while (this.time < tStopConv){
+		}
+
+	}
+	return {
+		timeData: timeData
+	};
 };
