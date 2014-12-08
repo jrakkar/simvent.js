@@ -11,15 +11,17 @@ sv.log = function(lung, vent){
 		Vt: lung.Vt,
 		Vti: lung.Vti,
 		Vte: lung.Vte,
-		Pco2: lung.Pco2,
-		Sco2: lung.Sco2,
-		Vco2: lung.Vco2,
+		Pco2: lung.PCO2,
+		Sco2: lung.SCO2,
+		Vco2: lung.VtCO2,
 
 		// Ventilator variables
 
-		Fip: lung.Fop,
-		Fop: lung.Fip
-		Pcirc: vent.Pcirc,
+		Pao: vent.Pao,
+		Fip: vent.Fip,
+		Fop: vent.Fop,
+		stateP: vent.stateP,
+		Pcirc: vent.Pcirc
 	};
 }
 
@@ -36,13 +38,13 @@ sv.SimpleLung = function(){
 	this.Pente3 = 5;
 
 	//Propriété dynamiques
-	this.pco2 = 0;
-	this.fco2 = 0;
-	this.vc = 0.0;
-	this.palv = 0.0;
+	this.Pco2 = 0;
+	this.Sco2 = 0;
+	this.Vt = 0.0;
+	this.Palv = 0.0;
 	this.flow = 0.0;
-	this.vcmax = 0;
-	this.veco2 = 0;
+	this.Vtmax = 0;
+	this.Vtco2 = 0;
 	
 	this.appliquer_pression = function (pression, duree){
 
@@ -63,6 +65,7 @@ sv.SimpleLung = function(){
 				this.fco2 = 0;
 				this.veco2 = 0;
 			}
+
 			else {
 				this.vce = this.vcmax - this.vc;
 				this.pco2 = this.co2(this.vce);
@@ -158,50 +161,83 @@ sv.PresureControler = function(){
 
 sv.VDR = {
 	time: 0, //The pseudo internal clock of the ventilator
+	Tsampl: 0.001,
 	Tvent: 15, //The length of time the lung will be ventilated
 	Tic: 1, // Convective inspiratory time
 	Tec: 1, // Convective expiratory time
-	Tip: 1, // Percussive expiratory time
-	Tep: 1, // Percussive expiratory time
+	Tip: 0.05, // Percussive expiratory time
+	Tep: 0.05, // Percussive expiratory time
+	Fipl: 1, // Percussive expiratory time
+	Fiph: 2, // Percussive expiratory time
 
 	/* Presure at the airway openning does not usualy fall
 	 * immediatly at zero during expiratory phase. This suggest
 	 * a small resistance of the expiratory circuit.
 	 */
-	Rexp: 1 // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
+	Rexp: 1, // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
+
+	//Variavle data
+
+	Fop:0, //Phasitron output flow
+	Fip:0, //Phasitron output flow
+	Pao:0 //Presure at the ariway openning (phasitron output)
 };
 
-sv.VDR.log = function(lung){
-	return {
-	};
+sv.VDR.percussiveExpiration = function(lung){
+	// Must be executed in a scope where te timeData container is defined
+	lung.flow = 0;
+	this.Fip = 0;
+	this.Fop = 0;
+	this.stateP = 0;
+	var tStopPerc = this.time + this.Tep;
+	while (this.time < tStopPerc){
+		this.Pao = lung.flow * this.Rexp;
+		
+		//lung.flow = (lung.Palv - this.Pao)/lung.Raw;
+		lung.flow = -9;
+		lung.Vt += lung.flow * this.Tsampl;
+		lung.Palv = lung.Vt / lung.Crs;
+		
+		timeData.push(sv.log(lung, this));
+		this.time += this.Tsampl;
+	}
+}
+sv.VDR.percussiveInspiration = function(lung, inFlow){
+	// Must be executed in a scope where te timeData container is defined
+	this.stateP = 1;
+	this.Fip = inFlow
+	var tStopPerc = this.time + this.Tip;
+
+	while (this.time < tStopPerc){
+		this.Pao = (this.Fop * lung.Raw) + lung.Palv 
+		this.Fop = inFlow * (6 - this.Pao/8);
+		lung.flow = this.Fop;
+
+		lung.Vt += this.Fop * this.Tsampl;
+		lung.Palv = lung.Vt / lung.Crs;
+		
+		timeData.push(sv.log(lung, this));
+		this.time += this.Tsampl;
+	}
 }
 
 sv.VDR.ventilate = function(lung){
 
 	timeData = [];
 
-	while (this.time < this.ventTime){
+	while (this.time < this.Tvent){
 
 		var tStopConv = this.time + this.Tec;
 		while (this.time < tStopConv){
 			
-			// This is the "percussive" flow algorythme
-			
-			var tStopPerc = this.time + this.Tep;
-			while (this.time < tStopPerc){
-				Fip = this.Fimh;
-				Fop = this.Fop(Tip);
-				Pao = (Fop * lung.Raw) + lung.Palv
-				lung.Vt += Fop * this.Tsamp;
-			}
-
-			var tStopPerc = this.time + this.Tip;
-			while (this.time < tStopPerc){
-			}
+			this.percussiveExpiration(lung);
+			this.percussiveInspiration(lung, this.Fipl);
 		}
 
 		var tStopConv = this.time + this.Tic;
 		while (this.time < tStopConv){
+			this.percussiveExpiration(lung);
+			this.percussiveInspiration(lung, this.Fiph);
 		}
 
 	}

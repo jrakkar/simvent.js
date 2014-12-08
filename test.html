@@ -2,9 +2,20 @@
 <meta charset="utf-8">
 <script src="simvent.js"></script>
 <script src="graphsimple.js"></script>
-
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="graphsimple-clear.css" charset="utf-8" />
+<svg id="svg1" width="1000" height="200"></svg>
+<svg id="svg2" width="1000" height="200"></svg>
+<svg id="svg2" width="700" height="200"></svg>
 <script>
 
-sv.VDR.ventilate();
-</script>
+var lung = new sv.SimpleLung();
+var VDR = sv.VDR;
+VDR.Tvent = 1;
+var data = VDR.ventilate(lung);
+console.log(data.timeData);
 
+gs.quickGraph("#svg1", data.timeData, function(d){return d.time}, function(d){return d.Flung});
+gs.quickGraph("#svg2", data.timeData, function(d){return d.time}, function(d){return d.stateP});
+
+</script>
