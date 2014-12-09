@@ -25,6 +25,10 @@ sv.log = function(lung, vent){
 	};
 }
 
+sv.syg = function(x, ymax, ymin, xid, kid){
+	return y;
+}
+
 sv.SimpleLung = function(){
 
 	// Propriété statiques
@@ -90,7 +94,6 @@ sv.SimpleLung = function(){
 
 		return co2;
 	};
-
 
 };
 
@@ -159,6 +162,15 @@ sv.PresureControler = function(){
 
 };
 
+sv.Phasitron = {};
+sv.Phasitron.Fop = function(Fip, Pao){
+	if(Pao >= 0 && Pao <=40){
+		return Fip + (Fip * (5 -(Pao/8)));
+	}
+	else if(Pao > 40){return Fip;}
+	else if(Pao < 0){return 6 * Fip;}
+}
+
 sv.VDR = {
 	time: 0, //The pseudo internal clock of the ventilator
 	Tsampl: 0.001,
@@ -174,7 +186,7 @@ sv.VDR = {
 	 * immediatly at zero during expiratory phase. This suggest
 	 * a small resistance of the expiratory circuit.
 	 */
-	Rexp: 1, // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
+	Rexp: 0.5, // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
 
 	//Variavle data
 
@@ -191,12 +203,12 @@ sv.VDR.percussiveExpiration = function(lung){
 	this.stateP = 0;
 	var tStopPerc = this.time + this.Tep;
 	while (this.time < tStopPerc){
-		this.Pao = lung.flow * this.Rexp;
+		this.Pao = - lung.flow * this.Rexp;
 		
-		//lung.flow = (lung.Palv - this.Pao)/lung.Raw;
-		lung.flow = -9;
+		lung.flow = (this.Pao - lung.Palv)/lung.Raw;
+		//lung.flow = -9;
 		lung.Vt += lung.flow * this.Tsampl;
-		lung.Palv = lung.Vt / lung.Crs;
+		lung.Palv = 1000 * lung.Vt / lung.Crs;
 		
 		timeData.push(sv.log(lung, this));
 		this.time += this.Tsampl;
@@ -209,18 +221,33 @@ sv.VDR.percussiveInspiration = function(lung, inFlow){
 	var tStopPerc = this.time + this.Tip;
 
 	while (this.time < tStopPerc){
-		this.Pao = (this.Fop * lung.Raw) + lung.Palv 
-		this.Fop = inFlow * (6 - this.Pao/8);
+		this.Pao = (this.Fop * lung.Raw) + lung.Palv;
+		this.Fop = sv.Phasitron.Fop(inFlow, this.Pao);
 		lung.flow = this.Fop;
 
 		lung.Vt += this.Fop * this.Tsampl;
-		lung.Palv = lung.Vt / lung.Crs;
+		lung.Palv = 1000 * lung.Vt / lung.Crs;
 		
 		timeData.push(sv.log(lung, this));
 		this.time += this.Tsampl;
 	}
 }
 
+sv.VDR.convectiveInspiration = function(lung){
+	var tStopConv = this.time + this.Tic;
+	while (this.time < tStopConv){
+		this.percussiveInspiration(lung, this.Fiph);
+		this.percussiveExpiration(lung);
+	}
+}
+
+sv.VDR.convectiveExpiration = function(lung){
+	var tStopConv = this.time + this.Tic;
+	while (this.time < tStopConv){
+		this.percussiveInspiration(lung, this.Fipl);
+		this.percussiveExpiration(lung);
+	}
+}
 sv.VDR.ventilate = function(lung){
 
 	timeData = [];
