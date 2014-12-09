@@ -11,6 +11,11 @@
 <link rel="stylesheet" type="text/css" href="graphsimple-clear.css" charset="utf-8" />
 
 <style>
+
+body {
+padding:0px;
+margin:0px;
+}
 .graph {
 	height:175px;
 	width:575px;
@@ -20,9 +25,34 @@
 	-moz-columns:400px 2;
 	line-height:200%;
 }
-div {
+
+table {
+	border-collapse:collapse;
+	margin:auto;
 }
+
+td {
+	padding:3px;
+}
+tr:nth-child(odd) {
+		background-color: rgb(230, 230, 230);
+	}
+
+#panel {
+position:fixed;
+right:0;
+height:100%;
+	box-shadow:0px 0px 10px;
+	margin-top:0px;
+transition: all 1s linear;
+}
+
 </style>
+
+
+<div id="panel">
+<table id="params"></table>
+</div>
 
 <div id="container">
 	Phasitron input
@@ -39,31 +69,44 @@ div {
 	<div id="graph6" class="graph"></div>
 </div>
 
+
 <script>
-var conf = {
-yaxis:{labelWidth:50}
+var flotConf = {
+	yaxis:{labelWidth:50}
 };
 var lung = new sv.SimpleLung();
 lung.Raw = 5;
 var VDR = sv.VDR;
-VDR.Tsampl=0.002;
-VDR.Tvent=1;
-VDR.Tip = 0.1;
-VDR.Tep = 0.1;
+VDR.Tsampl=0.0005;
+VDR.Fiph=1.5;
+VDR.Fipl=0.1;
+VDR.Tvent=6;
+VDR.Tip = 0.06;
+VDR.Tep = 0.06;
 
-//var timeData = VDR.ventilate(lung).timeData;
+var timeData = VDR.ventilate(lung).timeData;
 
-var timeData = [];
-VDR.percussiveInspiration(lung, 1.5);
-VDR.percussiveExpiration(lung);
+//var timeData = [];
+//VDR.percussiveInspiration(lung, 1.5);
+//VDR.percussiveExpiration(lung);
 //VDR.convectiveInspiration(lung);
 //VDR.convectiveExpiration(lung);
 
-$.plot("#graph1", [timeData.map(function(d){return [d.time, d.Fip]})], conf);
-$.plot("#graph2", [timeData.map(function(d){return [d.time, d.Fop]}),timeData.map(function(d){return [d.time, d.Fip]})], conf);
-$.plot("#graph3", [timeData.map(function(d){return [d.time, d.Pao]})], conf);
-$.plot("#graph4", [timeData.map(function(d){return [d.time, d.Flung]})], conf);
-$.plot("#graph5", [timeData.map(function(d){return [d.time, d.Palv]})], conf);
-$.plot("#graph6", [timeData.map(function(d){return [d.time, d.Vt]})], conf);
+$.plot("#graph1", [timeData.map(function(d){return [d.time, d.Fip]})], flotConf);
+$.plot("#graph2", [timeData.map(function(d){return [d.time, d.Fop]}),timeData.map(function(d){return [d.time, d.Fip]})], flotConf);
+$.plot("#graph3", [timeData.map(function(d){return [d.time, d.Pao]})], flotConf);
+$.plot("#graph4", [timeData.map(function(d){return [d.time, d.Flung]})], flotConf);
+$.plot("#graph5", [timeData.map(function(d){return [d.time, d.Palv]})], flotConf);
+$.plot("#graph6", [timeData.map(function(d){return [d.time, d.Vt]})], flotConf);
+
+var params = [
+	"Tsampl",
+	"Tip",
+	"Tep"
+];
+
+for(i in params){
+	$("#params").append("<tr><td>" + params[i] + "</td><td>" + VDR[params[i]] +"</td></tr>");
+}
 
 </script>

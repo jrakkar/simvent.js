@@ -174,6 +174,7 @@ sv.Phasitron.Fop = function(Fip, Pao){
 sv.VDR = {
 	time: 0, //The pseudo internal clock of the ventilator
 	Tsampl: 0.001,
+	Tramp: 0.005,
 	Tvent: 15, //The length of time the lung will be ventilated
 	Tic: 1, // Convective inspiratory time
 	Tec: 1, // Convective expiratory time
@@ -218,11 +219,22 @@ sv.VDR.percussiveInspiration = function(lung, inFlow){
 	// Must be executed in a scope where te timeData container is defined
 	this.stateP = 1;
 	this.Fip = inFlow
+	var tStartInsp = this.time;
+	var tStopRamp = this.time + this.Tramp;
 	var tStopPerc = this.time + this.Tip;
 
 	while (this.time < tStopPerc){
+
+		if(this.time < tStopRamp){
+			this.Fip = inFlow *  ( (this.time - tStartInsp)/this.Tramp );
+		}
+
+		else {
+			this.Fip = inFlow;
+		}
+
 		this.Pao = (this.Fop * lung.Raw) + lung.Palv;
-		this.Fop = sv.Phasitron.Fop(inFlow, this.Pao);
+		this.Fop = sv.Phasitron.Fop(this.Fip, this.Pao);
 		lung.flow = this.Fop;
 
 		lung.Vt += this.Fop * this.Tsampl;
