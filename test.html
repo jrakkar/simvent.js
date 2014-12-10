@@ -18,7 +18,8 @@ margin:0px;
 }
 .graph {
 	height:175px;
-	width:575px;
+	/*width:575px;*/
+	width:100%;
 }
 
 #container {
@@ -39,12 +40,14 @@ tr:nth-child(odd) {
 	}
 
 #panel {
-position:fixed;
-right:0;
-height:100%;
+	z-index:1;
+	background-color:white;
+	position:fixed;
+	right:-200px;
+	height:100%;
 	box-shadow:0px 0px 10px;
 	margin-top:0px;
-transition: all 1s linear;
+	transition: all 1s ;
 }
 
 </style>
@@ -72,12 +75,12 @@ transition: all 1s linear;
 
 <script>
 var flotConf = {
-	yaxis:{labelWidth:50}
+	yaxis:{labelWidth:30}
 };
 var lung = new sv.SimpleLung();
 lung.Raw = 5;
 var VDR = sv.VDR;
-VDR.Tsampl=0.0005;
+VDR.Tsampl=0.001;
 VDR.Fiph=1.5;
 VDR.Fipl=0.1;
 VDR.Tvent=6;
@@ -102,11 +105,27 @@ $.plot("#graph6", [timeData.map(function(d){return [d.time, d.Vt]})], flotConf);
 var params = [
 	"Tsampl",
 	"Tip",
+	"Fiph",
+	"Fipl",
 	"Tep"
 ];
 
 for(i in params){
-	$("#params").append("<tr><td>" + params[i] + "</td><td>" + VDR[params[i]] +"</td></tr>");
+	$("#params").append("<tr><td>" + params[i] + " :  </td><td>" + VDR[params[i]] +"</td></tr>");
 }
+
+$(window).keypress(function(event){
+
+	if (event.which == 109){
+		var pos = $("#panel").css("right");
+		if (pos == "0px"){
+			$("#panel").css("right", -200);
+		}
+		else{
+			$("#panel").css("right", 0);
+		}
+
+	}
+});
 
 </script>
