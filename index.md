@@ -12,5 +12,5 @@ var lung = new sv.SimpleLung();
 var vent = new sv.PresureControler();
 data = vent.ventilate(lung);
 
-var graph1 = new gs.quickGraph("#graph1", data.timeData, function(d){return d.time}, function(d){return d.Flung});
+var graph1 = new gs.quickGraph("#svg1", data.timeData, function(d){return d.time}, function(d){return d.Flung});
 </script>
