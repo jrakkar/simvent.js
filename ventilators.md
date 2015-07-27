@@ -3,7 +3,7 @@ title: Ventilator models
 ---
 The simvent.js library comes with two ventilators models.
 
-# sv.PresureControler
+## sv.PresureControler
 
 sv.PresureControler is a basic time trigered, presure controled, time cycled ventilator model. As you, wise respiratory therapist, have guessed, ventilating a lung with this ventilator result in a tipical decelerating flow patern.
 
