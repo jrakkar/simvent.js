@@ -9,9 +9,12 @@ Adding beautyful ventilator waveform to your documents or presentation is as eas
 
 	var lung = new sv.SimpleLung();
 	var vent = new sv.PresureControler();
-	data = vent.ventilate(lung);
+	var timeData = vent.ventilate(lung).timeData;
 
-	var graph1 = new gs.quickGraph("#svg1", data.timeData, function(d){return d.time}, function(d){return d.Flung});
+	fx = function(d){return d.time};
+	fy = function(d){return d.Flung};
+
+	var graph1 = new gs.quickGraph("#svg1", timeData, fx, fy);
 
 <svg class="graphcurve" id="svg1"></svg>
 <script src="https://raw.githubusercontent.com/ProgRT/VDR.js/master/simvent.js"></script>
@@ -20,7 +23,10 @@ Adding beautyful ventilator waveform to your documents or presentation is as eas
 <script>
 var lung = new sv.SimpleLung();
 var vent = new sv.PresureControler();
-data = vent.ventilate(lung);
+var timeData = vent.ventilate(lung).timeData;
 
-var graph1 = new gs.quickGraph("#svg1", data.timeData, function(d){return d.time}, function(d){return d.Flung});
+fx = function(d){return d.time};
+fy = function(d){return d.Flung};
+
+var graph1 = new gs.quickGraph("#svg1", timeData, fx, fy);
 </script>
