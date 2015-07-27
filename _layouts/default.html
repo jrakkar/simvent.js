@@ -10,6 +10,11 @@
 <script>hljs.initHighlightingOnLoad();</script>
 {{ page.extra_head }}
 <div id="content">
+	<ul class="nav">
+	{% for page in site.pages %}
+		<li> <a>{{ page.title }}</a></li>
+	{% endfor %}
+	</ul>
 	<h1>{{ page.title }}</h1>
 {{ content }}
 </div>

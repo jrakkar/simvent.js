@@ -5,6 +5,7 @@ body {
 }
 
 figcaption {
+	font-size: 9pt;
 	text-align: center;
 	font-weight: bold;
 	margin-top: 8px;
