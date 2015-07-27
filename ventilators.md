@@ -9,8 +9,20 @@ sv.PresureControler is a basic time trigered, presure controled, time cycled ven
 
 <figure>
 <svg id="svg1" class="graphcurve"></svg>
-<figcaption>Flow waveform produced by the PresureControler ventilator</figcaption>
+<figcaption>Flow waveform produced by the PresureControler ventilator.</figcaption>
 </figure>
+
+## sv.VDR
+
+sv.VDR is high frequency ventilator aiming to mimic Percussionaire's VDR-4.
+
+<figure>
+<svg id="svg2" class="graphcurve"></svg>
+<figcaption>Presure waveform produced by the VDR ventilator.</figcaption>
+</figure>
+
+
+
 <script>
 var lung = new sv.SimpleLung();
 var ventilator = new sv.PresureControler();
@@ -18,5 +30,12 @@ var data = ventilator.ventilate(lung);
 
 fx = function(d){return d.time};
 fy1 = function(d){return d.Flung};
-var graph = gs.quickGraph( "#svg1", data.timeData, fx, fy1).setidx("Temps").setidy("Flow");
+var graph = gs.quickGraph( "#svg1", data.timeData, fx, fy1).setidx("Time").setidy("Flow");
+
+var ventilator = new sv.VDR();
+var data = ventilator.ventilate(lung);
+
+fy2 = function(d){return d.Pcirc};
+var graph = gs.quickGraph( "#svg2", data.timeData, fx, fy2).setidx("Time").setidy("Presure");
 </script>
+
