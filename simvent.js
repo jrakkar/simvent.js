@@ -1,134 +1,338 @@
-var ssv = {} // SSV pour Simplified SimVent
+var sv = {}
 
-ssv.PoumonCool = function(){
+sv.log = function(lung, vent){
+	return {
+
+		// Lung variables
+		
+		time: vent.time,
+		Flung: lung.flow,
+		Palv: lung.Palv,
+		Vt: lung.Vt,
+		Vti: lung.Vti,
+		Vte: lung.Vte,
+		PCO2: lung.PCO2,
+		SCO2: lung.SCO2,
+		VCO2: lung.VtCO2,
+
+		// Ventilator variables
+
+		Pao: vent.Pao,
+		Fip: vent.Fip,
+		Fop: vent.Fop,
+		stateP: vent.stateP,
+		Pcirc: vent.Pcirc
+	};
+}
+
+sv.logPerc = function(lung, vent){
+	return {
+		time: vent.time,
+		Vtip: lung.Vtip,
+		Vtep: lung.Vtep
+	};
+}
+
+sv.syg = function(x, ymax, ymin, xid, kid){
+	return y;
+}
+
+sv.avg = function(dataset, data, Nroll){
+	
+	//console.log("Averaging " + data);
+	
+	for(i = 0; i < dataset.length - (Nroll -1); i ++){
+		
+		var curent = i;
+
+		var avged = dataset[curent][data];
+
+		//avged += dataset[curent +1][data];
+
+		for(i2 = curent + 1; i2 < (curent + Nroll) ; i2 ++){
+			avged += dataset[i2][data];
+		}
+
+		dataset[curent][data] = avged/Nroll;
+	}
+}
+
+sv.SimpleLung = function(){
 
 	// Propriété statiques
-	this.echantillonnage = 0.001; // Secondes
-	this.compliance = 50.0 ;// ml/cmH2O
-	this.resistance = 5.0 ;// cmH2O/l/s
-	this.Vem = 0.1;
+	this.Tsamp = 0.001; // Secondes
+	this.Crs = 50.0 ;// ml/cmH2O
+	this.Raw = 5.0 ;// cmH2O/l/s
+	this.Vdaw = 0.1;
 	this.PiCO2 = 0.0;
 	this.PACO2 = 35.0;
 	this.Pente2 = 0.003;
 	this.Pente3 = 5;
 
 	//Propriété dynamiques
-	this.pco2 = 0;
-	this.fco2 = 0;
-	this.vc = 0.0;
-	this.palv = 0.0;
-	this.debit = 0.0;
-	this.vcmax = 0;
-	this.veco2 = 0;
+	this.PCO2 = 0;
+	this.SCO2 = 0;
+	this.Vt = 0.0;
+	this.Palv = 0.0;
+	this.flow = 0.0;
+	this.Vtmax = 0;
+	this.VtCO2 = 0;
 	
 	this.appliquer_pression = function (pression, duree){
 
-		var temps = 0.0;
+		var time = 0.0;
 		var deltaVolume = 0.0;
 
-		while (temps < duree){
+		while (time < duree){
 
-			this.debit = (pression - this.palv) / this.resistance ; // l/s
-			deltaVolume = this.debit * this.echantillonnage; // l
-			this.vc += deltaVolume; // l
-			this.palv = (1000 *this.vc)  / (this.compliance);
+			this.flow = (pression - this.Palv) / this.Raw ; // l/s
+			deltaVolume = this.flow * this.Tsamp; // l
+			this.Vt += deltaVolume; // l
+			this.Palv = (1000 *this.Vt)  / (this.Crs);
 
-			if (this.debit > 0){
-				this.vcmax = this.vc;
-				this.pco2 = 0;
-				this.vce = 0;
-				this.fco2 = 0;
-				this.veco2 = 0;
+			if (this.flow > 0){
+				this.Vtmax = this.Vt;
+				this.PCO2 = 0;
+				this.Vte = 0;
+				this.SCO2 = 0;
+				this.VtCO2 = 0;
 			}
+
 			else {
-				this.vce = this.vcmax - this.vc;
-				this.pco2 = this.co2(this.vce);
-				this.fco2 = this.pco2/(760-47);
-				this.veco2 += this.fco2 * (-deltaVolume);
+				this.Vte = this.Vtmax - this.Vt;
+				this.PCO2 = this.co2(this.Vte);
+				this.SCO2 = this.PCO2/(760-47);
+				this.VtCO2 += this.SCO2 * (-deltaVolume);
 			}
 
-			temps += this.echantillonnage;
+			time += this.Tsamp;
 		}
 	};
 
 	this.co2 = function(volume){
 
-		this.VcAlv = this.vcmax - this.Vem;
+		this.VcAlv = this.Vtmax - this.Vdaw;
 		this.PplCO2 = this.PACO2 - (this.Pente3 * (this.VcAlv / 2));
 
-		co2 = this.PiCO2 + (this.PplCO2 - this.PiCO2)/(1 + Math.pow(Math.E,((this.Vem - volume)/this.Pente2)))
+		co2 = this.PiCO2 + (this.PplCO2 - this.PiCO2)/(1 + Math.pow(Math.E,((this.Vdaw - volume)/this.Pente2)))
 
-		if (volume > this.Vem) {
-			co2 += this.Pente3 * (volume - this.Vem);
+		if (volume > this.Vdaw) {
+			co2 += this.Pente3 * (volume - this.Vdaw);
 		}
 
 		return co2;
 	};
 
+};
+
+
+sv.PresureControler = function(){
+	this.Pinspi = 10;
+	this.PEP = 0;
+	this.Ti = 1;
+	this.time = 0;
+	this.echantillonnage = 0.001;
+	this.nbcycles = 3;
+	
+	this.ventilate = function(lung){
+
+		var timeData = [];
+		var respd = [];
+		this.time = 0.0;
+		for (c=0;c < this.nbcycles;c++){
+			var tdeb = this.time;
+
+			while(this.time < (tdeb + this.Ti)){
+				lung.appliquer_pression(this.Pinspi, this.echantillonnage)
+
+				timeData.push(sv.log(lung, this));
+
+				this.time += this.echantillonnage;	
+			}
+
+			while(this.time < (tdeb + this.Ti *3)){
+				lung.appliquer_pression(this.PEP, this.echantillonnage)
+				timeData.push(sv.log(lung, this));
+				this.time += this.echantillonnage;	
+			}
+			var pmeco2 = ((760-47) * lung.veco2/lung.vce);
+			respd.push({
+				pmeco2:pmeco2,
+				petco2:lung.pco2,
+				pAco2: lung.PACO2,
+				fowler: lung.Vem/lung.vce,
+				bohr: (lung.PACO2 - pmeco2)/lung.PACO2,
+			});
+		}
+
+		return {
+			timeData: timeData,
+			respd:respd
+		};
+	};
 
 };
 
 
-ssv.GenerateurPression = function(){
-	this.Pinspi = 10;
-	this.PEP = 0;
-	this.Ti = 1;
-	this.temps = 0;
-	this.echantillonnage = 0.001;
-	this.nbcycles = 3;
+//  *****************************************
+//  VDR Ventilator
+//  *****************************************
+
+
+sv.Phasitron = {};
+sv.Phasitron.Fop = function(Fip, Pao){
+	if(Pao >= 0 && Pao <=40){
+		return Fip + (Fip * (5 -(Pao/8)));
+	}
+	else if(Pao > 40){return Fip;}
+	else if(Pao < 0){return 6 * Fip;}
+};
+
+sv.VDR = function(){
+	this.Tsampl = 0.001;
+	this.Tramp= 0.005;
+	this.Tvent= 15; //The length of time the lung will be ventilated
+	this.Tic= 1; // Convective inspiratory time
+	this.Tec= 1; // Convective expiratory time
+	this.Fperc= 500;
+	this.Rit= 0.5; //Ratio of inspiratory time over total time (percussion)
+	this.Fipl= 1; // Percussive expiratory time
+	this.Fiph= 2; // Percussive expiratory time
+
+	/* Presure at the airway openning does not usualy fall
+	 * immediatly at zero during expiratory phase. This suggest
+	 * a small resistance of the txpiratory circuit.
+	 */
+	this.Rexp= 0.5; // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
 	
-	this.ventiler = function(poumon){
+	this.rolingAverage= 2;
+	this.lowPassFactor= 2;
 
-		var ventd = [];
-		var respd = [];
-		this.temps = 0.0;
-		for (c=0;c < this.nbcycles;c++){
-			var tdeb = this.temps;
 
-			while(this.temps < (tdeb + this.Ti)){
-				poumon.appliquer_pression(this.Pinspi, this.echantillonnage)
+	this.dataToFilter= [
+			"Pao",
+			"Flung"
+		];
 
-				ventd.push({
-					temps: this.temps,
-					debit: poumon.debit,
-					palv: poumon.palv,
-					pcirc: this.Pinspi,
-					vc: poumon.vc,
-					vce: poumon.vce,
-					pco2: poumon.pco2,
-					fco2: poumon.fco2,
-					vco2: poumon.veco2
-				});
+	//Variable data
 
-				this.temps += this.echantillonnage;	
-			}
+	this.time= 0; //The pseudo internal clock of the ventilator
+	this.Fop=0; //Phasitron output flow
+	this.Fip=0; //Phasitron output flow
+	this.Pao=0;//Presure at the ariway openning (phasitron output)
 
-			while(this.temps < (tdeb + this.Ti *3)){
-				poumon.appliquer_pression(this.PEP, this.echantillonnage)
-				ventd.push({
-					temps: this.temps,
-					debit: poumon.debit,
-					palv: poumon.palv,
-					pcirc: this.PEP,
-					vc: poumon.vc,
-					vce: poumon.vce,
-					pco2: poumon.pco2,
-					fco2: poumon.fco2,
-					vco2: poumon.veco2
-				});
-				this.temps += this.echantillonnage;	
-			}
-			var pmeco2 = ((760-47) * poumon.veco2/poumon.vce);
-			respd.push({
-				pmeco2:pmeco2,
-				petco2:poumon.pco2,
-				pAco2: poumon.PACO2,
-				fowler: poumon.Vem/poumon.vce,
-				bohr: (poumon.PACO2 - pmeco2)/poumon.PACO2,
-			});
+	this.percussiveExpiration = function(lung){
+		// Must be executed in a scope where te timeData container is defined
+		lung.flow = 0;
+		this.Fip = 0;
+		this.Fop = 0;
+		this.stateP = 0;
+		lung.Vtep = 0;
+		var tStopPerc = this.time + this.Tep;
+		while (this.time < tStopPerc){
+			this.Pao = - lung.flow * this.Rexp;
+			
+			lung.flow = (this.Pao - lung.Palv)/lung.Raw;
+			//lung.flow = -9;
+			var deltaVol = lung.flow * this.Tsampl;
+			lung.Vt += deltaVol;
+			lung.Vtep += deltaVol;
+			lung.Palv = 1000 * lung.Vt / lung.Crs;
+			
+			timeData.push(sv.log(lung, this));
+			this.time += this.Tsampl;
+		}
+	}
+
+	this.percussiveInspiration = function(lung, inFlow){
+		// Must be executed in a scope where te timeData container is defined
+		this.stateP = 1;
+		lung.Vtip = 0;
+		this.Fip = inFlow
+		var tStartInsp = this.time;
+		var tStopRamp = this.time + this.Tramp;
+		var tStopPerc = this.time + this.Tip;
+
+		while (this.time < tStopPerc){
+
+			this.Fip = inFlow;
+			this.Pao = (this.Fop * lung.Raw) + lung.Palv;
+			this.Fop = sv.Phasitron.Fop(this.Fip, this.Pao);
+			lung.flow = this.Fop;
+
+			var deltaVol = this.Fop * this.Tsampl;
+			lung.Vt += deltaVol;
+			lung.Vtip += deltaVol;
+			lung.Palv = 1000 * lung.Vt / lung.Crs;
+			
+			timeData.push(sv.log(lung, this));
+			this.time += this.Tsampl;
+		}
+		
+	}
+
+	this.convectiveInspiration = function(lung){
+		var tStopConv = this.time + this.Tic;
+		while (this.time < tStopConv && this.time < this.Tvent){
+			this.percussiveInspiration(lung, this.Fiph);
+			this.percussiveExpiration(lung);
+			percData.push(sv.logPerc(lung, this));
+		}
+	}
+
+	this.convectiveExpiration = function(lung){
+		var tStopConv = this.time + this.Tec;
+		while (this.time < tStopConv && this.time < this.Tvent){
+			this.percussiveInspiration(lung, this.Fipl);
+			this.percussiveExpiration(lung);
+			percData.push(sv.logPerc(lung, this));
+		}
+	}
+
+	this.ventilate = function(lung){
+
+		this.Ttot = 60 / this.Fperc;
+		this.Tip = this.Ttot * this.Rit;
+		this.Tep = this.Ttot - this.Tip;
+
+		timeData = [];
+		convData = [];
+		percData = [];
+
+		while (this.time < this.Tvent){
+			
+			this.convectiveExpiration(lung);
+			//convData.push(this.logConv());
+			this.convectiveInspiration(lung);
+
 		}
 
-		return {ventd: ventd, respd:respd};
+		if(this.lowPassFactor > 1){
+
+			for (index in this.dataToFilter){
+				var id = this.dataToFilter[index];
+				var smoothed = timeData[0][id];
+				for (var jndex = 1, len = timeData.length; jndex<len; ++jndex){
+					var currentValue = timeData[jndex][id];
+					smoothed += (currentValue - smoothed) / this.lowPassFactor;
+					timeData[jndex][id] = smoothed;
+				}
+
+			}
+		}
+
+		if(this.rolingAverage >= 2){
+
+			for (index in this.dataToFilter){
+				sv.avg(timeData, this.dataToFilter[index], this.rolingAverage);
+			}
+		}
+		
+		return {
+			timeData: timeData,
+			percData: percData,
+			convData: convData
+		};
 	};
 
 };
