@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="css/layout.css" />
 <link rel="stylesheet" href="css/typography.css" />
 <link rel="stylesheet" href="css/colors.css" />
+<link rel="stylesheet" href="css/nav.css" />
 <script src="https://raw.githubusercontent.com/ProgRT/simvent.js/master/simvent.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
 <script src="https://raw.githubusercontent.com/ProgRT/graphsimple.js/master/graphsimple.js"></script>
@@ -12,7 +13,7 @@
 <div id="content">
 	<ul class="nav">
 	{% for page in site.pages %}
-		<li> <a>{{ page.title }}</a></li>
+		<li> <a href="{{ page.url }}">{{ page.title }}</a></li>
 	{% endfor %}
 	</ul>
 	<h1>{{ page.title }}</h1>
