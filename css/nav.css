@@ -1,6 +1,12 @@
 ul.nav li {
   display: inline;
+  margin-left: 6px;
+  margin-right: 6px;
 }
 ul.nav {
   padding-left: 0px;
+}
+
+.nav a{
+  text-decoration-line: unset;
 }
