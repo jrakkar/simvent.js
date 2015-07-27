@@ -35,7 +35,7 @@ var graph = gs.quickGraph( "#svg1", data.timeData, fx, fy1).setidx("Time").setid
 var ventilator = new sv.VDR();
 var data = ventilator.ventilate(lung);
 
-fy2 = function(d){return d.Pcirc};
+fy2 = function(d){return d.Pao};
 var graph = gs.quickGraph( "#svg2", data.timeData, fx, fy2).setidx("Time").setidy("Presure");
 </script>
 
