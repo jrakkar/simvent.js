@@ -20,9 +20,6 @@ Adding beautyful ventilator waveforms to your documents or presentations is as e
 	var graph1 = new gs.quickGraph("#svg1", timeData, fx, fy);
 
 <svg class="graphcurve" id="svg1"></svg>
-<script src="https://raw.githubusercontent.com/ProgRT/VDR.js/master/simvent.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
-<script src="https://raw.githubusercontent.com/ProgRT/graphsimple.js/master/graphsimple.js"></script>
 <script>
 var lung = new sv.SimpleLung();
 var vent = new sv.PresureControler();
