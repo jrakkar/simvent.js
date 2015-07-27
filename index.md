@@ -7,8 +7,8 @@ simvent.js is a mechanical ventilation simulation library. It use mathematicla m
 <script src="https://raw.githubusercontent.com/ProgRT/VDR.js/simvent.js"></script>
 <script src="https://raw.githubusercontent.com/ProgRT/graphsimple.js/graphsimple.js"></script>
 <script>
-var lung = new vs.SimpleLung();
-var vent = new vs.PresureControler();
+var lung = new sv.SimpleLung();
+var vent = new sv.PresureControler();
 data = vent.ventilate(lung);
 
 gs.QuickGraph("#graph1", function(d){return d.time}, function(d){return d.Flung});
