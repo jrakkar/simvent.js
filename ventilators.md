@@ -17,6 +17,6 @@ var ventilator = new sv.PresureControler();
 var data = ventilator.ventilate(lung);
 
 fx = function(d){return d.time};
-fy1 = function(d){return f.Flung};
+fy1 = function(d){return d.Flung};
 var graph = gs.quickGraph( "#svg1", data.timeData, fx, fy1).setidx("Temps").setidy("Flow");
 </script>
