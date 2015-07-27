@@ -10,7 +10,7 @@ sv.PresureControler is a basic time trigered, presure controled, time cycled ven
 <figure>
 <svg id="svg1" class="graphcurve"></svg>
 <figcaption>Flow waveform produced by the PresureControler ventilator</figcaption>
-<figure>
+</figure>
 <script>
 var lung = new sv.SimpleLung();
 var ventilator = new sv.PresureControler();
@@ -21,3 +21,4 @@ var graph = gs.quickGraph(
 data.timeData,
 function(d){return d.time},
 function(d){return d.Flung).setidx("Temps").setidy("Flow");
+</script>
