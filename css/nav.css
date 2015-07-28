@@ -4,6 +4,8 @@ ul.nav {
 
 ul.nav li {
   display: inline;
+  margin-left: 6px;
+  margin-right: 6px;
 }
 
 ul.nav li:not(:first-child):before {
@@ -17,4 +19,8 @@ a:visited {
 }
 a:hover {
 color: blue;
+}
+
+.nav a{
+  text-decoration-line: unset;
 }
