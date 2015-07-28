@@ -191,13 +191,13 @@ sv.Phasitron.Fop = function(Fip, Pao){
 sv.VDR = function(){
 	this.Tsampl = 0.001;
 	this.Tramp= 0.005;
-	this.Tvent= 15; //The length of time the lung will be ventilated
-	this.Tic= 1; // Convective inspiratory time
-	this.Tec= 1; // Convective expiratory time
+	this.Tvent= 12; //The length of time the lung will be ventilated
+	this.Tic= 2; // Convective inspiratory time
+	this.Tec= 2; // Convective expiratory time
 	this.Fperc= 500;
 	this.Rit= 0.5; //Ratio of inspiratory time over total time (percussion)
-	this.Fipl= 1; // Percussive expiratory time
-	this.Fiph= 2; // Percussive expiratory time
+	this.Fipl= 0.18; // Percussive expiratory time
+	this.Fiph= 1.8; // Percussive expiratory time
 
 	/* Presure at the airway openning does not usualy fall
 	 * immediatly at zero during expiratory phase. This suggest
