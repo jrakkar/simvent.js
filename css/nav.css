@@ -14,6 +14,9 @@ ul.nav li:not(:first-child):before {
   margin-right: 5px;
 }
 
+.nav a {
+color:inherit;
+}
 a:visited {
   color: inherit;
 }
