@@ -1,0 +1,10 @@
+---
+title: Gallery
+---
+{% for post in site.posts %}
+	<div class="galleryTile">
+	<a href="{{ site.baseurl }}{{ post.url }}">
+	{{ post.content }}
+	</a>
+	</div>
+{% endfor %}
