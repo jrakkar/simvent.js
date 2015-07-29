@@ -1,5 +1,14 @@
 baseurl: /simvent.js
 defaults:
  -
+  scope:
+   path: ""
+   type: "pages"
   values:
-   layout: "default"
+   layout: "page"
+ -
+  scope:
+   path: ""
+   type: "posts"
+  values:
+   layout: "post"

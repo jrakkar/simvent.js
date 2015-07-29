@@ -12,3 +12,18 @@ svg {
 	width: 550px;
 	height: 250px;
 }
+
+.galleryTile {
+width: 200px;
+height: 200px;
+float: left;
+overflow: hidden;
+border: 1px solid black;
+padding:0px;
+margin: 5px;
+transition: all ease .05s;
+}
+
+.galleryTile:hover {
+transform: scale(1.03);
+}
