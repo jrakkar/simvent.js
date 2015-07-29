@@ -27,3 +27,7 @@ figcaption:before {
 .nav a {
 	text-decoration:none;
 }
+
+.galleryTile a {
+	text-decoration: none;
+}
