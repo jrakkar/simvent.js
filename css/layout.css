@@ -13,6 +13,11 @@ svg {
 	height: 250px;
 }
 
+.square {
+	width: 450px;
+	height: 350px;
+}
+
 .galleryTile {
 width: 200px;
 height: 200px;
@@ -24,6 +29,15 @@ margin: 5px;
 transition: all ease .05s;
 }
 
+.galleryTile svg.graphcurve {
+transform: scale(0.9);
+transform-origin: 0% 0%;
+}
+
+.galleryTile svg.square {
+transform: scale(0.60);
+transform-origin: 0% 0%;
+}
 .galleryTile:hover {
 transform: scale(1.03);
 }
