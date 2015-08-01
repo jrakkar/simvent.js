@@ -128,7 +128,7 @@ sv.SimpleLung = function(){
 
 sv.PresureControler = function(){
 	this.Pinspi = 10;
-	this.PEP = 0;
+	this.PEEP = 0;
 	this.Ti = 1;
 	this.time = 0;
 	this.echantillonnage = 0.001;
@@ -142,16 +142,19 @@ sv.PresureControler = function(){
 		for (c=0;c < this.nbcycles;c++){
 			var tdeb = this.time;
 
+			this.Pao = this.Pinspi;
 			while(this.time < (tdeb + this.Ti)){
-				lung.appliquer_pression(this.Pinspi, this.echantillonnage)
+				lung.appliquer_pression(this.Pao, this.echantillonnage)
 
 				timeData.push(sv.log(lung, this));
 
 				this.time += this.echantillonnage;	
 			}
 
+			this.Pao = this.PEEP
 			while(this.time < (tdeb + this.Ti *3)){
-				lung.appliquer_pression(this.PEP, this.echantillonnage)
+				this.Pao = this.PEEP
+				lung.appliquer_pression(this.Pao, this.echantillonnage)
 				timeData.push(sv.log(lung, this));
 				this.time += this.echantillonnage;	
 			}
