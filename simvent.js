@@ -125,6 +125,77 @@ sv.SimpleLung = function(){
 
 };
 
+sv.SygLung = function(){
+
+	// Propriété statiques
+	this.Tsamp = 0.001; // Secondes
+	this.Vmax = 4;
+	this.Vmin = 0;
+	this.Pid = 5;
+	this.Kid = 20;
+	this.Raw = 5.0 ;// cmH2O/l/s
+	this.Vdaw = 0.1;
+	this.PiCO2 = 0.0;
+	this.PACO2 = 35.0;
+	this.Pente2 = 0.003;
+	this.Pente3 = 5;
+
+	//Propriété dynamiques
+	this.PCO2 = 0;
+	this.SCO2 = 0;
+	this.Palv = 0.0;
+	this.flow = 0.0;
+	this.Vtmax = 0;
+	this.VtCO2 = 0;
+	
+	this.Vt = this.Vmin + (this.Vmax - this.Vmin)/(1+Math.exp(-(this.Palv - this.Pid)/this.Kid))
+	this.appliquer_pression = function (pression, duree){
+
+		var time = 0.0;
+		var deltaVolume = 0.0;
+
+		while (time < duree){
+
+			this.flow = (pression - this.Palv) / this.Raw ; // l/s
+			deltaVolume = this.flow * this.Tsamp; // l
+			this.Vt += deltaVolume; // l
+			this.Vti += deltaVolume;
+			this.Palv = this.Pid - (this.Kid * Math.log(((this.Vmax - this.Vmin)/(this.Vt - this.Vmin))-1));
+
+			if (this.flow > 0){
+				this.Vtmax = this.Vt;
+				this.PCO2 = 0;
+				this.Vte = 0;
+				this.SCO2 = 0;
+				this.VtCO2 = 0;
+			}
+
+			else {
+				this.Vte = this.Vtmax - this.Vt;
+				this.PCO2 = this.co2(this.Vte);
+				this.SCO2 = this.PCO2/(760-47);
+				this.VtCO2 += this.SCO2 * (-deltaVolume);
+			}
+
+			time += this.Tsamp;
+		}
+	};
+
+	this.co2 = function(volume){
+
+		this.VcAlv = this.Vtmax - this.Vdaw;
+		this.PplCO2 = this.PACO2 - (this.Pente3 * (this.VcAlv / 2));
+
+		co2 = this.PiCO2 + (this.PplCO2 - this.PiCO2)/(1 + Math.pow(Math.E,((this.Vdaw - volume)/this.Pente2)))
+
+		if (volume > this.Vdaw) {
+			co2 += this.Pente3 * (volume - this.Vdaw);
+		}
+
+		return co2;
+	};
+
+};
 
 sv.PresureControler = function(){
 	this.Pinspi = 10;
@@ -143,6 +214,7 @@ sv.PresureControler = function(){
 			var tdeb = this.time;
 
 			this.Pao = this.Pinspi;
+			lung.Vti = 0;
 			while(this.time < (tdeb + this.Ti)){
 				lung.appliquer_pression(this.Pao, this.echantillonnage)
 
