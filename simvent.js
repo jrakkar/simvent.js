@@ -129,16 +129,16 @@ sv.SygLung = function(){
 
 	// Propriété statiques
 	this.Tsamp = 0.001; // Secondes
-	this.Vmax = 4;
-	this.Vmin = 0;
-	this.Pid = 5;
-	this.Kid = 20;
+	this.Vmax = 4.0;
+	this.Vmin = 0.0;
+	this.Pid = 5.0;
+	this.Kid = 20.0;
 	this.Raw = 5.0 ;// cmH2O/l/s
 	this.Vdaw = 0.1;
 	this.PiCO2 = 0.0;
 	this.PACO2 = 35.0;
 	this.Pente2 = 0.003;
-	this.Pente3 = 5;
+	this.Pente3 = 5.0;
 
 	//Propriété dynamiques
 	this.PCO2 = 0;
@@ -198,11 +198,11 @@ sv.SygLung = function(){
 };
 
 sv.PresureControler = function(){
-	this.Pinspi = 10;
-	this.PEEP = 0;
+	this.Pinspi = 10.0;
+	this.PEEP = 0.0;
 	this.Ti = 1;
 	this.time = 0;
-	this.echantillonnage = 0.001;
+	this.echantillonnage = 0.02;
 	this.nbcycles = 3;
 	
 	this.ventilate = function(lung){
@@ -249,9 +249,9 @@ sv.PresureControler = function(){
 };
 sv.PVCurve = function(){
 
-	this.Pmin = 10;
-	this.Pmax = 0;
-	this.Pstep = 1;
+	this.Pmin = -100.0;
+	this.Pmax = 100;
+	this.Pstep = 10;
 	this.Tman = 10;
 	this.echantillonnage = 0.001;
 	
@@ -259,22 +259,28 @@ sv.PVCurve = function(){
 
 	this.ventilate = function(lung){
 
-		this.nbStep = (this.Pmax - this.Pmin) /this.Pstep
-		this.Ti = this.Tman / this.nbStep
 
 		var timeData = [];
 		var respd = [];
+
 		this.time = 0.0;
-		var tdeb = this.time;
+		this.nbStep = (this.Pmax - this.Pmin) /this.Pstep
+		this.Ti = this.Tman / this.nbStep
 		this.Pao = this.Pmin
+		console.log(lung.Palv);
+		while(this.Pao < this.Pmax){
+			
+			var tdeb = this.time;
 
-		this.Pao = this.Pinspi;
-		while(this.Pvent < this.Pmax){
-			lung.appliquer_pression(this.Pvent, this.echantillonnage)
+			lung.Vti = 0;
+			while(this.time < (tdeb + this.Ti)){
+				//if (isNaN(lung.flow)){throw "Dooo at " + this.time}
+				lung.appliquer_pression(this.Pao, this.echantillonnage)
 
-			timeData.push(sv.log(lung, this));
+				timeData.push(sv.log(lung, this));
 
-			this.time += this.echantillonnage;	
+				this.time += this.echantillonnage;	
+			}
 			this.Pao += this.Pstep;
 		}
 

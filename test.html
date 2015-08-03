@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+	<title>simvent.js test page</title>
+
+	<script src="simvent.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+	<script src="graphsimple.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.js"></script>
+	<link rel="stylesheet" href="http://rawgit.com/ProgRT/graphsimple.js/master/css/graphsimple-clear.css" />
+
+	<style>
+		body {
+			text-align:center;
+		}
+
+		.graph {
+			width: 600px;
+			height: 200px;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div id="svg5" class="graph" style="float:right;height:400px;width:400px;"></div>
+	<div id="svg1" class="graph"></div>
+	<div id="svg2" class="graph"></div>
+	<div id="svg3" class="graph"></div>
+	<div id="svg4" class="graph"></div>
+
+	<script>
+		function plot(div, data, x, y){
+			var placeholder = $(div);
+			function fxy(d){
+				return [d[x], d[y]];
+			}
+			var dataset = {
+				data: data.map(fxy),
+				label: y
+			}
+			var plot = $.plot(placeholder, [dataset]);
+		}
+		var vent = new sv.PVCurve();
+		vent.Pmin = 0;
+		vent.Pmax = 50;
+		vent.Pstep = 2;
+
+		var lung1 = new sv.SygLung();
+		lung1.Kid = 5;
+		lung1.Pid = 10;
+
+		var lung2 = new sv.SimpleLung();
+		
+		console.log(lung.Palv);
+		var data = vent.ventilate(lung).timeData;
+		
+		plot("#svg1",data,"time", "Vt");
+		plot("#svg2",data,"time", "Palv");
+		plot("#svg3",data,"time", "Flung");
+		plot("#svg4",data,"time", "Pao");
+		plot("#svg5",data,"Pao", "Vt");
+		</script>
+
+</body>
+
