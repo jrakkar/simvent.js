@@ -247,6 +247,46 @@ sv.PresureControler = function(){
 	};
 
 };
+sv.PVCurve = function(){
+
+	this.Pmin = 10;
+	this.Pmax = 0;
+	this.Pstep = 1;
+	this.Tman = 10;
+	this.echantillonnage = 0.001;
+	
+	this.time = 0;
+
+	this.ventilate = function(lung){
+
+		this.nbStep = (this.Pmax - this.Pmin) /this.Pstep
+		this.Ti = this.Tman / this.nbStep
+
+		var timeData = [];
+		var respd = [];
+		this.time = 0.0;
+		var tdeb = this.time;
+		this.Pao = this.Pmin
+
+		this.Pao = this.Pinspi;
+		while(this.Pvent < this.Pmax){
+			lung.appliquer_pression(this.Pvent, this.echantillonnage)
+
+			timeData.push(sv.log(lung, this));
+
+			this.time += this.echantillonnage;	
+			this.Pao += this.Pstep;
+		}
+
+
+		return {
+			timeData: timeData,
+			respd:respd
+		};
+	};
+
+};
+
 
 
 //  *****************************************
