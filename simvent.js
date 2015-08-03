@@ -148,7 +148,8 @@ sv.SygLung = function(){
 	this.Vtmax = 0;
 	this.VtCO2 = 0;
 	
-	this.Vt = this.Vmin + (this.Vmax - this.Vmin)/(1+Math.exp(-(this.Palv - this.Pid)/this.Kid))
+	this.Vt = this.Vmin + (this.Vmax - this.Vmin)/(1.0+Math.exp(-(this.Palv - this.Pid)/this.Kid))
+
 	this.appliquer_pression = function (pression, duree){
 
 		var time = 0.0;
@@ -259,28 +260,26 @@ sv.PVCurve = function(){
 
 	this.ventilate = function(lung){
 
-
 		var timeData = [];
 		var respd = [];
 
+		timeData.push(sv.log(lung, this));
 		this.time = 0.0;
 		this.nbStep = (this.Pmax - this.Pmin) /this.Pstep
 		this.Ti = this.Tman / this.nbStep
 		this.Pao = this.Pmin
-		console.log(lung.Palv);
+
 		while(this.Pao < this.Pmax){
 			
 			var tdeb = this.time;
-
 			lung.Vti = 0;
+
 			while(this.time < (tdeb + this.Ti)){
-				//if (isNaN(lung.flow)){throw "Dooo at " + this.time}
 				lung.appliquer_pression(this.Pao, this.echantillonnage)
-
 				timeData.push(sv.log(lung, this));
-
 				this.time += this.echantillonnage;	
 			}
+
 			this.Pao += this.Pstep;
 		}
 
