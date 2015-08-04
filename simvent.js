@@ -148,8 +148,13 @@ sv.SygLung = function(){
 	this.Vtmax = 0;
 	this.VtCO2 = 0;
 	
-	this.Vt = this.Vmin + (this.Vmax - this.Vmin)/(1.0+Math.exp(-(this.Palv - this.Pid)/this.Kid))
+	//this.Vt = this.Vmin + (this.Vmax - this.Vmin)/(1.0+Math.exp(-(this.Palv - this.Pid)/this.Kid))
 
+	this.volume = function(P){
+		return this.Vmin + (this.Vmax - this.Vmin)/(1.0+Math.exp(-(P - this.Pid)/this.Kid))
+	}
+
+	this.Vt = this.volume(this.Palv);
 	this.appliquer_pression = function (pression, duree){
 
 		var time = 0.0;

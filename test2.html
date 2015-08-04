@@ -43,26 +43,17 @@
 			}
 			var plot = $.plot(placeholder, [dataset]);
 		}
-		var vent = new sv.PVCurve();
-		vent.Pmin = -60;
-		vent.Pmax = 60;
-		vent.Pstep = 2;
-		vent.echantillonnage = 0.01;
 
 		var lung1 = new sv.SygLung();
-		lung1.Kid = 5.0;
-		lung1.Pid = -30.0;
-		vent.Tman = 30;
-		lung1.Palv = vent.Pmin;
-		lung1.Vt = lung1.volume(lung1.Palv);
-		
-		var data = vent.ventilate(lung1).timeData;
-		
-		plot("#svg1",data,"time", "Vt");
-		plot("#svg2",data,"time", "Palv");
-		plot("#svg3",data,"time", "Flung");
-		plot("#svg4",data,"time", "Pao");
-		plot("#svg5",data,"Pao", "Vt");
+		var volumes = [];	
+		for (p=0;p<=60;p++){
+			volumes.push([p,lung1.volume(p)]);
+		}
+
+			
+		var placeholder = $("#svg1");
+		var plot = $.plot(placeholder, [volumes]);
+
 		</script>
 
 </body>
