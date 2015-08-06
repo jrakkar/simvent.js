@@ -127,13 +127,22 @@ sv.SimpleLung = function(){
 
 sv.SygLung = function(){
 
+	this.mechParams = [
+		{id: "Vmax"},
+		{id: "Vmin"},
+		{id: "Pid"},
+		{id: "Kid"}
+		];
+
 	// Propriété statiques
 	this.Tsamp = 0.001; // Secondes
+
 	this.Vmax = 4.0;
 	this.Vmin = 0.0;
 	this.Pid = 5.0;
 	this.Kid = 20.0;
 	this.Raw = 5.0 ;// cmH2O/l/s
+
 	this.Vdaw = 0.1;
 	this.PiCO2 = 0.0;
 	this.PACO2 = 35.0;
@@ -148,7 +157,6 @@ sv.SygLung = function(){
 	this.Vtmax = 0;
 	this.VtCO2 = 0;
 	
-	//this.Vt = this.Vmin + (this.Vmax - this.Vmin)/(1.0+Math.exp(-(this.Palv - this.Pid)/this.Kid))
 
 	this.volume = function(P){
 		return this.Vmin + (this.Vmax - this.Vmin)/(1.0+Math.exp(-(P - this.Pid)/this.Kid))
@@ -204,12 +212,21 @@ sv.SygLung = function(){
 };
 
 sv.PresureControler = function(){
+
 	this.Pinspi = 10.0;
 	this.PEEP = 0.0;
 	this.Ti = 1;
-	this.time = 0;
+
 	this.echantillonnage = 0.02;
 	this.nbcycles = 3;
+
+	this.time = 0;
+
+	this.ventParams = [
+		{id: "Pinspi"},
+		{id: "PEEP"},
+		{id: "Ti"}
+		];
 	
 	this.ventilate = function(lung){
 

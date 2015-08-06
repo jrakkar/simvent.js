@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+	<meta charset="utf-8">
+
+	<script src="jquery.min.js"></script>
+	<!--
+	<script src="jquery.flot.min.js"></script>
+	<script src="jquery.flot.resize.js"></script>
+	<script src="jquery.flot.navigate.min.js"></script>
+	<script src="jquery.flot.selection.min.js"></script>
+	-->
+	<script src="jquery.mobile.custom.min.js"></script>
+	<script src="dygraph-combined.js"></script>
+	<script src="synchronizer.js"></script>
+	<script src="simvent.js"></script>
+	<script src="dict.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="cockpit.css" charset="utf-8" />
+
+</head>
+
+<body>
+
+	<div id="head">
+		<div id="head-left">
+			<span><i>VDR.js</i></span>
+		</div>
+		<div id="head-right">
+			<!--
+			<span id="Help">Help</span>
+			-->
+			<span><a  id="About" onClick="$('#about').css('display', 'block')">About</a></span>
+		</div>
+	</div>
+
+	<div id="about" onClick="$(this).css('display', 'none')">
+		<div>
+			<div id="aboutHead"><pre>888     888 8888888b.  8888888b.       d8b          
+888     888 888  "Y88b 888   Y88b      Y8P          
+888     888 888    888 888    888                   
+Y88b   d88P 888    888 888   d88P     8888 .d8888b  
+ Y88b d88P  888    888 8888888P"      "888 88K      
+  Y88o88P   888    888 888 T88b        888 "Y8888b. 
+   Y888P    888  .d88P 888  T88b  d8b  888      X88 
+    Y8P     8888888P"  888   T88b Y8P  888  88888P' 
+                                       888          
+                                      d88P          
+				    888P"          </pre>      
+		</div>
+		<div id="copyright">
+			© 2014 Nicolas Blais St-Laurent
+		</div>
+		<div id="aboutText" lang="fr">
+		</div>
+	</div>
+	</div>
+
+	<div id="panel"> 
+		<table id="params">
+			<caption id="Parameters">Parameters</caption>
+		</table>
+
+		<table id="simParams">
+			<caption id="Simulator">Simulator</caption>
+		</table>
+
+		<table id="lung">
+		<caption id="Lung" >Lung</caption>
+		</table>
+
+		<div id="button"><button id="ventiler" value="ventiler" onClick="maj()">Ventiler</button></div>
+	</div>
+
+
+	<!--
+	<div id="dataPanel"> 
+		<table id="data">
+			<caption id="Parameters">Parameters</caption>
+		</table>
+	</div>
+	-->
+	<div id="graphics"> </div>
+
+
+	<script src="cockpit.js" ></script>
+	<script>
+		fp.init()
+	</script>
+</body>
+</html>
