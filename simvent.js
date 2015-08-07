@@ -57,12 +57,25 @@ sv.avg = function(dataset, data, Nroll){
 	}
 }
 
+//**************************
+//	Lung models
+//**************************
+
 sv.SimpleLung = function(){
 
-	// Propriété statiques
+	// Simulator parameters
 	this.Tsamp = 0.001; // Secondes
+
+	// Mechanical parameters
 	this.Crs = 50.0 ;// ml/cmH2O
 	this.Raw = 5.0 ;// cmH2O/l/s
+
+	this.mechParams = {
+		Crs: {unit: "ml/mbar"},
+		Raw: {unit: "mbra/l/s"}
+	}
+
+	// Gaz exchange parameters
 	this.Vdaw = 0.1;
 	this.PiCO2 = 0.0;
 	this.PACO2 = 35.0;
@@ -127,22 +140,26 @@ sv.SimpleLung = function(){
 
 sv.SygLung = function(){
 
-	this.mechParams = [
-		{id: "Vmax"},
-		{id: "Vmin"},
-		{id: "Pid"},
-		{id: "Kid"}
-		];
-
-	// Propriété statiques
+	this.tostring = function(){return "Allo"};
+	// Simulation parameters
 	this.Tsamp = 0.001; // Secondes
 
+	// Mechanical parameters
 	this.Vmax = 4.0;
 	this.Vmin = 0.0;
 	this.Pid = 5.0;
 	this.Kid = 20.0;
 	this.Raw = 5.0 ;// cmH2O/l/s
 
+	this.mechParams = {
+		Vmax: {unit: "l"},
+		Vmin: {unit: "l"},
+		Pid: {unit: "mbar"},
+		Kid: {unit: "mbar"},
+		Raw: {unit: "mbar/l/s"}
+	};
+
+	// Gaz exchange parameters
 	this.Vdaw = 0.1;
 	this.PiCO2 = 0.0;
 	this.PACO2 = 35.0;
@@ -211,22 +228,32 @@ sv.SygLung = function(){
 
 };
 
+
+
+//******************************
+//	Ventilator models
+//******************************
+
 sv.PresureControler = function(){
+
+	this.logParam = sv.logParam;
+	this.log = function(){this.logParam("ventParams");}
 
 	this.Pinspi = 10.0;
 	this.PEEP = 0.0;
 	this.Ti = 1;
+
+	this.ventParams = {
+		Pinspi:{},
+		PEEP:{},
+		Ti:{}
+	};
 
 	this.echantillonnage = 0.02;
 	this.nbcycles = 3;
 
 	this.time = 0;
 
-	this.ventParams = [
-		{id: "Pinspi"},
-		{id: "PEEP"},
-		{id: "Ti"}
-		];
 	
 	this.ventilate = function(lung){
 
@@ -270,12 +297,21 @@ sv.PresureControler = function(){
 	};
 
 };
+
 sv.PVCurve = function(){
 
 	this.Pmin = -100.0;
 	this.Pmax = 100;
 	this.Pstep = 10;
 	this.Tman = 10;
+
+	this.ventParams = {
+		Pmin: {},
+		Pmax: {},
+		Pstep: {},
+		Tman: {}
+	};
+
 	this.echantillonnage = 0.001;
 	
 	this.time = 0;
@@ -316,10 +352,6 @@ sv.PVCurve = function(){
 
 
 
-//  *****************************************
-//  VDR Ventilator
-//  *****************************************
-
 
 sv.Phasitron = {};
 sv.Phasitron.Fop = function(Fip, Pao){
@@ -331,9 +363,13 @@ sv.Phasitron.Fop = function(Fip, Pao){
 };
 
 sv.VDR = function(){
+	this.Tvent= 12; //The length of time the lung will be ventilated
 	this.Tsampl = 0.001;
 	this.Tramp= 0.005;
-	this.Tvent= 12; //The length of time the lung will be ventilated
+	this.Rexp= 0.5; // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
+	this.rolingAverage= 2;
+	this.lowPassFactor= 2;
+
 	this.Tic= 2; // Convective inspiratory time
 	this.Tec= 2; // Convective expiratory time
 	this.Fperc= 500;
@@ -341,15 +377,14 @@ sv.VDR = function(){
 	this.Fipl= 0.18; // Percussive expiratory time
 	this.Fiph= 1.8; // Percussive expiratory time
 
-	/* Presure at the airway openning does not usualy fall
-	 * immediatly at zero during expiratory phase. This suggest
-	 * a small resistance of the txpiratory circuit.
-	 */
-	this.Rexp= 0.5; // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
-	
-	this.rolingAverage= 2;
-	this.lowPassFactor= 2;
-
+	this.ventParams = {
+		Tic: {},
+		Tec: {},
+		Fperc: {},
+		Rit: {},
+		Fiph: {},
+		Fipl: {}
+	};
 
 	this.dataToFilter= [
 			"Pao",
@@ -478,3 +513,10 @@ sv.VDR = function(){
 	};
 
 };
+sv.logParam = function(dataset){
+	table = {};
+	for (param in this[dataset]){
+		table[param] = this[param];
+	}
+	console.table(table);
+}
