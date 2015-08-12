@@ -19,21 +19,21 @@ of modelizing CO₂ exhalation.
 
 
 <script>
-var lung = new sv.SimpleLung();
-var ventilator = new sv.PVCurve();
-var data = ventilator.ventilate(lung);
+	var lung = new sv.SimpleLung();
+	var ventilator = new sv.PVCurve();
+	var data = ventilator.ventilate(lung);
 
-fx = function(d){return d.Palv};
-fy1 = function(d){return d.Vt};
+	fx = function(d){return d.Palv};
+	fy1 = function(d){return d.Vt};
 
-var graph = gs.quickGraph( "#svg1", data.timeData, fx, fy1)
-	.setidx("Palv")
-	.setidy("Volume");
+	var graph = gs.quickGraph( "#svg1", data.timeData, fx, fy1)
+		.setidx("Palv")
+		.setidy("Volume");
 </script>
 
-## sv.SimpleLung
+## sv.SygLung
 
-sv.SimpleLung is a basic one compartment lung model with a linear compliance curve.  
+sv.SygLung is a basic one compartment lung model with a linear compliance curve.  
 Although it is very basic in regard of lung mechanics, it has the very cool feature
 of modelizing CO₂ exhalation.
 
@@ -44,7 +44,6 @@ of modelizing CO₂ exhalation.
 </figure>
 
 
-{% highlight html %}
 <script>
 var lung = new sv.SygLung();
 var ventilator = new sv.PVCurve();
@@ -57,4 +56,3 @@ var graph = gs.quickGraph( "#svg3", data.timeData, fx, fy1)
 	.setidx("Palv")
 	.setidy("Volume");
 </script>
-{% endhighlight %}

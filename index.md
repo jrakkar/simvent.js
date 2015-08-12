@@ -1,7 +1,8 @@
 ---
 title: simvent.js
+order: 1
 ---
-$$1_2$$
+
 simvent.js is a mechanical ventilation simulation library. 
 It use mathematical models to simulate the ventilation of lungs by medical ventilators. 
 
