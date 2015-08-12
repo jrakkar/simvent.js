@@ -37,6 +37,7 @@ sv.PVCurve is a presure steps based low flow presure - volume curve maneuver.
 	fx = function(d){return d.time};
 	fy1 = function(d){return d.Flung};
 	fy2 = function(d){return d.Pao};
+	fy3 = function(d){return d.Palv};
 
 	var ventilator = new sv.PresureControler();
 	var data = ventilator.ventilate(lung);

@@ -44,6 +44,7 @@ of modelizing CO₂ exhalation.
 </figure>
 
 
+{% highlight html %}
 <script>
 var lung = new sv.SygLung();
 var ventilator = new sv.PVCurve();
@@ -56,3 +57,4 @@ var graph = gs.quickGraph( "#svg3", data.timeData, fx, fy1)
 	.setidx("Palv")
 	.setidy("Volume");
 </script>
+{% endhighlight %}
