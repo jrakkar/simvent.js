@@ -3,7 +3,7 @@
 	<meta charset="utf-8">
 	<title>simvent.js test page</title>
 
-	<script src="simvent.js"></script>
+	<script src="https://rawgit.com/ProgRT/simvent.js/dev/simvent.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
 	<script src="graphsimple.js"></script>
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined.js"></script>
@@ -44,16 +44,16 @@
 			}
 			var plot = $.plot(placeholder, [dataset]);
 		}
-/*
 		var vent = new sv.PVCurve();
 		vent.Pmin = -60;
 		vent.Pmax = 60;
 		vent.Pstep = 2;
 		vent.echantillonnage = 0.01;
-*/
+/*
 		var vent = new sv.PresureControler();
 		vent.Pinspi = 30;
 
+*/
 		var lung1 = new sv.SygLung();
 		lung1.Kid = 5.0;
 		lung1.Pid = 20.0;
@@ -61,7 +61,6 @@
 		//lung1.Palv = vent.Pmin;
 		//lung1.Vt = lung1.volume(lung1.Palv);
 		
-		function go(){
 		var data = vent.ventilate(lung1).timeData;
 		
 		plot("#svg1",data,"time", "Vt");
@@ -69,8 +68,6 @@
 		plot("#svg3",data,"time", "Flung");
 		plot("#svg4",data,"time", "Pao");
 		plot("#svg5",data,"Palv", "Vt");
-		}
-go();
 		</script>
 
 </body>

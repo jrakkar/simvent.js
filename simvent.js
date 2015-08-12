@@ -321,7 +321,7 @@ sv.PVCurve = function(){
 		var timeData = [];
 		var respd = [];
 
-		timeData.push(sv.log(lung, this));
+		//timeData.push(sv.log(lung, this));
 		this.time = 0.0;
 		this.nbStep = (this.Pmax - this.Pmin) /this.Pstep
 		this.Ti = this.Tman / this.nbStep
