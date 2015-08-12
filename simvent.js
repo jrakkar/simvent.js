@@ -249,7 +249,7 @@ sv.PresureControler = function(){
 		Ti:{}
 	};
 
-	this.echantillonnage = 0.02;
+	this.Tsampl = 0.02;
 	this.nbcycles = 3;
 
 	this.time = 0;
@@ -266,19 +266,19 @@ sv.PresureControler = function(){
 			this.Pao = this.Pinspi;
 			lung.Vti = 0;
 			while(this.time < (tdeb + this.Ti)){
-				lung.appliquer_pression(this.Pao, this.echantillonnage)
+				lung.appliquer_pression(this.Pao, this.Tsampl)
 
 				timeData.push(sv.log(lung, this));
 
-				this.time += this.echantillonnage;	
+				this.time += this.Tsampl;	
 			}
 
 			this.Pao = this.PEEP
 			while(this.time < (tdeb + this.Ti *3)){
 				this.Pao = this.PEEP
-				lung.appliquer_pression(this.Pao, this.echantillonnage)
+				lung.appliquer_pression(this.Pao, this.Tsampl)
 				timeData.push(sv.log(lung, this));
-				this.time += this.echantillonnage;	
+				this.time += this.Tsampl;	
 			}
 			var pmeco2 = ((760-47) * lung.veco2/lung.vce);
 			respd.push({
@@ -312,7 +312,7 @@ sv.PVCurve = function(){
 		Tman: {}
 	};
 
-	this.echantillonnage = 0.001;
+	this.Tsampl = 0.001;
 	
 	this.time = 0;
 
@@ -333,9 +333,9 @@ sv.PVCurve = function(){
 			lung.Vti = 0;
 
 			while(this.time < (tdeb + this.Ti)){
-				lung.appliquer_pression(this.Pao, this.echantillonnage)
+				lung.appliquer_pression(this.Pao, this.Tsampl)
 				timeData.push(sv.log(lung, this));
-				this.time += this.echantillonnage;	
+				this.time += this.Tsampl;	
 			}
 
 			this.Pao += this.Pstep;
