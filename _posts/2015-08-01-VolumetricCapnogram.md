@@ -10,7 +10,7 @@ title: Volumetric capnogram
 
 		var lung = new sv.SimpleLung();
 		var ventilator = new sv.PresureControler();
-		ventilator.nbcycles = 1;
+		ventilatorventilator.nbcycles = 1;
 		var data = ventilator.ventilate(lung).timeData;
 
 		fx = function(d){return d.Vte};
@@ -28,6 +28,7 @@ title: Volumetric capnogram
 	var lung = new sv.SimpleLung();
 	var ventilator = new sv.PresureControler();
 	ventilator.nbcycles = 1;
+	ventilator.echantillonnage = .001;
 	var data = ventilator.ventilate(lung);
 
 	fx = function(d){return d.Vte};
