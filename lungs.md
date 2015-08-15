@@ -5,23 +5,39 @@ title: Lungs models
 The simvent.js comes with two lung models: a basic model with a linear presure - volume curve 
 and a more sofisticated model with a sigmoid presure - volume curve.
 
+Lung models are objects created with constructor function. 
+
+	var lung = new sv.SimpleLung;
+
+Their mechanical property are set by directly accessing the lung object property.
+
+	lung.Raw = 50 // cmH2O/l/s;
+
+
 ## sv.SimpleLung
 
-sv.SimpleLung is a basic one compartment lung model with a linear compliance curve.  
+sv.SimpleLung is a constructor for a basic one compartment lung model with a linear compliance curve.  
+
+It's default parameters are as folow:
+
+|Crs | 50 ml/cmH₂O|
+|Raw | 5 cmH₂O/l/s|
+
+
 Although it is very basic in regard of lung mechanics, it has the very cool feature
 of modelizing CO₂ exhalation.
 
 <figure>
 	<svg id="svg1" class="square"></svg>
-	<figcaption>SimpleLung model ventilated by a presure controler ventilator.</figcaption>
+	<figcaption>Presure - Volume curve of the sv.SimpleLung model.</figcaption>
 </figure>
 
 
 
 <script>
-	var lung = new sv.SimpleLung();
+	var SimpleLung = new sv.SimpleLung();
 	var ventilator = new sv.PVCurve();
-	var data = ventilator.ventilate(lung);
+	var data = ventilator.ventilate(SimpleLung);
 
 	fx = function(d){return d.Palv};
 	fy1 = function(d){return d.Vt};
@@ -33,21 +49,19 @@ of modelizing CO₂ exhalation.
 
 ## sv.SygLung
 
-sv.SygLung is a basic one compartment lung model with a linear compliance curve.  
-Although it is very basic in regard of lung mechanics, it has the very cool feature
-of modelizing CO₂ exhalation.
+sv.SygLung is a more sofisticated lung model with a sygmoid presure - volume curve.  
 
 
 <figure>
 	<svg id="svg3" class="square"></svg>
-	<figcaption>SygLung model ventilated by a presure controler ventilator.</figcaption>
+	<figcaption>Presure - Volume curve of the sv.SygLung model.</figcaption>
 </figure>
 
 
 <script>
-var lung = new sv.SygLung();
+var SygLung = new sv.SygLung();
 var ventilator = new sv.PVCurve();
-var data = ventilator.ventilate(lung);
+var data = ventilator.ventilate(SygLung);
 
 fx = function(d){return d.Palv};
 fy1 = function(d){return d.Vt};
