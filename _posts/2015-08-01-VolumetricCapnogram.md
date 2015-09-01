@@ -1,7 +1,7 @@
 ---
 title: Volumetric capnogram
 ---
-<svg id="svg{{ page.id | replace: "/", "" }}" class="square"></svg>
+<svg id="svg{{ page.id | replace: "/", "" }}" class="square surface"></svg>
 
 	<svg id="svg{{ page.id | replace: "/", "" }}" class="square"></svg>
 
