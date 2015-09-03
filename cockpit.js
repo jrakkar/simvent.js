@@ -226,7 +226,7 @@ fp.paramTable = function(params, obj, tableId){
 	for(i in params){
 
 		var param = params[i];
-		var id = param.id;
+		var id = i;
 		//var abrev = fp.translate(dict[id].short);
 		var abrev = id;
 		var unit = param.unit;
@@ -291,9 +291,9 @@ var lungParams = [
 	{id:"Raw",unit:"mbar/l/s", step: 1}
 ];
 
-//fp.paramTable(simParams, fp.VDR, "simParams"); 
+fp.paramTable(fp.VDR.simParams, fp.VDR, "simParams"); 
 fp.paramTable(fp.VDR.ventParams, fp.VDR, "params"); 
-fp.paramTable(lungParams, fp.lung, "lung"); 
+fp.paramTable(fp.lung.mechParams, fp.lung, "lung"); 
 
 //fp.dataTable(fp.dataParams, "data");
 

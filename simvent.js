@@ -249,9 +249,16 @@ sv.PresureControler = function(){
 		Ti:{}
 	};
 
+
+
+
 	this.Tsampl = 0.02;
 	this.nbcycles = 3;
 
+	this.simParams = {
+		Tsampl:{},
+		nbcycles:{}
+	};
 	this.time = 0;
 
 	
