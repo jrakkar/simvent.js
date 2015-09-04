@@ -50,16 +50,6 @@ fp.lowPassFactor = 3;
 
 // Initialisation des modeles
 
-fp.lung = new sv.SimpleLung();
-fp.lung.Raw = 5;
-
-fp.VDR = new sv.PresureControler();
-/*
-fp.VDR.Tsampl=0.002;
-fp.VDR.Fiph=3;
-fp.VDR.Fipl=.2;
-fp.VDR.Tvent=6;
-*/
 
 // *****************************
 // Filters
@@ -165,20 +155,31 @@ fp.updateFperc = function(){
 
 fp.updateModels = function(){
 
-	for(i in simParams){
+	/*
+	for(i in fp.VDR.simParams){
 		fp.VDR[simParams[i].id] = parseFloat($("#input" + simParams[i].id).val());
 	}
-
+*/
 	for(i in fp.VDR.ventParams){
-		id = fp.VDR.ventParams[i].id;
-		fp.VDR[id] = parseFloat($("#input" + id).val());
+		//id = fp.VDR.ventParams[i].id;
+		fp.VDR[i] = parseFloat($("#input" + i).val());
+	}
+	for(i in fp.VDR.simParams){
+		//id = fp.VDR.simParams[i].id;
+		fp.VDR[i] = parseFloat($("#input" + i).val());
 	}
 
 	fp.lung = new sv.SimpleLung();
 
-	for(i in lungParams){
+	for(i in fp.lung.mechParams){
+		//id = fp.VDR.ventParams[i].id;
+		fp.lung[i] = parseFloat($("#input" + i).val());
+	}
+	/*
+	for(i in fp.lung.mechParams){
 		fp.lung[lungParams[i].id] = parseFloat($("#input" + lungParams[i].id).val());
 	}
+	*/
 }
 
 fp.ventilate = function(){
@@ -290,14 +291,6 @@ var lungParams = [
 	{id: "Crs", unit: "ml/mbar", step: 1},
 	{id:"Raw",unit:"mbar/l/s", step: 1}
 ];
-
-fp.paramTable(fp.VDR.simParams, fp.VDR, "simParams"); 
-fp.paramTable(fp.VDR.ventParams, fp.VDR, "params"); 
-fp.paramTable(fp.lung.mechParams, fp.lung, "lung"); 
-
-//fp.dataTable(fp.dataParams, "data");
-
-
 
 /***************************************
  * Creating the graphs
@@ -550,7 +543,21 @@ function maj() {
 	fp.plotDygraph()
 }
 
+fp.lung = new sv.SimpleLung();
+fp.lung.Raw = 5;
+
+fp.VDR = new sv.PresureControler();
+/*
+fp.VDR.Tsampl=0.002;
+fp.VDR.Fiph=3;
+fp.VDR.Fipl=.2;
+fp.VDR.Tvent=6;
+*/
 fp.init = function(){
+
+//	fp.paramTable(fp.VDR.simParams, fp.VDR, "simParams"); 
+	fp.paramTable(fp.VDR.ventParams, fp.VDR, "params"); 
+	fp.paramTable(fp.lung.mechParams, fp.lung, "lung"); 
 
 	fp.initDyGraph()
 	maj();
