@@ -313,10 +313,10 @@ sv.PVCurve = function(){
 	this.Tman = 10;
 
 	this.ventParams = {
-		Pmin: {},
-		Pmax: {},
-		Pstep: {},
-		Tman: {}
+		Pmin: {unit: "mbar"},
+		Pmax: {unit: "mbar"},
+		Pstep: {unit: "mbar"},
+		Tman: {unit: "s"}
 	};
 
 	this.Tsampl = 0.001;
@@ -328,7 +328,6 @@ sv.PVCurve = function(){
 		var timeData = [];
 		var respd = [];
 
-		//timeData.push(sv.log(lung, this));
 		this.time = 0.0;
 		this.nbStep = (this.Pmax - this.Pmin) /this.Pstep
 		this.Ti = this.Tman / this.nbStep

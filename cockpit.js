@@ -48,8 +48,7 @@ fp.filters = [
 
 fp.lowPassFactor = 3;
 
-// Initialisation des modeles
-
+fp.paramContainer = "#panel";
 
 // *****************************
 // Filters
@@ -141,13 +140,13 @@ $("#aboutText").text(text);
 
 fp.updateFconv = function(){
 	fp.updateModels()
-	var f = Math.round(60 / (fp.VDR.Tic + fp.VDR.Tec));
+	var f = Math.round(60 / (fp.ventilator.Tic + fp.ventilator.Tec));
 	$("#dataFconv").text(f);
 };
 
 fp.updateFperc = function(){
 	fp.updateModels()
-	var f = Math.round(10 * fp.VDR.Fperc / 60)/10;
+	var f = Math.round(10 * fp.ventilator.Fperc / 60)/10;
 	$("#dataFperc").text(f);
 };
 
@@ -155,37 +154,26 @@ fp.updateFperc = function(){
 
 fp.updateModels = function(){
 
-	/*
-	for(i in fp.VDR.simParams){
-		fp.VDR[simParams[i].id] = parseFloat($("#input" + simParams[i].id).val());
+	for(i in fp.ventilator.ventParams){
+		//id = fp.ventilator.ventParams[i].id;
+		fp.ventilator[i] = parseFloat($("#input" + i).val());
 	}
-*/
-	for(i in fp.VDR.ventParams){
-		//id = fp.VDR.ventParams[i].id;
-		fp.VDR[i] = parseFloat($("#input" + i).val());
-	}
-	for(i in fp.VDR.simParams){
-		//id = fp.VDR.simParams[i].id;
-		fp.VDR[i] = parseFloat($("#input" + i).val());
+	for(i in fp.ventilator.simParams){
+		//id = fp.ventilator.simParams[i].id;
+		fp.ventilator[i] = parseFloat($("#input" + i).val());
 	}
 
 	fp.lung = new sv.SimpleLung();
-
 	for(i in fp.lung.mechParams){
-		//id = fp.VDR.ventParams[i].id;
+		//id = fp.ventilator.ventParams[i].id;
 		fp.lung[i] = parseFloat($("#input" + i).val());
 	}
-	/*
-	for(i in fp.lung.mechParams){
-		fp.lung[lungParams[i].id] = parseFloat($("#input" + lungParams[i].id).val());
-	}
-	*/
 }
 
 fp.ventilate = function(){
 
-	fp.VDR.time = 0;
-	fp.data = fp.VDR.ventilate(fp.lung);
+	fp.ventilator.time = 0;
+	fp.data = fp.ventilator.ventilate(fp.lung);
 	fp.timeData = fp.data.timeData
 }
 
@@ -221,84 +209,64 @@ fp.download = function(objArray)
 // Création du tableau des paramètres
 // **********************************
 
-fp.paramTable = function(params, obj, tableId){
-	var table = $("#" + tableId);
+fp.paramTable = function(object, paramSet, container, label){
+	if(typeof object[paramSet] != "undefined"){
+		$(label).detach();
+		$(container).append("<table id="+label+"></table>");
+		var table = $("#" + label) ; 
+		if(typeof label != "undefined"){table.append("<caption>"+label+"</caption>");}
 
-	for(i in params){
+		for(id in object[paramSet]){
 
-		var param = params[i];
-		var id = i;
-		//var abrev = fp.translate(dict[id].short);
-		var abrev = id;
-		var unit = param.unit;
+			var param = object[paramSet][id];
+			var abrev = id; // abrev will eventualy beset to a translated value
+			if (typeof param.unit != "undefined"){var unit = param.unit;}
+			else {var unit = "";}
 
-		var tr = $("<tr></tr>");
+			var tr = $("<tr></tr>");
 
-		var td = $("<td></td>")
-				//.attr("title", fp.translate(dict[id].long))
-				.html(abrev + " :")
+			var td = $("<td></td>")
+					//.attr("title", fp.translate(dict[id].long))
+					.html(abrev + " :")
+					.appendTo(tr);
+
+			var td = $("<td class=\"data\"></td>");
+			if (param.update){
+				var dataSpan = $("<span></span")
+					.attr("id", "data" + id)
+					.appendTo(td.children());
+			}
+			else{
+				var input = $("<input></input>")
+								.attr("id", 'input' + id)
+								.attr("value", object[id])
+								.attr("size", '6')
+								.attr("type", 'number')
+								.attr("step", param.step)
+								.click(function(){this.select()})
+								.appendTo(td);
+			}
+			tr.append(td);
+			var unitSpan = $("<td class='unit'>" + unit + "</td>")
 				.appendTo(tr);
 
-		var td = $("<td class=\"data\"></td>");
-		if (param.update){
-			var dataSpan = $("<span></span")
-				.attr("id", "data" + id)
-				.appendTo(td);
-		}
-		else{
-			var input = $("<input></input>")
-							.attr("id", 'input' + id)
-							.attr("value", obj[id])
-							.attr("size", '6')
-							.attr("type", 'number')
-							.attr("step", param.step)
-							.click(function(){this.select()})
-							.appendTo(td);
-		}
-		tr.append(td);
-		var unitSpan = $("<td class='unit'>" + unit + "</td>")
-			.appendTo(tr);
 
+			tr.appendTo(table);
 
-		table.append(tr);
-
-		if(param.callback){
-			$("#input" + id).change(param.callback);
+			if(param.callback){
+				$("#input" + id).change(param.callback);
+			}
 		}
 	}
 } 
-
-var simParams = [
-	{id: "Tvent", unit: "s", step: 1},
-	{id: "Tsampl", unit: "s", step: 0.0001},
-	{id: "rolingAverage", unit: "", step: 1},
-	{id: "lowPassFactor", unit: "", step: 1},
-	{id: "Rexp", unit: "mbar/l/s", step: 1}
-];
-
-var params = [
-	{id: "Fperc", unit: "/m", step: 50,callback: fp.updateFperc},
-	{id: "Fperc", unit: "Hz", update: 1},
-	{id: "Rit", unit: "", step:.1},
-	{id: "Tic", unit: "s", step: .1,callback: fp.updateFconv},
-	{id: "Tec", unit: "s", step: .1,callback: fp.updateFconv},
-	{id: "Fconv", unit: "/m", update: 1},
-	{id:"Fiph", unit: "l/m", step: .1},
-	{id:"Fipl", unit: "l/m", step: .01}
-];
-
-var lungParams = [
-	{id: "Crs", unit: "ml/mbar", step: 1},
-	{id:"Raw",unit:"mbar/l/s", step: 1}
-];
 
 /***************************************
  * Creating the graphs
  **************************************/
 
-var graphics = [];
+fp.graphics = [];
 
-var graphParams = [
+fp.timeSeries = [
 	"Pao",
 	//"Fop",
 	"Flung",
@@ -307,7 +275,7 @@ var graphParams = [
 	];
 
 
-var graphParams2 = [
+fp.timeSeries2 = [
 	{
 		id: "Pao", 
 		dataSets:[
@@ -328,38 +296,16 @@ var graphParams2 = [
 	}
 ];
 
-fp.initDyGraph2 = function(){
-	for (index in graphParams2){
-
-		var id = graphParams2[index].id;
-		var idgraph = "#graph" + id;
-		var label = fp.translate(dict[id].long);
-
-		var conf = fp.dygraphConf;
-		//conf.ylabel = label;
-		conf.title = label;
-		conf.labels = ["Time", id];
-
-		$("#graphics").append("<div class='graph' id='graph" + id + "'></div>");
-		var  div = document.getElementById("graph" + id);
-
-		graphics.push(new Dygraph(div, [[0,0]], fp.dygraphConf));
-	}
-	fp.sync = Dygraph.synchronize(
-			graphics,
-			{
-				selection: true,
-				zoom: true,
-				range: false
-			}
-			);
-}
 fp.initDyGraph = function(){
-	for (index in graphParams){
+	$(".graph").detach();
+	for (index in fp.timeSeries){
 
-		var id = graphParams[index];
+		var id = fp.timeSeries[index];
 		var idgraph = "#graph" + id;
-		var label = fp.translate(dict[graphParams[index]].long);
+		if (typeof dict[id] != "undefined"){
+			var label = fp.translate(dict[fp.timeSeries[index]].long);
+		}
+		else { label = id}
 
 		var conf = fp.dygraphConf;
 		//conf.ylabel = label;
@@ -369,10 +315,10 @@ fp.initDyGraph = function(){
 		$("#graphics").append("<div class='graph' id='graph" + id + "'></div>");
 		var  div = document.getElementById("graph" + id);
 
-		graphics.push(new Dygraph(div, [[0,0]], fp.dygraphConf));
+		fp.graphics.push(new Dygraph(div, [[0,0]], fp.dygraphConf));
 	}
 	fp.sync = Dygraph.synchronize(
-			graphics,
+			fp.graphics,
 			{
 				selection: true,
 				zoom: true,
@@ -380,35 +326,17 @@ fp.initDyGraph = function(){
 			}
 			);
 
-	// Interacton with graphics
-	/*
-
-	$(".graph").bind("plotselected", function( event, ranges){
-		fp.xmin = ranges.xaxis.from;
-		fp.xmax = ranges.xaxis.to;
-
-		fp.plot();
-
-		for (i in graphics){graphics[i].clearSelection();}
-	});
-
-	$(".graph").dblclick(function(){
-		fp.xmin = null;
-		fp.xmax = null;
-		fp.plot();
-	});
-	*/
 }
 fp.initFlotGraph = function(){
-	for (index in graphParams){
+	for (index in fp.timeSeries){
 
-		var id = graphParams[index];
+		var id = fp.timeSeries[index];
 		var idgraph = "#graph" + id;
-		var label = fp.translate(dict[graphParams[index]].long);
+		var label = fp.translate(dict[fp.timeSeries[index]].long);
 
 		$("#graphics").append("<div class='graph' id='graph" + id + "'></div>");
 
-		graphics.push($("#graph" + id).plot([], fp.flotConf).data("plot"));
+		fp.graphics.push($("#graph" + id).plot([], fp.flotConf).data("plot"));
 	}
 
 	// Interacton with graphics
@@ -419,7 +347,7 @@ fp.initFlotGraph = function(){
 
 		fp.plot();
 
-		for (i in graphics){graphics[i].clearSelection();}
+		for (i in fp.graphics){fp.graphics[i].clearSelection();}
 	});
 
 	$(".graph").dblclick(function(){
@@ -451,9 +379,9 @@ fp.plotFlot = function(){
 		var dataSet = fp.timeData;
 	}
 
-	for (index in graphParams){
+	for (index in fp.timeSeries){
 
-		var param = graphParams[index];
+		var param = fp.timeSeries[index];
 		var id = param;
 		var label = fp.translate(dict[id].long);
 
@@ -471,65 +399,30 @@ fp.plotFlot = function(){
 		
 		var flotData = [ {data:data, label:label} ];
 
-		graphics[index].setData(flotData);
-		graphics[index].setupGrid();
-		graphics[index].draw();
+		fp.graphics[index].setData(flotData);
+		fp.graphics[index].setupGrid();
+		fp.graphics[index].draw();
 	}
 }
 
-fp.plotDygraph2 = function(){
-
-	for (index in graphParams2){
-
-		var param = graphParams2[index];
-		console.log(param);
-		var data = [];
-
-		function f1(d, i, a){ 
-			var sample = [d["time"]]; 
-			for (i in param.dataSets){
-				dataset  = param.dataSets[i].dataSet;
-				key  = param.dataSets[i].key;
-				function f1(d, i, a){ return [ d["time"], d[key] ]; }
-				var data = fp.lowPass(fp.timeData.map(f1));
-			}
-			return sample;		
-		}
-		var data = fp.lowPass(fp.timeData.map(f1));
-		console.log(data);
-
-		graphics[index].updateOptions({file: data});
-		
-
-	}
-	graphics[0].resetZoom();
-}
 
 fp.plotDygraph = function(){
 
-	/*
-	if(fp.xmin && fp.xmax){
-		var dataSet = fp.timeData.filter(fp.cropData);
-	}
-	else{
-		var dataSet = fp.timeData;
-	}
-	*/
-	for (index in graphParams){
+	for (index in fp.timeSeries){
 
-		var param = graphParams[index];
+		var param = fp.timeSeries[index];
 		var id = param;
-		var label = fp.translate(dict[id].long);
+		//var label = fp.translate(dict[id].long);
 
 		function f1(d, i, a){ return [ d["time"], d[id] ]; }
 		
 		var data = fp.timeData.map(f1);
 
-		graphics[index].updateOptions({file: data});
+		fp.graphics[index].updateOptions({file: data});
 		
 
 	}
-	graphics[0].resetZoom();
+	fp.graphics[0].resetZoom();
 }
 
 function maj() {
@@ -546,19 +439,18 @@ function maj() {
 fp.lung = new sv.SimpleLung();
 fp.lung.Raw = 5;
 
-fp.VDR = new sv.PresureControler();
-/*
-fp.VDR.Tsampl=0.002;
-fp.VDR.Fiph=3;
-fp.VDR.Fipl=.2;
-fp.VDR.Tvent=6;
-*/
+fp.ventilator = new sv.PresureControler();
+
 fp.init = function(){
 
-//	fp.paramTable(fp.VDR.simParams, fp.VDR, "simParams"); 
-	fp.paramTable(fp.VDR.ventParams, fp.VDR, "params"); 
-	fp.paramTable(fp.lung.mechParams, fp.lung, "lung"); 
+	$(fp.paramContainer).children().remove();
+	fp.paramTable(fp.ventilator, "ventParams", fp.paramContainer, "Parameters"); 
+	fp.paramTable(fp.ventilator, 'simParams', fp.paramContainer, "Simulator"); 
+	fp.paramTable(fp.lung, "mechParams", fp.paramContainer, "Lung"); 
 
+	$(fp.paramContainer).append('<button id="ventiler" value="ventiler" onClick="maj()">Ventiler</button>');
+
+	fp.graphics = [];
 	fp.initDyGraph()
 	maj();
 	
@@ -566,5 +458,24 @@ fp.init = function(){
 	$("#panel input").keypress(function(event){
 		if (event.which == 13){ $("#ventiler").click(); }
 	});
+
+};
+fp.reinit = function(){
+
+	$(fp.paramContainer).children().remove();
+	fp.paramTable(fp.ventilator, "ventParams", fp.paramContainer, "Parameters"); 
+	fp.paramTable(fp.ventilator, 'simParams', fp.paramContainer, "Simulator"); 
+	fp.paramTable(fp.lung, "mechParams", fp.paramContainer, "Lung"); 
+
+	$(fp.paramContainer).append('<button id="ventiler" value="ventiler" onClick="maj()">Ventiler</button>');
+
+	fp.graphics = [];
+	fp.initDyGraph()
+	maj();
+	
+	// Gestion des racourcis clavier
+//	$("#panel input").keypress(function(event){
+//		if (event.which == 13){ $("#ventiler").click(); }
+//	});
 
 };
