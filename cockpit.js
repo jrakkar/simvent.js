@@ -231,10 +231,13 @@ fp.paramTable = function(object, paramSet, container, label){
 					.appendTo(tr);
 
 			var td = $("<td class=\"data\"></td>");
-			if (param.update){
-				var dataSpan = $("<span></span")
+			if (param.calculated == true){
+				var value = fp.ventilator[id];
+				console.log(value);
+				var dataSpan = $("<span></span>")
 					.attr("id", "data" + id)
-					.appendTo(td.children());
+					.html(value)
+					.appendTo(td);
 			}
 			else{
 				var input = $("<input></input>")
@@ -439,8 +442,6 @@ function maj() {
 fp.lung = new sv.SimpleLung();
 fp.lung.Raw = 5;
 
-fp.ventilator = new sv.PresureControler();
-
 fp.init = function(){
 
 	$(fp.paramContainer).children().remove();
@@ -458,24 +459,5 @@ fp.init = function(){
 	$("#panel input").keypress(function(event){
 		if (event.which == 13){ $("#ventiler").click(); }
 	});
-
-};
-fp.reinit = function(){
-
-	$(fp.paramContainer).children().remove();
-	fp.paramTable(fp.ventilator, "ventParams", fp.paramContainer, "Parameters"); 
-	fp.paramTable(fp.ventilator, 'simParams', fp.paramContainer, "Simulator"); 
-	fp.paramTable(fp.lung, "mechParams", fp.paramContainer, "Lung"); 
-
-	$(fp.paramContainer).append('<button id="ventiler" value="ventiler" onClick="maj()">Ventiler</button>');
-
-	fp.graphics = [];
-	fp.initDyGraph()
-	maj();
-	
-	// Gestion des racourcis clavier
-//	$("#panel input").keypress(function(event){
-//		if (event.which == 13){ $("#ventiler").click(); }
-//	});
 
 };

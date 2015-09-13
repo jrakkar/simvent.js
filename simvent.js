@@ -242,25 +242,39 @@ sv.PresureControler = function(){
 	this.Pinspi = 10.0;
 	this.PEEP = 0.0;
 	this.Ti = 1;
+	this.Fconv = 12;
 
 	this.ventParams = {
-		Pinspi:{},
-		PEEP:{},
-		Ti:{}
+		Pinspi:{unit: "cmH₂O"},
+		PEEP:{unit: "cmH₂O"},
+		Fconv:{unit:"/min."},
+		Ti:{unit: "cmH₂O"},
+		Te:{calculated: true, unit: "sec."},
+		Tcycle:{calculated: true, unit: "sec."}
 	};
 
+	this.updateTcycle = function(){
+		this.Tcycle = 60 / this.Fconv;
+	};
 
+	this.updateTe = function(){
+		this.Te = (60 / this.Fconv) - this.Ti;
+	};
 
+	this.calcParams = [
+		"Tcycle",
+		"Te"
+	];
 
 	this.Tsampl = 0.02;
 	this.nbcycles = 3;
 
 	this.simParams = {
-		Tsampl:{},
+		Tsampl:{unit: "s"},
 		nbcycles:{}
 	};
-	this.time = 0;
 
+	this.time = 0;
 	
 	this.ventilate = function(lung){
 
@@ -280,8 +294,9 @@ sv.PresureControler = function(){
 				this.time += this.Tsampl;	
 			}
 
+
 			this.Pao = this.PEEP
-			while(this.time < (tdeb + this.Ti *3)){
+			while(this.time < (tdeb + (60/this.Fconv))){
 				this.Pao = this.PEEP
 				lung.appliquer_pression(this.Pao, this.Tsampl)
 				timeData.push(sv.log(lung, this));
@@ -302,6 +317,15 @@ sv.PresureControler = function(){
 			respd:respd
 		};
 	};
+	
+	this.updateCalcParams = function(){
+		for (index in this.calcParams){
+			var fname = "update" + this.calcParams[index];
+			this[fname]();
+		}
+	}
+
+	this.updateCalcParams();
 
 };
 
