@@ -39,8 +39,6 @@ sv.syg = function(x, ymax, ymin, xid, kid){
 
 sv.avg = function(dataset, data, Nroll){
 	
-	//console.log("Averaging " + data);
-	
 	for(i = 0; i < dataset.length - (Nroll -1); i ++){
 		
 		var curent = i;
@@ -261,11 +259,6 @@ sv.PresureControler = function(){
 		this.Te = (60 / this.Fconv) - this.Ti;
 	};
 
-	this.calcParams = [
-		"Tcycle",
-		"Te"
-	];
-
 	this.Tsampl = 0.02;
 	this.nbcycles = 3;
 
@@ -319,9 +312,11 @@ sv.PresureControler = function(){
 	};
 	
 	this.updateCalcParams = function(){
-		for (index in this.calcParams){
-			var fname = "update" + this.calcParams[index];
-			this[fname]();
+		for (index in this.ventParams){
+			if(this.ventParams[index].calculated == true){
+				var fname = "update" + index;
+				this[fname]();
+			}
 		}
 	}
 

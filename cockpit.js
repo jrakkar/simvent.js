@@ -233,7 +233,6 @@ fp.paramTable = function(object, paramSet, container, label){
 			var td = $("<td class=\"data\"></td>");
 			if (param.calculated == true){
 				var value = fp.ventilator[id];
-				console.log(value);
 				var dataSpan = $("<span></span>")
 					.attr("id", "data" + id)
 					.html(value)
