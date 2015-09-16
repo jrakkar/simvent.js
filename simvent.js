@@ -388,28 +388,42 @@ sv.Phasitron.Fop = function(Fip, Pao){
 };
 
 sv.VDR = function(){
+
 	this.Tvent= 12; //The length of time the lung will be ventilated
 	this.Tsampl = 0.001;
 	this.Tramp= 0.005;
 	this.Rexp= 0.5; // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
-	this.rolingAverage= 2;
-	this.lowPassFactor= 2;
+	this.rAvg= 2;
+	this.lowPass= 2;
 
+	this.simParams = {
+		Tvent: {unit: "s"},
+		Tsampl: {unit: "s"},
+		Tramp: {unit: "s"},
+		Rexp: {unit: "cmH₂O/l/s"},
+		rAvg: {},
+		lowPass: {}
+	};
 	this.Tic= 2; // Convective inspiratory time
 	this.Tec= 2; // Convective expiratory time
 	this.Fperc= 500;
 	this.Rit= 0.5; //Ratio of inspiratory time over total time (percussion)
-	this.Fipl= 0.18; // Percussive expiratory time
-	this.Fiph= 1.8; // Percussive expiratory time
+	this.Fipl= 0.18; // 	
+	this.Fiph= 1.8; // 
 
 	this.ventParams = {
-		Tic: {},
-		Tec: {},
-		Fperc: {},
+		Tic: {unit: "s"},
+		Tec: {unit: "s"},
+		Fconv: {unit: "s", calculated: true},
+		Fperc: {unit: "/min"},
 		Rit: {},
-		Fiph: {},
-		Fipl: {}
+		Fiph: {unit: "l/s"},
+		Fipl: {unit: "l/s"}
 	};
+
+	this.updateFconv = function(){
+		this.Fconv = 60 / (this.Tic + this.Tec);
+	}
 
 	this.dataToFilter= [
 			"Pao",
@@ -509,24 +523,24 @@ sv.VDR = function(){
 
 		}
 
-		if(this.lowPassFactor > 1){
+		if(this.lowPass > 1){
 
 			for (index in this.dataToFilter){
 				var id = this.dataToFilter[index];
 				var smoothed = timeData[0][id];
 				for (var jndex = 1, len = timeData.length; jndex<len; ++jndex){
 					var currentValue = timeData[jndex][id];
-					smoothed += (currentValue - smoothed) / this.lowPassFactor;
+					smoothed += (currentValue - smoothed) / this.lowPass;
 					timeData[jndex][id] = smoothed;
 				}
 
 			}
 		}
 
-		if(this.rolingAverage >= 2){
+		if(this.rAvg >= 2){
 
 			for (index in this.dataToFilter){
-				sv.avg(timeData, this.dataToFilter[index], this.rolingAverage);
+				sv.avg(timeData, this.dataToFilter[index], this.rAvg);
 			}
 		}
 		
@@ -536,6 +550,17 @@ sv.VDR = function(){
 			convData: convData
 		};
 	};
+
+	this.updateCalcParams = function(){
+		for (index in this.ventParams){
+			if(this.ventParams[index].calculated == true){
+				var fname = "update" + index;
+				this[fname]();
+			}
+		}
+	}
+
+	this.updateCalcParams();
 
 };
 sv.logParam = function(dataset){

@@ -8,6 +8,7 @@ fp = {};
 
 
 fp.dygraphConf = {
+			color: "hsl(220, 100%, 36%)",
 			fillGraph:false,
 		  	drawGrid:false,
 		  	drawAxesAtZero:true,
@@ -49,6 +50,7 @@ fp.filters = [
 fp.lowPassFactor = 3;
 
 fp.paramContainer = "#panel";
+fp.progressDelay = 50;
 
 // *****************************
 // Filters
@@ -138,28 +140,23 @@ $("#aboutText").text(text);
 // Other unsorted functions
 // **********************************
 
-fp.updateFconv = function(){
-	fp.updateModels()
-	var f = Math.round(60 / (fp.ventilator.Tic + fp.ventilator.Tec));
-	$("#dataFconv").text(f);
-};
-
-fp.updateFperc = function(){
-	fp.updateModels()
-	var f = Math.round(10 * fp.ventilator.Fperc / 60)/10;
-	$("#dataFperc").text(f);
-};
-
-
-
 fp.updateModels = function(){
 
 	for(i in fp.ventilator.ventParams){
-		//id = fp.ventilator.ventParams[i].id;
-		fp.ventilator[i] = parseFloat($("#input" + i).val());
+		if(fp.ventilator.ventParams[i].calculated != true){
+			fp.ventilator[i] = parseFloat($("#input" + i).val());
+		}
 	}
+
+	fp.ventilator.updateCalcParams();
+	for(i in fp.ventilator.ventParams){
+		if(fp.ventilator.ventParams[i].calculated == true){
+			console.log("data"+i);
+			document.getElementById("data"+i).textContent = ""+ Math.round(10 * fp.ventilator[i])/10;
+		}
+	}
+
 	for(i in fp.ventilator.simParams){
-		//id = fp.ventilator.simParams[i].id;
 		fp.ventilator[i] = parseFloat($("#input" + i).val());
 	}
 
@@ -232,7 +229,7 @@ fp.paramTable = function(object, paramSet, container, label){
 
 			var td = $("<td class=\"data\"></td>");
 			if (param.calculated == true){
-				var value = fp.ventilator[id];
+				var value = Math.round(10 * fp.ventilator[id])/10;
 				var dataSpan = $("<span></span>")
 					.attr("id", "data" + id)
 					.html(value)
@@ -408,7 +405,7 @@ fp.plotFlot = function(){
 }
 
 
-fp.plotDygraph = function(){
+fp.plotDygraph1 = function(){
 
 	for (index in fp.timeSeries){
 
@@ -427,15 +424,70 @@ fp.plotDygraph = function(){
 	fp.graphics[0].resetZoom();
 }
 
-function maj() {
+fp.plotDygraph = function(index){
+
+		var param = fp.timeSeries[index];
+		var id = param;
+		//var label = fp.translate(dict[id].long);
+
+		function f1(d, i, a){ return [ d["time"], d[id] ]; }
+		
+		var data = fp.timeData.map(f1);
+
+		fp.graphics[index].updateOptions({file: data});
+		fp.pBarr.value = (index + 1)/fp.timeSeries.length;
+		
+	if(index < fp.timeSeries.length - 1){
+		++ index;
+		setTimeout(function(){
+			fp.plotDygraph(index)
+		}, 10);
+	}
+	else{
+		//fp.stopProgress();
+		setTimeout(function(){fp.stopProgress();},50);
+	}
+	fp.graphics[0].resetZoom();
+}
+
+fp.progressBar = function(){
+	fp.pbTimer = setTimer(function(){
+
+	}, fp.pbDelay);
+}
+
+fp.initProgress = function(){
+	fp.pDiv = document.createElement("div");
+	fp.pDiv.id = "pDiv";
+	fp.pDiv.textContent = "Updating graphics...";
+	fp.pBarr = document.createElement("progress");
+	fp.pBarr.value = 0;
+	fp.pDiv.appendChild(fp.pBarr);
+	document.body.appendChild(fp.pDiv);
+
+};
+
+fp.progress = function(fname){
 	
-	fp.updateModels();
-	fp.updateFconv();
-	fp.updateFperc();
-	fp.ventilate()
-	fp.xmin = null;
-	fp.ymin = null;
-	fp.plotDygraph()
+}
+
+
+fp.stopProgress = function(){
+	setTimeout(function(){
+		document.body.removeChild(fp.pDiv);
+	},100);
+};
+
+function maj() {
+	fp.initProgress();
+	setTimeout(function(){
+		fp.updateModels();
+		fp.ventilate()
+		fp.xmin = null;
+		fp.ymin = null;
+		fp.plotDygraph(0)
+		//fp.plotDygraph1()
+	}, 50);
 }
 
 fp.lung = new sv.SimpleLung();
@@ -458,5 +510,10 @@ fp.init = function(){
 	$("#panel input").keypress(function(event){
 		if (event.which == 13){ $("#ventiler").click(); }
 	});
-
+	$("input").change(function(){
+		fp.updateModels();
+	});
+	$("input").keyup(function(){
+		fp.updateModels();
+	});
 };

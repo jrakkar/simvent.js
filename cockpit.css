@@ -2,11 +2,13 @@ body {
 	padding:0px;
 	margin:0px;
 	overflow-x:hidden;
+	font-family: sans-serif;
 }
 
 #panel table , #dataPanel table{
 	border-collapse:collapse;
 	width:100%;
+	text-align:left;
 }
 
 td {
@@ -103,7 +105,7 @@ td.data {
  ****************************************/
 
 caption {
-	background-color:rgb(80, 80, 80);
+	background-color:hsl(220, 0%, 30%);
 	color:white;
 	font-size:100%;
 	text-align:center;
@@ -235,4 +237,30 @@ input {
 #dataPanel {visibility:hidden}
 }
 
+#pDiv {
+	z-index: 100;
+	border: 1px solid black;
+	border-radius: 0px;
+	background-color: white;
+	box-shadow: 0px 0px 2px 4px white;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translateX(-50%);
+	text-align: center;
+	padding: 10px;
+}
+progress {
+	margin-top: 5px;
+	display: block;
+	background: none;
+	border: 1px solid black;
+	color: gray;
+	border-radius: 3px;
+}
+progress::-moz-progress-bar{
+	background-color: hsl(220, 0%, 40%);
+	border: none;
+	border-radius: 1px;
+}
 
