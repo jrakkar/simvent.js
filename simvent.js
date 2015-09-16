@@ -69,8 +69,8 @@ sv.SimpleLung = function(){
 	this.Raw = 5.0 ;// cmH2O/l/s
 
 	this.mechParams = {
-		Crs: {unit: "ml/mbar"},
-		Raw: {unit: "mbra/l/s"}
+		Crs: {unit: "ml/cmH₂O"},
+		Raw: {unit: "cmH₂O/l/s"}
 	}
 
 	// Gaz exchange parameters
@@ -152,9 +152,9 @@ sv.SygLung = function(){
 	this.mechParams = {
 		Vmax: {unit: "l"},
 		Vmin: {unit: "l"},
-		Pid: {unit: "mbar"},
-		Kid: {unit: "mbar"},
-		Raw: {unit: "mbar/l/s"}
+		Pid: {unit: "cmH₂O"},
+		Kid: {unit: "cmH₂O"},
+		Raw: {unit: "cmH₂O/l/s"}
 	};
 
 	// Gaz exchange parameters
@@ -332,9 +332,9 @@ sv.PVCurve = function(){
 	this.Tman = 10;
 
 	this.ventParams = {
-		Pmin: {unit: "mbar"},
-		Pmax: {unit: "mbar"},
-		Pstep: {unit: "mbar"},
+		Pmin: {unit: "cmH₂O"},
+		Pmax: {unit: "cmH₂O"},
+		Pstep: {unit: "cmH₂O"},
 		Tman: {unit: "s"}
 	};
 
@@ -373,6 +373,16 @@ sv.PVCurve = function(){
 		};
 	};
 
+	this.updateCalcParams = function(){
+		for (index in this.ventParams){
+			if(this.ventParams[index].calculated == true){
+				var fname = "update" + index;
+				this[fname]();
+			}
+		}
+	}
+
+	this.updateCalcParams();
 };
 
 
