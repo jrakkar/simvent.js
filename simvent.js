@@ -416,6 +416,7 @@ sv.VDR = function(){
 		Tec: {unit: "s"},
 		Fconv: {unit: "s", calculated: true},
 		Fperc: {unit: "/min"},
+		Fhz: {unit: "hz", calculated: true},
 		Rit: {},
 		Fiph: {unit: "l/s"},
 		Fipl: {unit: "l/s"}
@@ -423,6 +424,10 @@ sv.VDR = function(){
 
 	this.updateFconv = function(){
 		this.Fconv = 60 / (this.Tic + this.Tec);
+	}
+
+	this.updateFhz = function(){
+		this.Fhz = this.Fperc / 60;
 	}
 
 	this.dataToFilter= [

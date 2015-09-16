@@ -151,7 +151,6 @@ fp.updateModels = function(){
 	fp.ventilator.updateCalcParams();
 	for(i in fp.ventilator.ventParams){
 		if(fp.ventilator.ventParams[i].calculated == true){
-			console.log("data"+i);
 			document.getElementById("data"+i).textContent = ""+ Math.round(10 * fp.ventilator[i])/10;
 		}
 	}
@@ -242,7 +241,7 @@ fp.paramTable = function(object, paramSet, container, label){
 								.attr("size", '6')
 								.attr("type", 'number')
 								.attr("step", param.step)
-								.click(function(){this.select()})
+								//.click(function(){this.select()})
 								.appendTo(td);
 			}
 			tr.append(td);
@@ -251,10 +250,6 @@ fp.paramTable = function(object, paramSet, container, label){
 
 
 			tr.appendTo(table);
-
-			if(param.callback){
-				$("#input" + id).change(param.callback);
-			}
 		}
 	}
 } 
