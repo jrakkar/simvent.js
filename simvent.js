@@ -62,7 +62,7 @@ sv.avg = function(dataset, data, Nroll){
 sv.SimpleLung = function(){
 
 	// Simulator parameters
-	this.Tsamp = 0.001; // Secondes
+	this.Tsampl = 0.001; // Secondes
 
 	// Mechanical parameters
 	this.Crs = 50.0 ;// ml/cmH2O
@@ -97,7 +97,7 @@ sv.SimpleLung = function(){
 		while (time < duree){
 
 			this.flow = (pression - this.Palv) / this.Raw ; // l/s
-			deltaVolume = this.flow * this.Tsamp; // l
+			deltaVolume = this.flow * this.Tsampl; // l
 			this.Vt += deltaVolume; // l
 			this.Palv = (1000 *this.Vt)  / (this.Crs);
 
@@ -116,7 +116,7 @@ sv.SimpleLung = function(){
 				this.VtCO2 += this.SCO2 * (-deltaVolume);
 			}
 
-			time += this.Tsamp;
+			time += this.Tsampl;
 		}
 	};
 
@@ -138,9 +138,8 @@ sv.SimpleLung = function(){
 
 sv.SygLung = function(){
 
-	this.tostring = function(){return "Allo"};
 	// Simulation parameters
-	this.Tsamp = 0.001; // Secondes
+	this.Tsampl = 0.001; // Secondes
 
 	// Mechanical parameters
 	this.Vmax = 4.0;
@@ -178,6 +177,35 @@ sv.SygLung = function(){
 	}
 
 	this.Vt = this.volume(this.Palv);
+
+	this.appliquer_debit = function (flow, duration){
+			if(isNaN(flow)){throw "Function debit: NaN value passed as flow" }	
+			this.flow = flow ; // l/s
+			console.log("Appliquer debit flow: " + this.flow);
+			console.log("Duration: " + duration);
+			deltaVolume = this.flow * duration; // l
+			console.log(deltaVolume);
+			this.Vt += deltaVolume; // l
+			this.Vti += deltaVolume;
+			this.Palv = this.Pid - (this.Kid * Math.log(((this.Vmax - this.Vmin)/(this.Vt - this.Vmin))-1));
+			console.log("Palv: " + this.Palv);
+
+			if (this.flow > 0){
+				this.Vtmax = this.Vt;
+				this.PCO2 = 0;
+				this.Vte = 0;
+				this.SCO2 = 0;
+				this.VtCO2 = 0;
+			}
+
+			else {
+				this.Vte = this.Vtmax - this.Vt;
+				this.Vti -= deltaVolume;
+				this.PCO2 = this.co2(this.Vte);
+				this.SCO2 = this.PCO2/(760-47);
+				this.VtCO2 += this.SCO2 * (-deltaVolume);
+			}
+	}
 	this.appliquer_pression = function (pression, duree){
 
 		var time = 0.0;
@@ -185,8 +213,10 @@ sv.SygLung = function(){
 
 		while (time < duree){
 
-			this.flow = (pression - this.Palv) / this.Raw ; // l/s
-			deltaVolume = this.flow * this.Tsamp; // l
+			flow = (pression - this.Palv) / this.Raw ; // l/s
+			this.appliquer_debit(flow, this.Tsampl);
+			/*
+			deltaVolume = this.flow * this.Tsampl; // l
 			this.Vt += deltaVolume; // l
 			this.Vti += deltaVolume;
 			this.Palv = this.Pid - (this.Kid * Math.log(((this.Vmax - this.Vmin)/(this.Vt - this.Vmin))-1));
@@ -205,8 +235,9 @@ sv.SygLung = function(){
 				this.SCO2 = this.PCO2/(760-47);
 				this.VtCO2 += this.SCO2 * (-deltaVolume);
 			}
+			*/
 
-			time += this.Tsamp;
+			time += this.Tsampl;
 		}
 	};
 
@@ -463,13 +494,15 @@ sv.VDR = function(){
 		while (this.time < tStopPerc){
 			this.Pao = - lung.flow * this.Rexp;
 			
-			lung.flow = (this.Pao - lung.Palv)/lung.Raw;
+			flow = (this.Pao - lung.Palv)/lung.Raw;
+			lung.appliquer_debit(flow, this.Tsampl);
+			/*
 			//lung.flow = -9;
 			var deltaVol = lung.flow * this.Tsampl;
 			lung.Vt += deltaVol;
 			lung.Vtep += deltaVol;
 			lung.Palv = 1000 * lung.Vt / lung.Crs;
-			
+			*/
 			timeData.push(sv.log(lung, this));
 			this.time += this.Tsampl;
 		}
@@ -481,7 +514,6 @@ sv.VDR = function(){
 		lung.Vtip = 0;
 		this.Fip = inFlow
 		var tStartInsp = this.time;
-		var tStopRamp = this.time + this.Tramp;
 		var tStopPerc = this.time + this.Tip;
 
 		while (this.time < tStopPerc){
@@ -489,12 +521,18 @@ sv.VDR = function(){
 			this.Fip = inFlow;
 			this.Pao = (this.Fop * lung.Raw) + lung.Palv;
 			this.Fop = sv.Phasitron.Fop(this.Fip, this.Pao);
+			console.log(sv.log(lung, this));
+			console.log("Tsampl = " + this.Tsampl);
+			lung.appliquer_debit(this.Fop, this.Tsampl);
+			
+			/*
 			lung.flow = this.Fop;
 
 			var deltaVol = this.Fop * this.Tsampl;
 			lung.Vt += deltaVol;
 			lung.Vtip += deltaVol;
 			lung.Palv = 1000 * lung.Vt / lung.Crs;
+			*/
 			
 			timeData.push(sv.log(lung, this));
 			this.time += this.Tsampl;

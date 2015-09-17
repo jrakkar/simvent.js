@@ -30,8 +30,8 @@
 	<script src="frontPanel.js" ></script>
 	<script>
 		fp.timeSeries = ["Pao","Flung","Vt"];
-		fp.ventilator = new sv.VDR();
-		fp.lung = new sv.SimpleLung();
+		fp.ventModel = "PresureControler";
+		fp.lungModel = "SimpleLung";
 		fp.init()
 	</script>
 </body>
