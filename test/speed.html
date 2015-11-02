@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<meta charset="utf-8"/>
+
+<script src="/home/user1/Librairies JavaScript/js/d3.min.js" charset="utf-8"></script>
+<script src="../../graphsimple.js/graphsimple.js" charset="utf-8"></script>
+<script src="../simvent.js" charset="utf-8"></script>
+
+<link rel="stylesheet" type="text/css" href="../../graphsimple.js/css/graphsimple-clear.css" charset="utf-8"/>
+
+<style>
+	body {
+		text-align:center;
+	}
+	.square {
+		width:400px;
+		height:400px;
+	}
+	.half {
+		width:600px;
+		height:200px;
+		border:1px dashed gray;
+	}
+	svg{
+		display:block;
+		margin-left:auto;
+		margin-right:auto;
+		margin-top:10px;yg
+		margin-bottom:10px;
+	}
+
+</style>
+
+<svg id="svg1"  class="half surface"></svg>
+<svg id="svg2"  class="half surface"></svg>
+
+<script>
+	function plot(target, x, y){
+		gs.quickGraph(target, data, function(d){return d[x]}, function(d){return d[y]})
+			.setidy(y);
+	}
+
+	var lung = new sv.SimpleLung();
+	lung.Raw = 15;
+	var ventilator = new sv.FlowControler();	
+	ventilator.PEEP = 5;
+
+	var tstart = Date.now();
+	var data = ventilator.ventilate(lung).timeData;
+	var duration = Date.now() - tstart;
+	var numpoints = data.length;
+	console.log("Simulation time: " + duration + " milisecondes");
+	console.log(numpoints + " data points");
+	console.log(Math.round(10000 * duration / numpoints)/10000 + " miliseconde / points");
+
+	var tstart = Date.now();
+	plot ("#svg1", "time", "Flung");
+	var duration = Date.now() - tstart;
+	console.log("Plot time: " + duration + " milisecondes");
+
+	plot ("#svg2", "time", "Pao");
+</script>

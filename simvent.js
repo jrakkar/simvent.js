@@ -89,6 +89,33 @@ sv.SimpleLung = function(){
 	this.Vtmax = 0;
 	this.VtCO2 = 0;
 	
+	this.appliquer_debit = function (flow, duration){
+
+			if(isNaN(flow)){throw "Function debit: NaN value passed as flow" }	
+
+			this.flow = flow ; // l/s
+			deltaVolume = this.flow * duration; // l
+			this.Vt += deltaVolume; // l
+			this.Vti += deltaVolume;
+			this.Palv = this.Vt * this.Crs;
+
+			if (this.flow > 0){
+				this.Vtmax = this.Vt;
+				this.PCO2 = 0;
+				this.Vte = 0;
+				this.SCO2 = 0;
+				this.VtCO2 = 0;
+			}
+
+			else {
+				this.Vte = this.Vtmax - this.Vt;
+				this.Vti -= deltaVolume;
+				this.PCO2 = this.co2(this.Vte);
+				this.SCO2 = this.PCO2/(760-47);
+				this.VtCO2 += this.SCO2 * (-deltaVolume);
+			}
+	}
+
 	this.appliquer_pression = function (pression, duree){
 
 		var time = 0.0;
@@ -166,6 +193,7 @@ sv.SygLung = function(){
 	//Propriété dynamiques
 	this.PCO2 = 0;
 	this.SCO2 = 0;
+	this.Vt = 0.0;
 	this.Palv = 0.0;
 	this.flow = 0.0;
 	this.Vtmax = 0;
@@ -181,14 +209,10 @@ sv.SygLung = function(){
 	this.appliquer_debit = function (flow, duration){
 			if(isNaN(flow)){throw "Function debit: NaN value passed as flow" }	
 			this.flow = flow ; // l/s
-			console.log("Appliquer debit flow: " + this.flow);
-			console.log("Duration: " + duration);
 			deltaVolume = this.flow * duration; // l
-			console.log(deltaVolume);
 			this.Vt += deltaVolume; // l
 			this.Vti += deltaVolume;
 			this.Palv = this.Pid - (this.Kid * Math.log(((this.Vmax - this.Vmin)/(this.Vt - this.Vmin))-1));
-			console.log("Palv: " + this.Palv);
 
 			if (this.flow > 0){
 				this.Vtmax = this.Vt;
@@ -202,7 +226,7 @@ sv.SygLung = function(){
 				this.Vte = this.Vtmax - this.Vt;
 				this.Vti -= deltaVolume;
 				this.PCO2 = this.co2(this.Vte);
-				this.SCO2 = this.PCO2/(760-47);
+	this.SCO2 = this.PCO2/(760-47);
 				this.VtCO2 += this.SCO2 * (-deltaVolume);
 			}
 	}
@@ -484,12 +508,14 @@ sv.VDR = function(){
 	this.Pao=0;//Presure at the ariway openning (phasitron output)
 
 	this.percussiveExpiration = function(lung){
-		// Must be executed in a scope where te timeData container is defined
+
+		// Must be executed in a scope where the timeData container is defined
 		lung.flow = 0;
 		this.Fip = 0;
 		this.Fop = 0;
 		this.stateP = 0;
 		lung.Vtep = 0;
+
 		var tStopPerc = this.time + this.Tep;
 		while (this.time < tStopPerc){
 			this.Pao = - lung.flow * this.Rexp;
@@ -521,8 +547,6 @@ sv.VDR = function(){
 			this.Fip = inFlow;
 			this.Pao = (this.Fop * lung.Raw) + lung.Palv;
 			this.Fop = sv.Phasitron.Fop(this.Fip, this.Pao);
-			console.log(sv.log(lung, this));
-			console.log("Tsampl = " + this.Tsampl);
 			lung.appliquer_debit(this.Fop, this.Tsampl);
 			
 			/*
@@ -616,6 +640,100 @@ sv.VDR = function(){
 	this.updateCalcParams();
 
 };
+
+sv.FlowControler = function(){
+
+	this.logParam = sv.logParam;
+	this.log = function(){this.logParam("ventParams");}
+
+	this.Vt = 10.0;
+	this.PEEP = 0.0;
+	this.Ti = 1;
+	this.Fconv = 12;
+
+	this.ventParams = {
+		Vt:{unit: "l"},
+		PEEP:{unit: "cmH₂O"},
+		Fconv:{unit:"/min."},
+		Ti:{unit: "cmH₂O"},
+		Te:{calculated: true, unit: "sec."},
+		Tcycle:{calculated: true, unit: "sec."}
+	};
+
+	this.updateTcycle = function(){
+		this.Tcycle = 60 / this.Fconv;
+	};
+
+	this.updateTe = function(){
+		this.Te = (60 / this.Fconv) - this.Ti;
+	};
+
+	this.Tsampl = 0.02;
+	this.nbcycles = 3;
+
+	this.simParams = {
+		Tsampl:{unit: "s"},
+		nbcycles:{}
+	};
+
+	this.time = 0;
+	
+	this.ventilate = function(lung){
+
+		var timeData = [];
+		var convData = [];
+		this.time = 0.0;
+		
+		this.Flow = this.Vt / this.Ti;
+		for (c=0;c < this.nbcycles;c++){
+			var tdeb = this.time;
+
+			lung.Vti = 0;
+			while(this.time < (tdeb + this.Ti)){
+				lung.appliquer_debit(this.Flow, this.Tsampl)
+				this.Pao = lung.Palv + (this.Flow * lung.Raw);
+				timeData.push(sv.log(lung, this));
+				this.time += this.Tsampl;	
+			}
+
+
+			this.Pao = this.PEEP
+			while(this.time < (tdeb + (60/this.Fconv))){
+				lung.appliquer_pression(this.Pao, this.Tsampl)
+				timeData.push(sv.log(lung, this));
+				this.time += this.Tsampl;	
+			}
+
+			var pmeco2 = ((760-47) * lung.veco2/lung.vce);
+
+			convData.push({
+				pmeco2:pmeco2,
+				petco2:lung.pco2,
+				pAco2: lung.PACO2,
+				fowler: lung.Vem/lung.vce,
+				bohr: (lung.PACO2 - pmeco2)/lung.PACO2,
+			});
+		}
+
+		return {
+			timeData: timeData,
+			convData:convData
+		};
+	};
+	
+	this.updateCalcParams = function(){
+		for (index in this.ventParams){
+			if(this.ventParams[index].calculated == true){
+				var fname = "update" + index;
+				this[fname]();
+			}
+		}
+	}
+
+	this.updateCalcParams();
+
+}
+
 sv.logParam = function(dataset){
 	table = {};
 	for (param in this[dataset]){
