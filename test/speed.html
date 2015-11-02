@@ -41,23 +41,45 @@
 			.setidx(x);
 	}
 
-	var lung = new sv.SimpleLung();
-	lung.Raw = 15;
-	var ventilator = new sv.FlowControler();	
-	ventilator.PEEP = 5;
-
-	var tstart = Date.now();
-	var data = ventilator.ventilate(lung).timeData;
-	var duration = Date.now() - tstart;
-	var numpoints = data.length;
-	console.log("Simulation time: " + duration + " milisecondes");
-	console.log(numpoints + " data points");
-	console.log(Math.round(10000 * duration / numpoints)/10000 + " miliseconde / points");
-
+/*
 	var tstart = Date.now();
 	plot ("#svg1", "time", "Flung");
 	var duration = Date.now() - tstart;
 	console.log("Plot time: " + duration + " milisecondes");
 
 	plot ("#svg2", "time", "Pao");
+*/
+	var ventilators = [
+		"PresureControler",
+		"FlowControler",
+		"VDR",
+		];
+
+	for(i in ventilators){
+		var ventType = ventilators[i]
+
+		var lung = new sv.SimpleLung();
+		lung.Raw = 15;
+		var ventilator = new sv[ventType]();	
+		ventilator.PEEP = 5;
+		ventilator.Tsampl = 0.001;
+
+		var tstart = Date.now();
+		var data = ventilator.ventilate(lung).timeData;
+		var duration = Date.now() - tstart;
+		var numpoints = data.length;
+
+		console.log("==================");
+		console.log(ventType);
+		console.log("==================");
+		console.log("");
+
+		console.log("number of iterations: " + data.length);
+		console.log("Sampling time: " + ventilator.Tsampl + " seconds");
+		console.log("Simulation time: " + duration + " milisecondes");
+		console.log(numpoints + " data points");
+		console.log(Math.round(10000 * duration / numpoints)/10000 + " miliseconde / points");
+		console.log("");
+
+	}
 </script>
