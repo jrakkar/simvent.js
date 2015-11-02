@@ -646,7 +646,7 @@ sv.FlowControler = function(){
 	this.logParam = sv.logParam;
 	this.log = function(){this.logParam("ventParams");}
 
-	this.Vt = 10.0;
+	this.Vt = 0.5;
 	this.PEEP = 0.0;
 	this.Ti = 1;
 	this.Fconv = 12;
