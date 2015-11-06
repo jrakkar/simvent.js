@@ -1,5 +1,6 @@
 ---
 title: Ventilator models
+order: 3
 ---
 The simvent.js library comes with two ventilators models.
 
@@ -51,4 +52,3 @@ sv.PVCurve is a presure steps based low flow presure - volume curve maneuver.
 	var data = ventilator.ventilate(lung);
 	var graph = gs.quickGraph( "#svg3", data.timeData, fx, fy2).setidx("Time").setidy("Presure");
 </script>
-

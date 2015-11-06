@@ -1,5 +1,6 @@
 ---
 title: Lungs models
+order: 4
 ---
 
 The simvent.js comes with two lung models: a basic model with a linear presure - volume curve 
