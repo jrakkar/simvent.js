@@ -20,3 +20,9 @@ figcaption:before {
 .galleryTile a {
 	text-decoration: none;
 }
+
+pre {
+	width: 90%;
+	margin-left: auto;
+	margin-right:auto;
+}

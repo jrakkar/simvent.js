@@ -21,8 +21,11 @@ sv.SimpleLung is a constructor for a basic one compartment lung model with a lin
 
 It's default parameters are as folow:
 
-|Crs | 50 ml/cmH₂O|
-|Raw | 5 cmH₂O/l/s|
+
+| Parameter | Default value |
+|-----------+---------------|
+| Crs       | 50 ml/cmH₂O   |
+| Raw       | 5 cmH₂O/l/s   |
 
 
 Although it is very basic in regard of lung mechanics, it has the very cool feature

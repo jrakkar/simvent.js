@@ -40,14 +40,29 @@ input {
 	text-align: right;
 }
 
-td , tr{
+td {
 	background-color: white;
 	text-align: left;
-	padding: 1px;
+	padding: 3px;
+	/*
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+	border-left: none;
+	border-right: none;
+	*/
+	border:none;
+}
+
+tr {
+	border-bottom: 1px solid silver;
 }
 
 td.data {
 	text-align:right;
+}
+
+table {
+	border: none;
 }
 
 button, select {
