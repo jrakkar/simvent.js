@@ -1,20 +1,26 @@
 table {
 	border-collapse: collapse;
-	border: none;
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
 	margin-left: auto;
 	margin-right: auto;
 }
 
 tr:nth-child(odd){
-	background: hsl( 0, 0%, 90% )
+	background: inherit;
    }
 
 
 tr:nth-child(even){
-	background: hsl( 0, 0%, 50% )
+	background: inherit;
    }
    
-td {
+td, th{
 	padding: 6px;
-	border: 1px solid white;
+	border: 1px solid black;
+}
+
+th {
+	font-weight: bold;
+	text-align: center;
 }
