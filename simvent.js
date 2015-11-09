@@ -97,7 +97,7 @@ sv.SimpleLung = function(){
 			deltaVolume = this.flow * duration; // l
 			this.Vt += deltaVolume; // l
 			this.Vti += deltaVolume;
-			this.Palv = this.Vt * this.Crs;
+			this.Palv = 1000 * this.Vt / this.Crs;
 
 			if (this.flow > 0){
 				this.Vtmax = this.Vt;
