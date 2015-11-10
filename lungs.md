@@ -18,6 +18,8 @@ Their mechanical property are set by directly accessing the lung object property
 ## sv.SimpleLung
 
 sv.SimpleLung is a constructor for a basic one compartment lung model with a linear compliance curve.  
+Although it is very basic in regard of lung mechanics, it has the very cool feature
+of modelizing CO₂ exhalation.
 
 It's default parameters are as folow:
 
@@ -28,8 +30,6 @@ It's default parameters are as folow:
 | Raw       | 5 cmH₂O/l/s   |
 
 
-Although it is very basic in regard of lung mechanics, it has the very cool feature
-of modelizing CO₂ exhalation.
 
 <figure>
 	<svg id="svg1" class="square"></svg>
