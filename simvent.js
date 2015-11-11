@@ -45,8 +45,6 @@ sv.avg = function(dataset, data, Nroll){
 
 		var avged = dataset[curent][data];
 
-		//avged += dataset[curent +1][data];
-
 		for(i2 = curent + 1; i2 < (curent + Nroll) ; i2 ++){
 			avged += dataset[i2][data];
 		}
@@ -77,8 +75,8 @@ sv.SimpleLung = function(){
 	this.Vdaw = 0.1;
 	this.PiCO2 = 0.0;
 	this.PACO2 = 35.0;
-	this.Pente2 = 0.003;
-	this.Pente3 = 5;
+	this.Solpe2 = 0.003;
+	this.Solpe3 = 5;
 
 	//Propriété dynamiques
 	this.PCO2 = 0;
@@ -150,12 +148,12 @@ sv.SimpleLung = function(){
 	this.co2 = function(volume){
 
 		this.VcAlv = this.Vtmax - this.Vdaw;
-		this.PplCO2 = this.PACO2 - (this.Pente3 * (this.VcAlv / 2));
+		this.PplCO2 = this.PACO2 - (this.Solpe3 * (this.VcAlv / 2));
 
-		co2 = this.PiCO2 + (this.PplCO2 - this.PiCO2)/(1 + Math.pow(Math.E,((this.Vdaw - volume)/this.Pente2)))
+		co2 = this.PiCO2 + (this.PplCO2 - this.PiCO2)/(1 + Math.pow(Math.E,((this.Vdaw - volume)/this.Solpe2)))
 
 		if (volume > this.Vdaw) {
-			co2 += this.Pente3 * (volume - this.Vdaw);
+			co2 += this.Solpe3 * (volume - this.Vdaw);
 		}
 
 		return co2;
@@ -187,8 +185,8 @@ sv.SygLung = function(){
 	this.Vdaw = 0.1;
 	this.PiCO2 = 0.0;
 	this.PACO2 = 35.0;
-	this.Pente2 = 0.003;
-	this.Pente3 = 5.0;
+	this.Solpe2 = 0.003;
+	this.Solpe3 = 5.0;
 
 	//Propriété dynamiques
 	this.PCO2 = 0;
@@ -239,27 +237,6 @@ sv.SygLung = function(){
 
 			flow = (pression - this.Palv) / this.Raw ; // l/s
 			this.appliquer_debit(flow, this.Tsampl);
-			/*
-			deltaVolume = this.flow * this.Tsampl; // l
-			this.Vt += deltaVolume; // l
-			this.Vti += deltaVolume;
-			this.Palv = this.Pid - (this.Kid * Math.log(((this.Vmax - this.Vmin)/(this.Vt - this.Vmin))-1));
-
-			if (this.flow > 0){
-				this.Vtmax = this.Vt;
-				this.PCO2 = 0;
-				this.Vte = 0;
-				this.SCO2 = 0;
-				this.VtCO2 = 0;
-			}
-
-			else {
-				this.Vte = this.Vtmax - this.Vt;
-				this.PCO2 = this.co2(this.Vte);
-				this.SCO2 = this.PCO2/(760-47);
-				this.VtCO2 += this.SCO2 * (-deltaVolume);
-			}
-			*/
 
 			time += this.Tsampl;
 		}
@@ -268,12 +245,12 @@ sv.SygLung = function(){
 	this.co2 = function(volume){
 
 		this.VcAlv = this.Vtmax - this.Vdaw;
-		this.PplCO2 = this.PACO2 - (this.Pente3 * (this.VcAlv / 2));
+		this.PplCO2 = this.PACO2 - (this.Solpe3 * (this.VcAlv / 2));
 
-		co2 = this.PiCO2 + (this.PplCO2 - this.PiCO2)/(1 + Math.pow(Math.E,((this.Vdaw - volume)/this.Pente2)))
+		co2 = this.PiCO2 + (this.PplCO2 - this.PiCO2)/(1 + Math.pow(Math.E,((this.Vdaw - volume)/this.Solpe2)))
 
 		if (volume > this.Vdaw) {
-			co2 += this.Pente3 * (volume - this.Vdaw);
+			co2 += this.Solpe3 * (volume - this.Vdaw);
 		}
 
 		return co2;
