@@ -14,12 +14,11 @@ Their mechanical property are set by directly accessing the lung object property
 
 	lung.Raw = 50 // cmH2O/l/s;
 
+Beside their mechanical property, both lung models simulate CO₂ exalation.
 
 ## sv.SimpleLung
 
-sv.SimpleLung is a constructor for a basic one compartment lung model with a linear compliance curve.  
-Although it is very basic in regard of lung mechanics, it has the very cool feature
-of modelizing CO₂ exhalation.
+sv.SimpleLung is a constructor for a basic, one compartment, lung model with a linear compliance curve.  
 
 It's default parameters are as folow:
 
