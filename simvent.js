@@ -5,23 +5,23 @@ sv.log = function(lung, vent){
 
 		// Lung variables
 		
-		time: vent.time,
-		Flung: lung.flow,
-		Palv: lung.Palv,
-		Vt: lung.Vt,
-		Vti: lung.Vti,
-		Vte: lung.Vte,
-		PCO2: lung.PCO2,
-		SCO2: lung.SCO2,
-		VCO2: lung.VtCO2,
+		time  : vent.time,
+		Flung : lung.flow,
+		Palv  : lung.Palv,
+		Vt    : lung.Vt,
+		Vti   : lung.Vti,
+		Vte   : lung.Vte,
+		PCO2  : lung.PCO2,
+		SCO2  : lung.SCO2,
+		VCO2  : lung.VtCO2,
 
 		// Ventilator variables
 
-		Pao: vent.Pao,
-		Fip: vent.Fip,
-		Fop: vent.Fop,
-		stateP: vent.stateP,
-		Pcirc: vent.Pcirc
+		Pao    : vent.Pao,
+		Fip    : vent.Fip,
+		Fop    : vent.Fop,
+		stateP : vent.stateP,
+		Pcirc  : vent.Pcirc
 	};
 }
 
@@ -72,18 +72,18 @@ sv.SimpleLung = function(){
 	}
 
 	// Gaz exchange parameters
-	this.Vdaw = 0.1;
-	this.PiCO2 = 0.0;
-	this.PACO2 = 35.0;
-	this.Solpe2 = 0.003;
-	this.Solpe3 = 5;
+	this.Vdaw   = 0.1;
+	this.PiCO2  = 0.0;
+	this.PACO2  = 35.0;
+	this.Slope2 = 0.003;
+	this.Slope3 = 5;
 
 	//Propriété dynamiques
-	this.PCO2 = 0;
-	this.SCO2 = 0;
-	this.Vt = 0.0;
-	this.Palv = 0.0;
-	this.flow = 0.0;
+	this.PCO2  = 0;
+	this.SCO2  = 0;
+	this.Vt    = 0.0;
+	this.Palv  = 0.0;
+	this.flow  = 0.0;
 	this.Vtmax = 0;
 	this.VtCO2 = 0;
 	
@@ -148,12 +148,14 @@ sv.SimpleLung = function(){
 	this.co2 = function(volume){
 
 		this.VcAlv = this.Vtmax - this.Vdaw;
-		this.PplCO2 = this.PACO2 - (this.Solpe3 * (this.VcAlv / 2));
+		this.PplCO2 = this.PACO2 - (this.Slope3 * (this.VcAlv / 2));
 
-		co2 = this.PiCO2 + (this.PplCO2 - this.PiCO2)/(1 + Math.pow(Math.E,((this.Vdaw - volume)/this.Solpe2)))
+		co2 = this.PiCO2 + 
+			(this.PplCO2 - this.PiCO2)/
+			(1 + Math.pow(Math.E,((this.Vdaw - volume)/this.Slope2)))
 
 		if (volume > this.Vdaw) {
-			co2 += this.Solpe3 * (volume - this.Vdaw);
+			co2 += this.Slope3 * (volume - this.Vdaw);
 		}
 
 		return co2;
@@ -185,8 +187,8 @@ sv.SygLung = function(){
 	this.Vdaw = 0.1;
 	this.PiCO2 = 0.0;
 	this.PACO2 = 35.0;
-	this.Solpe2 = 0.003;
-	this.Solpe3 = 5.0;
+	this.Slope2 = 0.003;
+	this.Slope3 = 5.0;
 
 	//Propriété dynamiques
 	this.PCO2 = 0;
@@ -245,12 +247,12 @@ sv.SygLung = function(){
 	this.co2 = function(volume){
 
 		this.VcAlv = this.Vtmax - this.Vdaw;
-		this.PplCO2 = this.PACO2 - (this.Solpe3 * (this.VcAlv / 2));
+		this.PplCO2 = this.PACO2 - (this.Slope3 * (this.VcAlv / 2));
 
-		co2 = this.PiCO2 + (this.PplCO2 - this.PiCO2)/(1 + Math.pow(Math.E,((this.Vdaw - volume)/this.Solpe2)))
+		co2 = this.PiCO2 + (this.PplCO2 - this.PiCO2)/(1 + Math.pow(Math.E,((this.Vdaw - volume)/this.Slope2)))
 
 		if (volume > this.Vdaw) {
-			co2 += this.Solpe3 * (volume - this.Vdaw);
+			co2 += this.Slope3 * (volume - this.Vdaw);
 		}
 
 		return co2;
