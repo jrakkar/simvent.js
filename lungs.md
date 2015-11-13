@@ -18,15 +18,25 @@ Beside their mechanical property, both lung models simulate CO₂ exalation.
 
 ## sv.SimpleLung
 
+deRealign
 sv.SimpleLung is a constructor for a basic, one compartment, lung model with a linear compliance curve.  
 
-It's default parameters are as folow:
+It's default mechanical parameters are as folow:
+
+| Parameter | Definition                                                                                       | Default value | Unit      |
+|-----------+--------------------------------------------------------------------------------------------------+---------------+-----------|
+| Crs       | Respiratory system compliance                                                                    | 50            | ml/cmH₂O  |
+| Raw       | Airway resistance                                                                                | 5             | cmH₂O/l/s |
+
+It's gaz exchange parameters are as folow:
 
 
-| Parameter | Default value |
-|-----------+---------------|
-| Crs       | 50 ml/cmH₂O   |
-| Raw       | 5 cmH₂O/l/s   |
+| Parameter | Definition                                                                                       | Default value | Unit   |
+|-----------+--------------------------------------------------------------------------------------------------+---------------+--------|
+| Vdaw      | Airway dead space                                                                                | 0.1           | L      |
+| PACO2     | Mean alveolar carbon dioxyde partial pressure                                                    | 35            | mmHg   |
+| Slope2    | Volumetric capnogram second phase slope (volume between airway dead space and inflection points) | 0.003         | L      |
+| Slope3    | Volumetric capnogram third phase slope                                                           | 5             | mmHg/L |
 
 
 
