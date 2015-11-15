@@ -260,13 +260,11 @@ sv.SygLung = function(){
 
 };
 
-
-
 //******************************
 //	Ventilator models
 //******************************
 
-sv.PresureControler = function(){
+sv.PressureControler = function(){
 
 	this.logParam = sv.logParam;
 	this.log = function(){this.logParam("ventParams");}
@@ -419,9 +417,6 @@ sv.PVCurve = function(){
 	this.updateCalcParams();
 };
 
-
-
-
 sv.Phasitron = {};
 sv.Phasitron.Fop = function(Fip, Pao){
 	if(Pao >= 0 && Pao <=40){
@@ -527,15 +522,6 @@ sv.VDR = function(){
 			this.Pao = (this.Fop * lung.Raw) + lung.Palv;
 			this.Fop = sv.Phasitron.Fop(this.Fip, this.Pao);
 			lung.appliquer_debit(this.Fop, this.Tsampl);
-			
-			/*
-			lung.flow = this.Fop;
-
-			var deltaVol = this.Fop * this.Tsampl;
-			lung.Vt += deltaVol;
-			lung.Vtip += deltaVol;
-			lung.Palv = 1000 * lung.Vt / lung.Crs;
-			*/
 			
 			timeData.push(sv.log(lung, this));
 			this.time += this.Tsampl;
@@ -720,3 +706,4 @@ sv.logParam = function(dataset){
 	}
 	console.table(table);
 }
+sv.PresureControler = sv.PressureControler;
