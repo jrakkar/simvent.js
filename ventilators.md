@@ -2,6 +2,11 @@
 title: Ventilator models
 order: 3
 ---
+## Contents
+{:.no_toc}
+
+1. Will be replaced with the ToC, excluding the "Contents" header
+{:toc}
 
 ## sv.PresureControler
 
