@@ -1,4 +1,3 @@
-					<a href="cv/cv.xml"><li>VDR<span class="collapsible">.js</span></a></li>
 var sv = {}
 
 sv.log = function(lung, vent){
@@ -164,34 +163,6 @@ sv.SimpleLung = function(){
 
 };
 
-sv.SptLung = function(){
-
-	// Mechanical parameters
-	this.Crs = 50.0 ;// ml/cmH2O
-	this.Raw = 5.0 ;// cmH2O/l/s
-
-	this.mechParams = {
-		Crs: {unit: "ml/cmH₂O"},
-		Raw: {unit: "cmH₂O/l/s"}
-	}	
-
-	this.Fspt = 14.0 ;// c/min
-	this.Ti = 1.0 ; // sec
-	this.Pmax = 5.0 ; // cmH20
-	
-	this.Pmus = function(time){
-		this.Tcycle = 60.0/this.Fspt;
-		this.Te = this.Tcycle - this.Ti ;
-
-		if(i<this.Ti){
-			var Pmus = this.Pmax * Math.sin((2*Math.PI - Math.PI/2)* time / this.Ti);
-		}
-		else{
-			var Pmus = 0.0 ;
-		}
-	}
-
-}	
 sv.SygLung = function(){
 
 	// Simulation parameters
