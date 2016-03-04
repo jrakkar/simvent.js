@@ -46,19 +46,16 @@
 			var plot = $.plot(placeholder, [dataset]);
 		}
 
-		var vent = new sv.PressureControler();
-		vent.Pmin = -60;
-		vent.Pmax = 60;
-		vent.Pstep = 2;
-		vent.echantillonnage = 0.01;
+		var vent = new sv.PresureControler();
+		vent.Fconv = 18;
+		//vent.Pinspi = 0;
 
-		var lung1 = new sv.SygLung();
-		lung1.Kid = 5.0;
-		lung1.Pid = 20.0;
-		
+		var lung1 = new sv.SptLung();
+		lung1.Crs = 100;
+
 		var data = vent.ventilate(lung1).timeData;
 		
-		plot("#svg1",data,"time", "Vt");
+		plot("#svg1",data,"time", "Pmus");
 		plot("#svg2",data,"time", "Palv");
 		plot("#svg3",data,"time", "Flung");
 		plot("#svg4",data,"time", "Pao");
