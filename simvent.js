@@ -1,4 +1,3 @@
-					<a href="cv/cv.xml"><li>VDR<span class="collapsible">.js</span></a></li>
 var sv = {}
 
 sv.log = function(lung, vent){
