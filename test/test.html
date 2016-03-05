@@ -26,11 +26,15 @@
 
 <body>
 
-	<div id="svg5" class="graph" style="float:right;height:400px;width:400px;"></div>
+	<!--div id="svg5" class="graph" style="float:right;height:400px;width:400px;"></div-->
 	<div id="svg1" class="graph"></div>
-	<div id="svg2" class="graph"></div>
+	<div id="svg7" class="graph"></div>
 	<div id="svg3" class="graph"></div>
+	<div id="svg2" class="graph"></div>
 	<div id="svg4" class="graph"></div>
+	<div id="svg5" class="graph"></div>
+	<div id="svg6" class="graph"></div>
+	<div id="svg8" class="graph"></div>
 
 	<script>
 		function plot(div, data, x, y){
@@ -46,12 +50,9 @@
 			var plot = $.plot(placeholder, [dataset]);
 		}
 
-		var vent = new sv.PresureControler();
-		vent.Fconv = 18;
-		//vent.Pinspi = 0;
+		var vent = new sv.PressureAssistor();
 
 		var lung1 = new sv.SptLung();
-		lung1.Crs = 100;
 
 		var data = vent.ventilate(lung1).timeData;
 		
@@ -59,7 +60,10 @@
 		plot("#svg2",data,"time", "Palv");
 		plot("#svg3",data,"time", "Flung");
 		plot("#svg4",data,"time", "Pao");
-		plot("#svg5",data,"Palv", "Vt");
+		plot("#svg5",data,"time", "Vt");
+		plot("#svg6",data,"time", "Fmax");
+		plot("#svg7",data,"time", "Fstop");
+		plot("#svg7",data,"time", "Pel");
 		</script>
 
 </body>

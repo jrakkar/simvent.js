@@ -8,6 +8,7 @@ sv.log = function(lung, vent){
 		time  : vent.time,
 		Flung : lung.flow,
 		Palv  : lung.Palv,
+		Pel   : lung.Pel,
 		Pmus  : lung.Pmus,
 		Vt    : lung.Vt,
 		Vti   : lung.Vti,
@@ -22,7 +23,9 @@ sv.log = function(lung, vent){
 		Fip    : vent.Fip,
 		Fop    : vent.Fop,
 		stateP : vent.stateP,
-		Pcirc  : vent.Pcirc
+		Pcirc  : vent.Pcirc,
+		Fmax   : vent.Fmax,
+		Fstop  : vent.Fstop
 	};
 }
 
@@ -170,17 +173,17 @@ sv.SptLung = function(){
 	this.Tsampl = 0.001; // Secondes
 
 	// Mechanical parameters
-	this.Crs = 50.0 ;// ml/cmH2O
-	this.Raw = 5.0 ;// cmH2O/l/s
+	this.Crs = 30.0 ;// ml/cmH2O
+	this.Raw = 20.0 ;// cmH2O/l/s
 
 	this.mechParams = {
 		Crs: {unit: "ml/cmH₂O"},
 		Raw: {unit: "cmH₂O/l/s"}
 	}	
 
-	this.Fspt = 14.0 ;// c/min
-	this.Ti = 3 ; // sec
-	this.Pmax = 5.0 ; // cmH20
+	this.Fspt = 30.0 ;// c/min
+	this.Ti = 1 ; // sec
+	this.Pmax = 6.5 ; // cmH20
 	
 	this.Tcycle = 60.0/this.Fspt;
 	this.Te = this.Tcycle - this.Ti ;
@@ -210,6 +213,7 @@ sv.SptLung = function(){
 			var Pmus = 0.5 * this.Pmax * (1 + Math.sin(
 						(2*Math.PI )* (mTime / this.Ti)- Math.PI/2
 					));
+
 		}
 		else{
 			var Pmus = 0.0 ;
@@ -376,6 +380,81 @@ sv.SygLung = function(){
 //******************************
 //	Ventilator models
 //******************************
+
+sv.PressureAssistor = function(){
+
+	this.logParam = sv.logParam;
+	this.log = function(){this.logParam("ventParams");}
+
+	this.Passist = 25.0;
+	this.PEEP = 0.0;
+	this.Cycling = 10;
+	this.Ftrig = 0.1;
+
+	this.ventParams = {
+		Passist:{unit: "cmH₂O"},
+		PEEP:{unit: "cmH₂O"},
+		Ftrig:{unit:"l/min."},
+		Cycling:{unit: "%"},
+	};
+
+	this.Tsampl = 0.02;
+	this.nbcycles = 4;
+
+	this.simParams = {
+		Tsampl:{unit: "s"},
+		nbcycles:{}
+	};
+
+	this.time = 0;
+	
+	this.ventilate = function(lung){
+
+		var timeData = [];
+		var respd = [];
+		this.time = 0.0;
+
+		for (c=0;c < this.nbcycles;c++){
+			// Attente d'un declecnchement
+			
+			this.Fstop = 0;
+			this.Fmax = 0;
+			this.Pao = this.PEEP;
+			while (lung.flow < this.Ftrig){
+				lung.appliquer_pression(this.PEEP, this.Tsampl)
+				timeData.push(sv.log(lung, this));
+				this.time += this.Tsampl;
+				//if (lung.flow > this.Fmax) {this.Fmax = lung.flow;}
+				//else {this.Fstop = this.Cycling * this.Fmax / 100;}
+			}
+			
+			// Phase inspiratoire
+			this.Pao = this.Passist;
+			while (lung.flow > this.Fstop){
+				lung.appliquer_pression(this.Passist, this.Tsampl)
+				timeData.push(sv.log(lung, this));
+				this.time += this.Tsampl;
+
+				if (lung.flow > this.Fmax) {this.Fmax = lung.flow;}
+				this.Fstop = this.Cycling * this.Fmax / 100;
+			}
+		  lung.appliquer_pression(this.PEEP, this.Tsampl)
+		}
+		return {timeData: timeData};
+	};
+	
+	this.updateCalcParams = function(){
+		for (index in this.ventParams){
+			if(this.ventParams[index].calculated == true){
+				var fname = "update" + index;
+				this[fname]();
+			}
+		}
+	}
+
+	this.updateCalcParams();
+
+};
 
 sv.PressureControler = function(){
 
