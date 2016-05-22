@@ -550,13 +550,14 @@ sv.PressureControler = function(){
 
 sv.PVCurve = function(){
 
-	this.Pmin = -100.0;
+	this.Pstart = -100.0;
 	this.Pmax = 100;
+	this.Pstop = -100;
 	this.Pstep = 10;
 	this.Tman = 10;
 
 	this.ventParams = {
-		Pmin: {unit: "cmH₂O"},
+		Pstart: {unit: "cmH₂O"},
 		Pmax: {unit: "cmH₂O"},
 		Pstep: {unit: "cmH₂O"},
 		Tman: {unit: "s"}
@@ -572,9 +573,9 @@ sv.PVCurve = function(){
 		var respd = [];
 
 		this.time = 0.0;
-		this.nbStep = (this.Pmax - this.Pmin) /this.Pstep
+		this.nbStep = ((this.Pmax - this.Pstart)+(this.Pmax - this.Pstop)) /this.Pstep
 		this.Ti = this.Tman / this.nbStep
-		this.Pao = this.Pmin
+		this.Pao = this.Pstart
 
 		while(this.Pao < this.Pmax){
 			
@@ -590,6 +591,19 @@ sv.PVCurve = function(){
 			this.Pao += this.Pstep;
 		}
 
+		while(this.Pao > this.Pstop){
+			
+			var tdeb = this.time;
+			lung.Vti = 0;
+
+			while(this.time < (tdeb + this.Ti)){
+				lung.appliquer_pression(this.Pao, this.Tsampl)
+				timeData.push(sv.log(lung, this));
+				this.time += this.Tsampl;	
+			}
+
+			this.Pao -= this.Pstep;
+		}
 
 		return {
 			timeData: timeData,
