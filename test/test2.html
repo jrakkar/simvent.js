@@ -25,11 +25,7 @@
 
 <body>
 
-	<div id="svg5" class="graph" style="float:right;height:400px;width:400px;"></div>
 	<div id="svg1" class="graph"></div>
-	<div id="svg2" class="graph"></div>
-	<div id="svg3" class="graph"></div>
-	<div id="svg4" class="graph"></div>
 
 	<script>
 		function plot(div, data, x, y){
@@ -37,22 +33,21 @@
 			function fxy(d){
 				return [d[x], d[y]];
 			}
-			var dataset = {
-				data: data.map(fxy),
-				label: y
-			}
-			var plot = $.plot(placeholder, [dataset]);
+			var dataset =  data.map(fxy);
+			console.log(dataset);
+			return $.plot(placeholder, [dataset]);
 		}
 
 		var lung1 = new sv.SygLung();
+		var vent = new sv.PVCurve();
+		var timeData = vent.ventilate(lung1).timeData;
 		var volumes = [];	
-		for (p=0;p<=60;p++){
+		for (p=-60;p<=60;p++){
 			volumes.push([p,lung1.volume(p)]);
 		}
 
 			
-		var placeholder = $("#svg1");
-		var plot = $.plot(placeholder, [volumes]);
+		plot("svg1", timeData, "Palv", "Vt");
 
 		</script>
 

@@ -35,6 +35,7 @@
 	<div id="svg5" class="graph"></div>
 	<div id="svg6" class="graph"></div>
 	<div id="svg8" class="graph"></div>
+	<div id="svg9" class="graph"></div>
 
 	<script>
 		function plot(div, data, x, y){
@@ -50,9 +51,9 @@
 			var plot = $.plot(placeholder, [dataset]);
 		}
 
-		var vent = new sv.PressureAssistor();
+		var vent = new sv.PVCurve();
 
-		var lung1 = new sv.SptLung();
+		var lung1 = new sv.SygLung();
 
 		var data = vent.ventilate(lung1).timeData;
 		
@@ -64,6 +65,7 @@
 		plot("#svg6",data,"time", "Fmax");
 		plot("#svg7",data,"time", "Fstop");
 		plot("#svg7",data,"time", "Pel");
+		plot("#svg9",data,"Palv", "Vt");
 		</script>
 
 </body>
