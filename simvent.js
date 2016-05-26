@@ -377,6 +377,108 @@ sv.SygLung = function(){
 
 };
 
+sv.RLung = function(){
+
+	// Simulation parameters
+	this.Tsampl = 0.001; // Secondes
+
+	// Mechanical parameters
+	this.Vmax = 4.0;
+	this.Vmin = 0.0;
+	this.Pid = 5.0;
+	this.Kid = 20.0;
+	this.hist = 5: // Histeresis in cmH2O of diference between Pi and Pd
+	this.Raw = 5.0 ;// cmH2O/l/s
+
+	this.mechParams = {
+		Vmax: {unit: "l"},
+		Vmin: {unit: "l"},
+		Pid: {unit: "cmH₂O"},
+		Kid: {unit: "cmH₂O"},
+		Raw: {unit: "cmH₂O/l/s"}
+	};
+
+	// Gaz exchange parameters
+	this.Vdaw = 0.1;
+	this.PiCO2 = 0.0;
+	this.PACO2 = 35.0;
+	this.Slope2 = 0.003;
+	this.Slope3 = 5.0;
+
+	//Propriété dynamiques
+	this.PCO2 = 0;
+	this.SCO2 = 0;
+	this.Vt = 0.0;
+	this.Palv = 0.0;
+	this.flow = 0.0;
+	this.Vtmax = 0;
+	this.VtCO2 = 0;
+	
+
+	this.volume = function(P){
+		return this.Vmin + (this.Vmax - this.Vmin)/(1.0+Math.exp(-(P - this.Pid)/this.Kid))
+	}
+
+	this.Vt = this.volume(this.Palv);
+
+	this.findVmaxE = function(){
+		
+	};
+	this.appliquer_debit = function (flow, duration){
+			if(isNaN(flow)){throw "Function debit: NaN value passed as flow" }	
+			this.flow = flow ; // l/s
+			deltaVolume = this.flow * duration; // l
+			this.Vt += deltaVolume; // l
+			this.Vti += deltaVolume;
+			this.Palv = this.Pid - (this.Kid * Math.log(((this.Vmax - this.Vmin)/(this.Vt - this.Vmin))-1));
+
+			if (this.flow > 0){
+				this.Vtmax = this.Vt;
+				this.Vte = 0;
+
+				this.PCO2 = 0;
+				this.SCO2 = 0;
+				this.VtCO2 = 0;
+			}
+
+			else {
+				this.Vte = this.Vtmax - this.Vt;
+				this.Vti -= deltaVolume;
+
+				this.PCO2 = this.co2(this.Vte);
+				this.SCO2 = this.PCO2/(760-47);
+				this.VtCO2 += this.SCO2 * (-deltaVolume);
+			}
+	}
+	this.appliquer_pression = function (pression, duree){
+
+		var time = 0.0;
+		var deltaVolume = 0.0;
+
+		while (time < duree){
+
+			flow = (pression - this.Palv) / this.Raw ; // l/s
+			this.appliquer_debit(flow, this.Tsampl);
+
+			time += this.Tsampl;
+		}
+	};
+
+	this.co2 = function(volume){
+
+		this.VcAlv = this.Vtmax - this.Vdaw;
+		this.PplCO2 = this.PACO2 - (this.Slope3 * (this.VcAlv / 2));
+
+		co2 = this.PiCO2 + (this.PplCO2 - this.PiCO2)/(1 + Math.pow(Math.E,((this.Vdaw - volume)/this.Slope2)))
+
+		if (volume > this.Vdaw) {
+			co2 += this.Slope3 * (volume - this.Vdaw);
+		}
+
+		return co2;
+	};
+
+};
 //******************************
 //	Ventilator models
 //******************************
