@@ -387,7 +387,7 @@ sv.RLung = function(){
 	this.Vmin = 0.0;
 	this.Pid = 5.0;
 	this.Kid = 20.0;
-	this.hist = 5: // Histeresis in cmH2O of diference between Pi and Pd
+	this.hist = 5; // Histeresis in cmH2O of diference between Pi and Pd
 	this.Raw = 5.0 ;// cmH2O/l/s
 
 	this.mechParams = {
@@ -421,9 +421,18 @@ sv.RLung = function(){
 
 	this.Vt = this.volume(this.Palv);
 
-	this.findVmaxE = function(){
-		
+	this.fitExp = function(){
+		var Pid = this.Pid - this.hist;
+		var N = 1 + Math.pow(Math.E,-((this.Palv - Pid)/this.Kid));
+		this.VmaxExp = this.Vmin + (this.Vt - this.Vmin) * N;
 	};
+
+	this.fitInsp = function(){
+		var Pid = this.Pid + this.hist;
+		var N = 1 + Math.pow(Math.E,-((this.Palv - Pid)/this.Kid));
+		this.VminInsp = (N * this.Vt - this.Vmax)/(N-1);
+	};
+
 	this.appliquer_debit = function (flow, duration){
 			if(isNaN(flow)){throw "Function debit: NaN value passed as flow" }	
 			this.flow = flow ; // l/s
