@@ -55,8 +55,10 @@
 
 		var lung1 = new sv.RLung();
 
+		console.log("simulation started");
 		var data = vent.ventilate(lung1).timeData;
 		
+		console.log("simulation ended");
 		plot("#svg1",data,"time", "Pmus");
 		plot("#svg2",data,"time", "Palv");
 		plot("#svg3",data,"time", "Flung");
@@ -66,6 +68,7 @@
 		plot("#svg7",data,"time", "Fstop");
 		plot("#svg7",data,"time", "Pel");
 		plot("#svg9",data,"Palv", "Vt");
+		console.log("graph ended");
 		</script>
 
 </body>

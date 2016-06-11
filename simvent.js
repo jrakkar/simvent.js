@@ -384,11 +384,13 @@ sv.RLung = function(){
 
 	// Mechanical parameters
 	this.Vmax = 4.0;
+	this.VmaxExp = 4.0;
 	this.Vmin = 0.0;
-	this.PidInsp = 5.0;
-	this.PidExp = 5.0;
+	this.VminInsp = 0.0;
+	this.PidInsp = 10.0;
+	this.PidExp = -10.0;
+	this.Pid = 0;
 	this.Kid = 20.0;
-	this.hist = 5; // Histeresis in cmH2O of diference between Pi and Pd
 	this.Raw = 5.0 ;// cmH2O/l/s
 
 	this.mechParams = {
@@ -412,6 +414,7 @@ sv.RLung = function(){
 	this.Vt = 0.0;
 	this.Palv = 0.0;
 	this.flow = 0.0;
+	this.lastFlow = 0.0;
 	this.Vtmax = 0;
 	this.VtCO2 = 0;
 	
@@ -422,51 +425,59 @@ sv.RLung = function(){
 
 	this.Vt = this.volume(this.Palv);
 
-	this.fitExp = function(){
-		var N = 1 + Math.pow(Math.E,-((this.Palv - this.PidExp)/this.Kid));
-		this.VmaxExp = this.Vmin + (this.Vt - this.Vmin) * N;
-	};
-
-	this.fitInsp = function(){
-		var N = 1 + Math.pow(Math.E,-((this.Palv - this.PidInsp)/this.Kid));
-		this.VminInsp = (N * this.Vt - this.Vmax)/(N-1);
-	};
-	
 	this.fit = function(){
 		
-			if (this.flow > 0 and this.lastFlow < 0){
-				this.fitInsp();
+			if (this.flow > 0 && this.lastFlow < 0){
+				var N = 1 + Math.pow(Math.E,-((this.Palv - this.PidInsp)/this.Kid));
+				this.VminInsp = (N * this.Vt - this.Vmax)/(N-1);
 			}
 
-			else if (this.flow < 0 and this.lastFlow > 0){
-				this.fitExp();
+			else if (this.flow < 0 && this.lastFlow > 0){
+				var N = 1 + Math.pow(Math.E,-((this.Palv - this.PidExp)/this.Kid));
+				this.VmaxExp = this.Vmin + (this.Vt - this.Vmin) * N;
 			}
+
+			this.lastFlow = this.flow;
 	}
+
 	this.appliquer_debit = function (flow, duration){
-			if(isNaN(flow)){throw "Function debit: NaN value passed as flow" }	
+			//console.log("lung.appliquer_debit()");
+			if(isNaN(flow)){throw "Function debit: NaN value passed as flow" }
+
 			this.flow = flow ; // l/s
 			deltaVolume = this.flow * duration; // l
+			//console.log("deltaVolume: " + deltaVolume);
 			this.Vt += deltaVolume; // l
+			//console.log("Vt: " + this.Vt);
 			this.Vti += deltaVolume;
+
+			this.fit();
 			
 			if (this.flow > 0){
-				this.palv = this.pidinsp - (this.kid * math.log(((this.vmax - this.vmininsp)/(this.vt - this.vmininsp))-1));
-				this.vtmax = this.vt;
-				this.vte = 0;
+				this.Palv = this.PidInsp - (this.Kid * Math.log(((this.Vmax - this.VminInsp)/(this.Vt - this.VminInsp))-1));
+				this.Vtmax = this.Vt;
+				this.Vte = 0;
 
-				this.pco2 = 0;
-				this.sco2 = 0;
-				this.vtco2 = 0;
+				this.PCO2 = 0;
+				this.SCO2 = 0;
+				this.VtCO2 = 0;
 			}
 
 			else {
-				this.palv = this.pidexp - (this.kid * math.log(((this.vmaxexp - this.vmin)/(this.vt - this.vmin))-1));
-				this.vte = this.vtmax - this.vt;
-				this.vti -= deltavolume;
+				this.Palv = this.PidExp - (this.Kid * Math.log(((this.VmaxExp - this.Vmin)/(this.Vt - this.Vmin))-1));
+				this.Vte = this.Vtmax - this.Vt;
+				this.Vti -= deltaVolume;
 
-				this.pco2 = this.co2(this.vte);
-				this.sco2 = this.pco2/(760-47);
-				this.vtco2 += this.sco2 * (-deltavolume);
+				this.PCO2 = this.co2(this.Vte);
+				this.SCO2 = this.PCO2/(760-47);
+				this.VtCO2 += this.SCO2 * (-deltaVolume);
+
+				//console.log("PidExp: "+ this.PidExp);
+				//console.log("Kid: "+ this.Kid);
+				//console.log("VmaxExp: "+ this.VmaxExp);
+				//console.log("VMin: "+ this.Vmin);
+				//console.log("Vt: "+ this.Vt);
+				//console.log("Palv: "+ this.Palv);
 			}
 	}
 	this.appliquer_pression = function (pression, duree){
@@ -476,7 +487,8 @@ sv.RLung = function(){
 
 		while (time < duree){
 
-			flow = (pression - this.Palv) / this.Raw ; // l/s
+			var flow = (pression - this.Palv) / this.Raw ; // l/s
+			//console.log(flow);
 			this.appliquer_debit(flow, this.Tsampl);
 
 			time += this.Tsampl;
