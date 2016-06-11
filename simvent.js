@@ -441,14 +441,11 @@ sv.RLung = function(){
 	}
 
 	this.appliquer_debit = function (flow, duration){
-			//console.log("lung.appliquer_debit()");
 			if(isNaN(flow)){throw "Function debit: NaN value passed as flow" }
 
 			this.flow = flow ; // l/s
 			deltaVolume = this.flow * duration; // l
-			//console.log("deltaVolume: " + deltaVolume);
 			this.Vt += deltaVolume; // l
-			//console.log("Vt: " + this.Vt);
 			this.Vti += deltaVolume;
 
 			this.fit();
@@ -472,12 +469,6 @@ sv.RLung = function(){
 				this.SCO2 = this.PCO2/(760-47);
 				this.VtCO2 += this.SCO2 * (-deltaVolume);
 
-				//console.log("PidExp: "+ this.PidExp);
-				//console.log("Kid: "+ this.Kid);
-				//console.log("VmaxExp: "+ this.VmaxExp);
-				//console.log("VMin: "+ this.Vmin);
-				//console.log("Vt: "+ this.Vt);
-				//console.log("Palv: "+ this.Palv);
 			}
 	}
 	this.appliquer_pression = function (pression, duree){
@@ -488,7 +479,6 @@ sv.RLung = function(){
 		while (time < duree){
 
 			var flow = (pression - this.Palv) / this.Raw ; // l/s
-			//console.log(flow);
 			this.appliquer_debit(flow, this.Tsampl);
 
 			time += this.Tsampl;
