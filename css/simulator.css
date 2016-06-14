@@ -61,6 +61,12 @@ td.data {
 	text-align:right;
 }
 
+th {
+
+border:none;
+background-color: hsl(0, 0%, 20%);
+color:white;
+}
 table {
 	border: none;
 }
