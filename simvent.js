@@ -396,7 +396,8 @@ sv.RLung = function(){
 	this.mechParams = {
 		Vmax: {unit: "l"},
 		Vmin: {unit: "l"},
-		Pid: {unit: "cmH₂O"},
+		PidInsp: {unit: "cmH₂O"},
+		PidExp: {unit: "cmH₂O"},
 		Kid: {unit: "cmH₂O"},
 		Raw: {unit: "cmH₂O/l/s"}
 	};
@@ -682,6 +683,7 @@ sv.PVCurve = function(){
 	this.ventParams = {
 		Pstart: {unit: "cmH₂O"},
 		Pmax: {unit: "cmH₂O"},
+		Pstop: {unit: "cmH₂O"},
 		Pstep: {unit: "cmH₂O"},
 		Tman: {unit: "s"}
 	};
