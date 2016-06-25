@@ -51,12 +51,9 @@
 			var plot = $.plot(placeholder, [dataset]);
 		}
 
-		var vent = new sv.PVCurve();
-		vent.Pmax = 25;
-		vent.Pstart = 0;
+		var vent = new sv.VDR();
 
 		var lung1 = new sv.RLung();
-		lung1.Palv=-100;
 
 		console.log("simulation started");
 		var data = vent.ventilate(lung1).timeData;
