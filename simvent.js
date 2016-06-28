@@ -774,12 +774,14 @@ sv.VDR = function(){
 		rAvg: {},
 		lowPass: {}
 	};
+
 	this.Tic= 2; // Convective inspiratory time
 	this.Tec= 2; // Convective expiratory time
 	this.Fperc= 500;
 	this.Rit= 0.5; //Ratio of inspiratory time over total time (percussion)
 	this.Fipl= 0.18; // 	
 	this.Fiph= 1.8; // 
+	this.CPR = 0.2;
 
 	this.ventParams = {
 		Tic: {unit: "s"},
@@ -789,7 +791,8 @@ sv.VDR = function(){
 		Fhz: {unit: "hz", calculated: true},
 		Rit: {},
 		Fiph: {unit: "l/s"},
-		Fipl: {unit: "l/s"}
+		Fipl: {unit: "l/s"},
+		CPR: {}
 	};
 
 	this.updateFconv = function(){
@@ -862,8 +865,13 @@ sv.VDR = function(){
 
 	this.convectiveInspiration = function(lung){
 		var tStopConv = this.time + this.Tic;
+		var tCPR = this.time + 0.8;
 		while (this.time < tStopConv && this.time < this.Tvent){
-			this.percussiveInspiration(lung, this.Fiph);
+			if (this.time < tCPR){
+				var inflow = this.Fiph;
+			}
+			else {var inflow = this.Fiph * (1 + this.CPR);}
+			this.percussiveInspiration(lung, inflow);
 			this.percussiveExpiration(lung);
 			percData.push(sv.logPerc(lung, this));
 		}

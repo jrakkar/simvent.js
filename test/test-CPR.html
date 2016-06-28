@@ -21,7 +21,7 @@
 
 <body>
 
-	<script src="http://jsconsole.com/js/remote.js?progrt"></script>
+	<!--script src="http://jsconsole.com/js/remote.js?progrt"></script-->
 	<script>
 		function plot(data, x, y){
 			
@@ -39,14 +39,17 @@
 		}
 
 		var vent = new sv.VDR();
+		vent.Tvent=24;
+		vent.Tic = 3;
+		vent.CPR=0.8;
 
-		var lung1 = new sv.RLung();
+		var lung1 = new sv.SimpleLung();
 
 		console.log("simulation started");
 		var data = vent.ventilate(lung1).timeData;
 		
 		console.log("simulation ended");
-		plot(data,"time", "Palv");
+		plot(data,"time", "Pao");
 		plot(data,"time", "Flung");
 		plot(data,"time", "Vt");
 		plot(data,"Palv", "Vt");
