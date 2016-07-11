@@ -1,5 +1,5 @@
 ---
-title: Flow control ventilator waveform
+title: Time based capnogram
 ---
 <svg id="svg1{{ page.id | replace: "/", "" }}" class="graphcurve surface"></svg>
 <svg id="svg2{{ page.id | replace: "/", "" }}" class="graphcurve surface"></svg>
