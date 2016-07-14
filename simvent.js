@@ -781,7 +781,7 @@ sv.VDR = function(){
 	this.Rit= 0.5; //Ratio of inspiratory time over total time (percussion)
 	this.Fipl= 0.18; // 	
 	this.Fiph= 1.8; // 
-	this.CPR = 0.2;
+	this.CPR = 0.0;
 
 	this.ventParams = {
 		Tic: {unit: "s"},
