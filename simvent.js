@@ -814,6 +814,7 @@ sv.VDR = function(){
 	this.Fop=0; //Phasitron output flow
 	this.Fip=0; //Phasitron output flow
 	this.Pao=0;//Presure at the ariway openning (phasitron output)
+	this.CycleC=0;
 
 	this.percussiveExpiration = function(lung){
 
@@ -866,6 +867,7 @@ sv.VDR = function(){
 	this.convectiveInspiration = function(lung){
 		var tStopConv = this.time + this.Tic;
 		var tCPR = this.time + 0.8;
+		this.CycleC=1;
 		while (this.time < tStopConv && this.time < this.Tvent){
 			if (this.time < tCPR){
 				var inflow = this.Fiph;
@@ -879,6 +881,7 @@ sv.VDR = function(){
 
 	this.convectiveExpiration = function(lung){
 		var tStopConv = this.time + this.Tec;
+		this.CycleC=0;
 		while (this.time < tStopConv && this.time < this.Tvent){
 			this.percussiveInspiration(lung, this.Fipl);
 			this.percussiveExpiration(lung);
