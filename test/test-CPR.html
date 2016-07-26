@@ -43,7 +43,7 @@
 		vent.Fperc = 300;
 		vent.Tic = 3;
 		vent.lowPass = 3;
-		vent.CPR=1.8;
+		vent.CPR=0.001;
 
 		var lung1 = new sv.SimpleLung();
 
@@ -52,8 +52,8 @@
 		
 		console.log("simulation ended");
 		plot(data,"time", "Pao");
-		//plot(data,"time", "Flung");
-		//plot(data,"time", "Vt");
+		plot(data,"time", "Fip");
+		plot(data,"time", "Fop");
 		//plot(data,"Palv", "Vt");
 		console.log("graph ended");
 		</script>

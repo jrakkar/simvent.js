@@ -879,7 +879,7 @@ sv.VDR = function(){
 				this.percussiveExpiration(lung);
 			}
 			else {
-				thi.percussiveInspiration(lung, thi.Fiph * this.CPR);
+				this.percussiveInspiration(lung, this.Fiph * this.CPR);
 			}
 			percData.push(sv.logPerc(lung, this));
 		}
