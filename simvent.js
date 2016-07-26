@@ -874,13 +874,7 @@ sv.VDR = function(){
 			}
 			else {var inflow = this.Fiph * (1 + this.CPR);}
 			this.percussiveInspiration(lung, inflow);
-
-			if (this.time < tCPR){
-				this.percussiveExpiration(lung);
-			}
-			else {
-				this.percussiveInspiration(lung, this.Fiph * this.CPR);
-			}
+			this.percussiveExpiration(lung);
 			percData.push(sv.logPerc(lung, this));
 		}
 	}
