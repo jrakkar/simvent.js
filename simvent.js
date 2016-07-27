@@ -93,7 +93,7 @@ sv.SimpleLung = function(){
 	
 	this.appliquer_debit = function (flow, duration){
 
-			if(isNaN(flow)){throw "Function debit: NaN value passed as flow" }	
+			if(isNaN(flow)){throw "sv.SimpleLung.appliquer_debit: NaN value passed as flow" }	
 
 			this.flow = flow ; // l/s
 			deltaVolume = this.flow * duration; // l
@@ -762,7 +762,7 @@ sv.VDR = function(){
 	this.Tvent= 12; //The length of time the lung will be ventilated
 	this.Tsampl = 0.001;
 	this.Tramp= 0.005;
-	this.Rexp= 0.5; // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
+	this.Rexp= 1; // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
 	this.rAvg= 2;
 	this.lowPass= 2;
 
@@ -781,7 +781,7 @@ sv.VDR = function(){
 	this.Rit= 0.5; //Ratio of inspiratory time over total time (percussion)
 	this.Fipl= 0.18; // 	
 	this.Fiph= 1.8; // 
-	this.CPR = 0.0;
+	this.CPR = 2;
 
 	this.ventParams = {
 		Tic: {unit: "s"},
@@ -816,7 +816,7 @@ sv.VDR = function(){
 	this.Pao=0;//Presure at the ariway openning (phasitron output)
 	this.CycleC=0;
 
-	this.percussiveExpiration = function(lung){
+	this.percussiveExpiration = function(lung, Rexp){
 
 		// Must be executed in a scope where the timeData container is defined
 		lung.flow = 0;
@@ -827,17 +827,10 @@ sv.VDR = function(){
 
 		var tStopPerc = this.time + this.Tep;
 		while (this.time < tStopPerc){
-			this.Pao = - lung.flow * this.Rexp;
+			this.Pao = - lung.flow * Rexp;
 			
 			flow = (this.Pao - lung.Palv)/lung.Raw;
 			lung.appliquer_debit(flow, this.Tsampl);
-			/*
-			//lung.flow = -9;
-			var deltaVol = lung.flow * this.Tsampl;
-			lung.Vt += deltaVol;
-			lung.Vtep += deltaVol;
-			lung.Palv = 1000 * lung.Vt / lung.Crs;
-			*/
 			timeData.push(sv.log(lung, this));
 			this.time += this.Tsampl;
 		}
@@ -874,7 +867,13 @@ sv.VDR = function(){
 			}
 			else {var inflow = this.Fiph * (1 + this.CPR);}
 			this.percussiveInspiration(lung, inflow);
-			this.percussiveExpiration(lung);
+
+			if (this.time < tCPR){
+				this.percussiveExpiration(lung, this.Rexp);
+			}
+			else {
+				 this.percussiveExpiration(lung, this.Rexp *  (1 + this.CPR));
+				 }
 			percData.push(sv.logPerc(lung, this));
 		}
 	}
@@ -884,7 +883,7 @@ sv.VDR = function(){
 		this.CycleC=0;
 		while (this.time < tStopConv && this.time < this.Tvent){
 			this.percussiveInspiration(lung, this.Fipl);
-			this.percussiveExpiration(lung);
+			this.percussiveExpiration(lung, this.Rexp);
 			percData.push(sv.logPerc(lung, this));
 		}
 	}
