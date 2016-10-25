@@ -15,11 +15,11 @@ fp.dygraphConf.axisLabelWidth = 25;
 fp.dygraphConf.titleHeight = 30;
 fp.paramContainer = "#control";
 fp.jparamContainer = "control";
-		fp.timeSeries = ["Pao","Flung","Vt", "PCO2"];
-		fp.ventModels = ["FlowControler", "PresureControler", "VDR", "PVCurve"];
-		fp.ventModel = "FlowControler";
-		fp.lungModel = "SimpleLung";
-		fp.init()
+fp.timeSeries = ["Pao","Flung","Vt", "PCO2"];
+fp.ventModels = ["FlowControler", "PresureControler", "VDR", "PVCurve"];
+fp.ventModel = "FlowControler";
+fp.lungModel = "SimpleLung";
+fp.init()
 </script>
 <script>
 function togglecontrol(){
@@ -30,8 +30,6 @@ function togglecontrol(){
 	else{
 		ctrlClass.add("hidden");
 	}
-
-	
 }
 setTimeout(togglecontrol,1000);
 </script>
