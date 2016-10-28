@@ -178,15 +178,16 @@ sv.SptLung = function(){
 
 	this.mechParams = {
 		Crs: {unit: "ml/cmH₂O"},
-		Raw: {unit: "cmH₂O/l/s"}
+		Raw: {unit: "cmH₂O/l/s"},
+		Fspt: {unit: "/min."},
+		Ti: {unit: "sec."},
+		Pmax: {unit: "cmH₂O"}
 	}	
 
 	this.Fspt = 30.0 ;// c/min
 	this.Ti = 1 ; // sec
 	this.Pmax = 6.5 ; // cmH20
 	
-	this.Tcycle = 60.0/this.Fspt;
-	this.Te = this.Tcycle - this.Ti ;
 
 	// Gaz exchange parameters
 	this.Vdaw   = 0.1;
@@ -207,7 +208,9 @@ sv.SptLung = function(){
 	this.VtCO2 = 0;
 
 	this.updatePmus = function(){
-		var mTime = this.time % this.Tcycle;
+		//this.Tcycle = 60.0/this.Fspt;
+		//this.Te = this.Tcycle - this.Ti ;
+		var mTime = this.time % (60.0/this.Fspt);
 
 		if(mTime<this.Ti){
 			var Pmus = 0.5 * this.Pmax * (1 + Math.sin(
