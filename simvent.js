@@ -1,4 +1,4 @@
-var sv = {}
+sv = {}
 
 sv.log = function(lung, vent){
 	return {
