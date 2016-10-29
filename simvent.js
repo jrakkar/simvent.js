@@ -111,7 +111,7 @@ sv.SimpleLung = function(){
 
 			else {
 				this.Vte = this.Vtmax - this.Vt;
-				this.Vti -= deltaVolume;
+				//this.Vti -= deltaVolume;
 				this.PCO2 = this.co2(this.Vte);
 				this.SCO2 = this.PCO2/(760-47);
 				this.VtCO2 += this.SCO2 * (-deltaVolume);
@@ -467,7 +467,7 @@ sv.RLung = function(){
 			else {
 				this.Palv = this.PidExp - (this.Kid * Math.log(((this.VmaxExp - this.Vmin)/(this.Vt - this.Vmin))-1));
 				this.Vte = this.Vtmax - this.Vt;
-				this.Vti -= deltaVolume;
+				//this.Vti -= deltaVolume;
 
 				this.PCO2 = this.co2(this.Vte);
 				this.SCO2 = this.PCO2/(760-47);
