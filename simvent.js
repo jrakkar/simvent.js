@@ -184,7 +184,7 @@ sv.SptLung = function(){
 		Pmax: {unit: "cmH₂O"}
 	}	
 
-	this.Fspt = 30.0 ;// c/min
+	this.Fspt = 14.0 ;// c/min
 	this.Ti = 1 ; // sec
 	this.Pmax = 6.5 ; // cmH20
 	
@@ -212,7 +212,7 @@ sv.SptLung = function(){
 		//this.Te = this.Tcycle - this.Ti ;
 		var mTime = this.time % (60.0/this.Fspt);
 
-		if(mTime<this.Ti){
+		if(mTime<this.Ti && this.Fspt > 0){
 			var Pmus = 0.5 * this.Pmax * (1 + Math.sin(
 						(2*Math.PI )* (mTime / this.Ti)- Math.PI/2
 					));
@@ -526,11 +526,13 @@ sv.PressureAssistor = function(){
 	};
 
 	this.Tsampl = 0.02;
-	this.nbcycles = 4;
+	this.Tvent = 12.0;
+	//this.nbcycles = 4;
 
 	this.simParams = {
 		Tsampl:{unit: "s"},
-		nbcycles:{}
+		Tvent: {uni: "s"}
+	//	nbcycles:{}
 	};
 
 	this.time = 0;
@@ -541,13 +543,14 @@ sv.PressureAssistor = function(){
 		var respd = [];
 		this.time = 0.0;
 
-		for (c=0;c < this.nbcycles;c++){
+		//for (c=0;c < this.nbcycles;c++){
+		while(this.time <= this.Tvent){
 			// Attente d'un declecnchement
 			
 			this.Fstop = 0;
 			this.Fmax = 0;
 			this.Pao = this.PEEP;
-			while (lung.flow < this.Ftrig){
+			while (lung.flow < this.Ftrig && this.time <= this.Tvent){
 				lung.appliquer_pression(this.PEEP, this.Tsampl)
 				timeData.push(sv.log(lung, this));
 				this.time += this.Tsampl;
@@ -557,7 +560,7 @@ sv.PressureAssistor = function(){
 			
 			// Phase inspiratoire
 			this.Pao = this.Passist;
-			while (lung.flow > this.Fstop){
+			while (lung.flow > this.Fstop && this.time <= this.Tvent){
 				lung.appliquer_pression(this.Passist, this.Tsampl)
 				timeData.push(sv.log(lung, this));
 				this.time += this.Tsampl;
@@ -767,7 +770,7 @@ sv.VDR = function(){
 	this.Tramp= 0.005;
 	this.Rexp= 1; // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
 	this.rAvg= 2;
-	this.lowPass= 2;
+	this.lowPass= 3;
 
 	this.simParams = {
 		Tvent: {unit: "s"},
@@ -784,7 +787,7 @@ sv.VDR = function(){
 	this.Rit= 0.5; //Ratio of inspiratory time over total time (percussion)
 	this.Fipl= 0.18; // 	
 	this.Fiph= 1.8; // 
-	this.CPR = 2;
+	this.CPR = 0;
 
 	this.ventParams = {
 		Tic: {unit: "s"},
