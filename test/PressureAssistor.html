@@ -32,10 +32,10 @@
 
 	<script src="../frontpaneljs/frontPanel.js" ></script>
 	<script>
-		fp.timeSeries = ["Pao","Flung","Vt", "PCO2"];
+		fp.timeSeries = ["Pao","Flung","Vt", "Vti", "PCO2"];
 		fp.ventModels = ["PressureAssistor", "PressureControler", "FlowControler", "VDR"];
-		fp.ventModel = "PressureAssistor";
-		fp.lungModel = "SptLung";
+		fp.ventModel = "FlowControler";
+		fp.lungModel = "RLung";
 		fp.init()
 	</script>
 </body>
