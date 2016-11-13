@@ -57,9 +57,6 @@ sv.avg = function(dataset, data, Nroll){
 	}
 }
 
-//**************************
-//	Lung models
-//**************************
 
 sv.SimpleLung = function(){
 

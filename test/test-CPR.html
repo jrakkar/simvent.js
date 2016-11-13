@@ -3,6 +3,7 @@
 	<meta charset="utf-8">
 	<title>simvent.js test page</title>
 	<script src="../simvent.js"></script>
+	<script src="../sv2.0.js"></script>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.js"></script>
@@ -23,6 +24,7 @@
 
 	<!--script src="http://jsconsole.com/js/remote.js?progrt"></script-->
 	<script>
+	/*
 		function plot(data, x, y){
 			
 			$("body").append("<div id='graph"+x+y +"' class='graph'></div>");
@@ -38,24 +40,15 @@
 			var plot = $.plot(placeholder, [dataset]);
 		}
 
-		var vent = new sv.VDR();
-		vent.Tvent=12;
-		vent.Fperc = 300;
-		vent.Tic = 3;
-		vent.lowPass = 3;
+		var vent = new sv.FlowControler();
 
-		var lung1 = new sv.SimpleLung();
+		var lung1 = new sv.DeuxSimpleLung();
 
 		console.log("simulation started");
 		var data = vent.ventilate(lung1).timeData;
 		
-		console.log("simulation ended");
-		plot(data,"time", "Pao");
-		plot(data,"time", "Fip");
-		plot(data,"time", "Fop");
-		//plot(data,"Palv", "Vt");
-		console.log("graph ended");
-		</script>
-
+		plot(data,"Palv", "Vt");
+		*/
+	</script>
 </body>
 
