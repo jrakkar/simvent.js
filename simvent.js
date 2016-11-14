@@ -58,199 +58,31 @@ sv.avg = function(dataset, data, Nroll){
 }
 
 
-sv.SimpleLung = function(){
+sv.Lung = class {
+	constructor() {
 
-	// Simulator parameters
-	this.Tsampl = 0.001; // Secondes
+		this.defaults = {
+			Tsampl: 0.001,
 
-	// Mechanical parameters
-	this.Crs = 50.0 ;// ml/cmH2O
-	this.Raw = 5.0 ;// cmH2O/l/s
+			// Gaz exchange parameters
 
-	this.mechParams = {
-		Crs: {unit: "ml/cmH₂O"},
-		Raw: {unit: "cmH₂O/l/s"}
+			Vdaw   : 0.1,
+			PiCO2  : 0.0,
+			PACO2  : 35.0,
+			Slope2 : 0.003,
+			Slope3 : 5
+		};
+
+		this.parseDefaults();	
 	}
 
-	// Gaz exchange parameters
-	this.Vdaw   = 0.1;
-	this.PiCO2  = 0.0;
-	this.PACO2  = 35.0;
-	this.Slope2 = 0.003;
-	this.Slope3 = 5;
-
-	//Propriété dynamiques
-	this.PCO2  = 0;
-	this.SCO2  = 0;
-	this.Vt    = 0.0;
-	this.Palv  = 0.0;
-	this.flow  = 0.0;
-	this.Vtmax = 0;
-	this.VtCO2 = 0;
-	
-	this.appliquer_debit = function (flow, duration){
-
-			if(isNaN(flow)){throw "sv.SimpleLung.appliquer_debit: NaN value passed as flow" }	
-
-			this.flow = flow ; // l/s
-			deltaVolume = this.flow * duration; // l
-			this.Vt += deltaVolume; // l
-			this.Vti += deltaVolume;
-			this.Palv = 1000 * this.Vt / this.Crs;
-
-			if (this.flow > 0){
-				this.Vtmax = this.Vt;
-				this.PCO2 = 0;
-				this.Vte = 0;
-				this.SCO2 = 0;
-				this.VtCO2 = 0;
-			}
-
-			else {
-				this.Vte = this.Vtmax - this.Vt;
-				//this.Vti -= deltaVolume;
-				this.PCO2 = this.co2(this.Vte);
-				this.SCO2 = this.PCO2/(760-47);
-				this.VtCO2 += this.SCO2 * (-deltaVolume);
-			}
+	parseDefaults() {
+		for (var p in this.defaults) {
+			this[p] = this.defaults[p];
+		}
 	}
 
-	this.appliquer_pression = function (pression, duree){
-
-		var time = 0.0;
-		var deltaVolume = 0.0;
-
-		while (time < duree){
-
-			this.flow = (pression - this.Palv) / this.Raw ; // l/s
-			deltaVolume = this.flow * this.Tsampl; // l
-			this.Vt += deltaVolume; // l
-			this.Palv = (1000 *this.Vt)  / (this.Crs);
-
-			if (this.flow > 0){
-				this.Vtmax = this.Vt;
-				this.PCO2 = 0;
-				this.Vte = 0;
-				this.SCO2 = 0;
-				this.VtCO2 = 0;
-			}
-
-			else {
-				this.Vte = this.Vtmax - this.Vt;
-				this.PCO2 = this.co2(this.Vte);
-				this.SCO2 = this.PCO2/(760-47);
-				this.VtCO2 += this.SCO2 * (-deltaVolume);
-			}
-
-			time += this.Tsampl;
-		}
-	};
-
-	this.co2 = function(volume){
-
-		this.VcAlv = this.Vtmax - this.Vdaw;
-		this.PplCO2 = this.PACO2 - (this.Slope3 * (this.VcAlv / 2));
-
-		co2 = this.PiCO2 + 
-			(this.PplCO2 - this.PiCO2)/
-			(1 + Math.pow(Math.E,((this.Vdaw - volume)/this.Slope2)))
-
-		if (volume > this.Vdaw) {
-			co2 += this.Slope3 * (volume - this.Vdaw);
-		}
-
-		return co2;
-	};
-
-};
-
-sv.SptLung = function(){
-
-	// Simulator parameters
-	this.Tsampl = 0.001; // Secondes
-
-	// Mechanical parameters
-	this.Crs = 30.0 ;// ml/cmH2O
-	this.Raw = 20.0 ;// cmH2O/l/s
-
-	this.mechParams = {
-		Crs: {unit: "ml/cmH₂O"},
-		Raw: {unit: "cmH₂O/l/s"},
-		Fspt: {unit: "/min."},
-		Ti: {unit: "sec."},
-		Pmax: {unit: "cmH₂O"}
-	}	
-
-	this.Fspt = 14.0 ;// c/min
-	this.Ti = 1 ; // sec
-	this.Pmax = 6.5 ; // cmH20
-	
-
-	// Gaz exchange parameters
-	this.Vdaw   = 0.1;
-	this.PiCO2  = 0.0;
-	this.PACO2  = 35.0;
-	this.Slope2 = 0.003;
-	this.Slope3 = 5;
-
-	//Propriété dynamiques
-	this.time = 0;
-	this.PCO2  = 0;
-	this.SCO2  = 0;
-	this.Vt    = 0.0;
-	this.Palv  = 0.0;
-	this.Pmus = 0;
-	this.flow  = 0.0;
-	this.Vtmax = 0;
-	this.VtCO2 = 0;
-
-	this.updatePmus = function(){
-		//this.Tcycle = 60.0/this.Fspt;
-		//this.Te = this.Tcycle - this.Ti ;
-		var mTime = this.time % (60.0/this.Fspt);
-
-		if(mTime<this.Ti && this.Fspt > 0){
-			var Pmus = 0.5 * this.Pmax * (1 + Math.sin(
-						(2*Math.PI )* (mTime / this.Ti)- Math.PI/2
-					));
-
-		}
-		else{
-			var Pmus = 0.0 ;
-		}
-		this.Pmus = Pmus;
-	}
-
-	this.appliquer_debit = function (flow, duration){
-
-			this.flow = flow ; // l/s
-			deltaVolume = this.flow * duration; // l
-			this.Vt += deltaVolume; // l
-			this.Vti += deltaVolume;
-			this.Pel = 1000 * this.Vt / this.Crs;
-			this.Palv = this.Pel - this.Pmus;
-
-			if (this.flow > 0){
-				this.Vtmax = this.Vt;
-				this.PCO2 = 0;
-				this.Vte = 0;
-				this.SCO2 = 0;
-				this.VtCO2 = 0;
-			}
-
-			else {
-				this.Vte = this.Vtmax - this.Vt;
-				this.Vti -= deltaVolume;
-				this.PCO2 = this.co2(this.Vte);
-				this.SCO2 = this.PCO2/(760-47);
-				this.VtCO2 += this.SCO2 * (-deltaVolume);
-			}
-
-			this.time += duration;
-			this.updatePmus();
-	}
-
-	this.appliquer_pression = function (pression, duree){
+	appliquer_pression(pression, duree) {
 
 		var time = 0.0;
 		var deltaVolume = 0.0;
@@ -264,22 +96,110 @@ sv.SptLung = function(){
 		}
 	};
 
-	this.co2 = function(volume){
+	updateCO2() {
 
-		this.VcAlv = this.Vtmax - this.Vdaw;
-		this.PplCO2 = this.PACO2 - (this.Slope3 * (this.VcAlv / 2));
-
-		co2 = this.PiCO2 + 
+		var co2 = this.PiCO2 + 
 			(this.PplCO2 - this.PiCO2)/
-			(1 + Math.pow(Math.E,((this.Vdaw - volume)/this.Slope2)))
+			(1 + Math.pow(Math.E,((this.Vdaw - this.Vte)/this.Slope2)))
 
-		if (volume > this.Vdaw) {
-			co2 += this.Slope3 * (volume - this.Vdaw);
+		if (this.Vte > this.Vdaw) {
+			co2 += this.Slope3 * (this.Vte - this.Vdaw);
 		}
 
-		return co2;
+		this.PCO2 = co2;
 	};
-}	
+
+	appliquer_debit (flow, duration){
+
+		if(isNaN(flow)){
+			throw "sv.SimpleLung.appliquer_debit: NaN value passed as flow";
+		}	
+
+		this.flow = flow ; // l/s
+		var deltaVolume = this.flow * duration; // l
+		this.Vt += deltaVolume; // l
+		this.Vti += deltaVolume;
+
+		if (this.flow > 0){
+			this.Vtmax = this.Vt;
+			this.PCO2 = 0;
+			this.Vte = 0;
+			this.VtCO2 = 0;
+		}
+
+		else {
+			this.Vte = this.Vtmax - this.Vt;
+			this.updateCO2();
+			this.VtCO2 += this.SCO2 * (-deltaVolume);
+		}
+		this.time += duration;
+	}
+
+	get SCO2() { return this.PCO2/(760-47); }
+	get VcAlv() { return this.Vtmax - this.Vdaw; }
+	get PplCO2() { return this.PACO2 - (this.Slope3 * (this.VcAlv / 2)); }
+}
+
+sv.SimpleLung = class extends sv.Lung {
+	constructor(params) {
+		super();
+
+		this.defaults = {
+			Crs : 50.0,// ml/cmH2O
+			Raw : 5.0// cmH2O/l/s
+		};
+
+		this.parseDefaults();
+		this.mechParams = {
+			Crs: {unit: "ml/cmH₂O"},
+			Raw: {unit: "cmH₂O/l/s"}
+		}
+
+	}	
+	get Palv() {return 1000 * this.Vt / this.Crs;}
+	
+}
+
+sv.SptLung = class extends sv.Lung{
+	
+	constructor() {
+	
+		super();
+		this.defaults = {
+			Crs : 30.0 ,// ml/cmH2O
+			Raw : 20.0 ,// cmH2O/l/s
+			Fspt : 14.0 ,// c/min
+			Ti : 1 , // sec
+			Pmax : 6.5, // cmH20
+			Vt : 0, // Have to be initialised
+			time : 0 // Have to be initialised
+		}
+
+		this.parseDefaults();
+		this.mechParams = {
+			Crs: {unit: "ml/cmH₂O"},
+			Raw: {unit: "cmH₂O/l/s"},
+			Fspt: {unit: "/min."},
+			Ti: {unit: "sec."},
+			Pmax: {unit: "cmH₂O"}
+		}	
+	}
+
+	get Pmus(){
+		var mTime = this.time % (60.0/this.Fspt);
+
+		if(mTime<this.Ti && this.Fspt > 0){
+			return 0.5 * this.Pmax * (1 + Math.sin(
+						(2*Math.PI )* (mTime / this.Ti)- Math.PI/2
+					));
+		}
+		else{ return 0; }
+	}
+
+	get Pel() {return 1000 * this.Vt / this.Crs;}
+	get Palv() {return this.Pel - this.Pmus;}
+}
+
 sv.SygLung = function(){
 
 	// Simulation parameters
@@ -565,7 +485,7 @@ sv.PressureAssistor = function(){
 				if (lung.flow > this.Fmax) {this.Fmax = lung.flow;}
 				this.Fstop = this.Cycling * this.Fmax / 100;
 			}
-		  lung.appliquer_pression(this.PEEP, this.Tsampl)
+			lung.appliquer_pression(this.PEEP, this.Tsampl)
 		}
 		return {timeData: timeData};
 	};
@@ -875,8 +795,8 @@ sv.VDR = function(){
 				this.percussiveExpiration(lung, this.Rexp);
 			}
 			else {
-				 this.percussiveExpiration(lung, this.Rexp *  (1 + this.CPR));
-				 }
+				this.percussiveExpiration(lung, this.Rexp *  (1 + this.CPR));
+			}
 			percData.push(sv.logPerc(lung, this));
 		}
 	}
