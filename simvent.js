@@ -4,7 +4,7 @@ sv.log = function(lung, vent){
 	return {
 
 		// Lung variables
-		
+
 		time  : vent.time,
 		Flung : lung.flow,
 		Palv  : lung.Palv,
@@ -42,11 +42,10 @@ sv.syg = function(x, ymax, ymin, xid, kid){
 }
 
 sv.avg = function(dataset, data, Nroll){
-	
-	for(i = 0; i < dataset.length - (Nroll -1); i ++){
-		
-		var curent = i;
 
+	for(i = 0; i < dataset.length - (Nroll -1); i ++){
+
+		var curent = i;
 		var avged = dataset[curent][data];
 
 		for(i2 = curent + 1; i2 < (curent + Nroll) ; i2 ++){
@@ -63,9 +62,7 @@ sv.Lung = class {
 
 		this.defaults = {
 			Tsampl: 0.001,
-
 			// Gaz exchange parameters
-
 			Vdaw   : 0.1,
 			PiCO2  : 0.0,
 			PACO2  : 35.0,
@@ -73,7 +70,7 @@ sv.Lung = class {
 			Slope3 : 5
 		};
 
-		this.parseDefaults();	
+		this.parseDefaults();
 	}
 
 	parseDefaults() {
@@ -88,9 +85,9 @@ sv.Lung = class {
 		var deltaVolume = 0.0;
 
 		while (time < duree){
-
-			var flow = (pression - this.Palv) / this.Raw ; // l/s
-			this.appliquer_debit(flow, this.Tsampl);
+			var deltaP = pression / this.Palv;
+			this.flow = deltaP / this.Raw;
+			this.appliquer_debit(this.flow, this.Tsampl);
 
 			time += this.Tsampl;
 		}
@@ -98,7 +95,7 @@ sv.Lung = class {
 
 	updateCO2() {
 
-		var co2 = this.PiCO2 + 
+		var co2 = this.PiCO2 +
 			(this.PplCO2 - this.PiCO2)/
 			(1 + Math.pow(Math.E,((this.Vdaw - this.Vte)/this.Slope2)))
 
@@ -113,7 +110,7 @@ sv.Lung = class {
 
 		if(isNaN(flow)){
 			throw "sv.SimpleLung.appliquer_debit: NaN value passed as flow";
-		}	
+		}
 
 		this.flow = flow ; // l/s
 		var deltaVolume = this.flow * duration; // l
@@ -155,7 +152,7 @@ sv.SimpleLung = class extends sv.Lung {
 			Raw: {unit: "cmH₂O/l/s"}
 		}
 
-	}	
+	}
 	get Palv() {return 1000 * this.Vt / this.Crs;}
 	
 }
@@ -200,102 +197,68 @@ sv.SptLung = class extends sv.Lung{
 	get Palv() {return this.Pel - this.Pmus;}
 }
 
-sv.SygLung = function(){
+sv.SygLung = class extends sv.Lung{
 
-	// Simulation parameters
-	this.Tsampl = 0.001; // Secondes
+	constructor() {
 
-	// Mechanical parameters
-	this.Vmax = 4.0;
-	this.Vmin = 0.0;
-	this.Pid = 5.0;
-	this.Kid = 20.0;
-	this.Raw = 5.0 ;// cmH2O/l/s
+		super();
+		this.defaults = {
+		// Mechanical parameters
+		Vmax : 4.0,
+		Vmin : 0.0,
+		Pid : 5.0,
+		Kid : 20.0,
+		Raw : 5.0 // cmH2O/l/s
+		};
 
-	this.mechParams = {
-		Vmax: {unit: "l"},
-		Vmin: {unit: "l"},
-		Pid: {unit: "cmH₂O"},
-		Kid: {unit: "cmH₂O"},
-		Raw: {unit: "cmH₂O/l/s"}
-	};
+		this.parseDefaults();
 
-	// Gaz exchange parameters
-	this.Vdaw = 0.1;
-	this.PiCO2 = 0.0;
-	this.PACO2 = 35.0;
-	this.Slope2 = 0.003;
-	this.Slope3 = 5.0;
+		this.mechParams = {
+			Vmax: {unit: "l"},
+			Vmin: {unit: "l"},
+			Pid: {unit: "cmH₂O"},
+			Kid: {unit: "cmH₂O"},
+			Raw: {unit: "cmH₂O/l/s"}
+		};
 
-	//Propriété dynamiques
-	this.PCO2 = 0;
-	this.SCO2 = 0;
-	this.Vt = 0.0;
-	this.Palv = 0.0;
-	this.flow = 0.0;
-	this.Vtmax = 0;
-	this.VtCO2 = 0;
-	
+		this.flow = 0.0;
+		this.Vt = this.volume(this.Palv);
+	}
+		
 
-	this.volume = function(P){
+	volume(P){
 		return this.Vmin + (this.Vmax - this.Vmin)/(1.0+Math.exp(-(P - this.Pid)/this.Kid))
 	}
 
-	this.Vt = this.volume(this.Palv);
-
-	this.appliquer_debit = function (flow, duration){
-			if(isNaN(flow)){throw "Function debit: NaN value passed as flow" }	
-			this.flow = flow ; // l/s
-			deltaVolume = this.flow * duration; // l
-			this.Vt += deltaVolume; // l
-			this.Vti += deltaVolume;
-			this.Palv = this.Pid - (this.Kid * Math.log(((this.Vmax - this.Vmin)/(this.Vt - this.Vmin))-1));
-
-			if (this.flow > 0){
-				this.Vtmax = this.Vt;
-				this.PCO2 = 0;
-				this.Vte = 0;
-				this.SCO2 = 0;
-				this.VtCO2 = 0;
-			}
-
-			else {
-				this.Vte = this.Vtmax - this.Vt;
-				this.Vti -= deltaVolume;
-				this.PCO2 = this.co2(this.Vte);
-	this.SCO2 = this.PCO2/(760-47);
-				this.VtCO2 += this.SCO2 * (-deltaVolume);
-			}
+	get Palv() {
+		return this.Pid - (this.Kid * Math.log(((this.Vmax - this.Vmin)/(this.Vt - this.Vmin))-1));
 	}
-	this.appliquer_pression = function (pression, duree){
+	/*
+	this.appliquer_debit = function (flow, duration){
+		if(isNaN(flow)){throw "Function debit: NaN value passed as flow" }	
+		this.flow = flow ; // l/s
+		deltaVolume = this.flow * duration; // l
+		this.Vt += deltaVolume; // l
+		this.Vti += deltaVolume;
 
-		var time = 0.0;
-		var deltaVolume = 0.0;
-
-		while (time < duree){
-
-			flow = (pression - this.Palv) / this.Raw ; // l/s
-			this.appliquer_debit(flow, this.Tsampl);
-
-			time += this.Tsampl;
-		}
-	};
-
-	this.co2 = function(volume){
-
-		this.VcAlv = this.Vtmax - this.Vdaw;
-		this.PplCO2 = this.PACO2 - (this.Slope3 * (this.VcAlv / 2));
-
-		co2 = this.PiCO2 + (this.PplCO2 - this.PiCO2)/(1 + Math.pow(Math.E,((this.Vdaw - volume)/this.Slope2)))
-
-		if (volume > this.Vdaw) {
-			co2 += this.Slope3 * (volume - this.Vdaw);
+		if (this.flow > 0){
+			this.Vtmax = this.Vt;
+			this.PCO2 = 0;
+			this.Vte = 0;
+			this.SCO2 = 0;
+			this.VtCO2 = 0;
 		}
 
-		return co2;
-	};
-
-};
+		else {
+			this.Vte = this.Vtmax - this.Vt;
+			this.Vti -= deltaVolume;
+			this.PCO2 = this.co2(this.Vte);
+			this.SCO2 = this.PCO2/(760-47);
+			this.VtCO2 += this.SCO2 * (-deltaVolume);
+		}
+	}
+	*/
+}
 
 sv.RLung = function(){
 
