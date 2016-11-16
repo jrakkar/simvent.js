@@ -20,11 +20,9 @@
 </head>
 
 <body>
-
 	<!--script src="http://jsconsole.com/js/remote.js?progrt"></script-->
 	<script>
 		function plot(data, x, y){
-			
 			$("body").append("<div id='graph"+x+y +"' class='graph'></div>");
 			var placeholder = $("#graph"+x+y);
 			function fxy(d){
@@ -39,10 +37,8 @@
 		}
 
 		var vent = new sv.FlowControler();
-		var lung1 = new sv.SimpleLung();
+		var lung1 = new sv.SptLung();
 		var data = vent.ventilate(lung1).timeData;
-		console.log(typeof data);
-		console.log("Allo");
 		
 		plot(data,"time", "Vt");
 
