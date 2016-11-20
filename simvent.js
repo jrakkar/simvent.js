@@ -860,3 +860,13 @@ sv.logParam = function(dataset){
 	console.table(table);
 }
 sv.PresureControler = sv.PressureControler;
+
+sv.Protocol = class {
+	constructor() {
+
+	 }
+
+	ventilate(lung) {
+		  
+	}
+}
