@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<head>
+
+<script src="codemirror-5.20.2/lib/codemirror.js"></script>
+<script src="codemirror-5.20.2/mode/yaml/yaml.js"></script>
+<script src="codemirror-5.20.2/keymap/vim.js"></script>
+<script src="codemirror-5.20.2/addon/dialog/dialog.js"></script>
+<script src="codemirror-5.20.2/addon/search/search.js"></script>
+<script src="codemirror-5.20.2/addon/edit/matchbrackets.js"></script>
+
+<link rel="stylesheet" href="codemirror-5.20.2/lib/codemirror.css"/>
+<link rel="stylesheet" href="codemirror-5.20.2/theme/solarized.css"/>
+<link rel="stylesheet" href="codemirror-5.20.2/theme/midnight.css"/>
+<link rel="stylesheet" href="codemirror-5.20.2/addon/dialog/dialog.css"/>
+
+<style>
+html {
+		  font-size: 16pt;
+		  }
+</style>
+
+</head>
+<body>
+
+<textarea id="myTextArea" class=".cm-s-3024-night">Ventilateur:
+   Mode: PressureControler
+   Fconv: 12
+   Pvent: 15
+Poumon: SimpleLung </textarea>
+
+<script>
+var tArea = document.querySelector("#myTextArea");
+var cm = CodeMirror.fromTextArea(tArea,{
+		  //keyMap: "vim",
+		  theme: "midnight",
+		  mode: "yaml",
+        matchBrackets: true,
+        showCursorWhenSelecting: true,
+		  lineNumbers: true
+		  });
+document.write(cm.getValue());
+document.write(tArea.value);
+</script>
+
+</body>
