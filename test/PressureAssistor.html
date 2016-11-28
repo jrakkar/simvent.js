@@ -15,7 +15,6 @@
 	<script src="https://raw.githubusercontent.com/progrt/simvent.js/master/simvent.js"></script>
 	-->
 	<script src="../frontpaneljs/dict.js"></script>
-	<!--script src="jquery.terminal-min.js"></script-->
 
 	<link rel="stylesheet" type="text/css" href="../frontpaneljs/css/demo.css" charset="utf-8" />
 </head>
@@ -30,9 +29,9 @@
 
 	<script src="../frontpaneljs/frontPanel.js" ></script>
 	<script>
-		fp.timeSeries = ["Pao","Flung","Vt", "Vti", "PCO2"];
-		fp.ventModels = ["PressureAssistor", "PressureControler", "FlowControler", "VDR"];
-		fp.ventModel = "PressureControler";
+		fp.timeSeries = ["Pao","Flung","Vt", "Vti", "Vte",  "PCO2"];
+		fp.ventModels = ["PVCurve", "PressureAssistor", "PressureControler", "FlowControler", "VDR"];
+		fp.ventModel = "PVCurve";
 		fp.lungModel = "SygLung";
 		fp.init()
 	</script>

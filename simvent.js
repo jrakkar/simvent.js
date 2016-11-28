@@ -1,10 +1,15 @@
 sv = {}
 
+//****************************
+// Helper fumctions
+//****************************
+
 sv.translate = function(toTranslate, form, lang){
 	try {var translated = dict[toTranslate][form][lang];}
 	catch (e){console.log("Was unable to translate " + toTranslate)}
 	finally {return translated;}
 }
+
 sv.log = function(lung, vent){
 	return {
 		// Lung variables
@@ -17,6 +22,8 @@ sv.log = function(lung, vent){
 		Vabs  : lung.Vabs,
 		Vti   : lung.Vti,
 		Vte   : lung.Vte,
+		Vt	: lung.Vt,
+		Vtmax : lung.Vtmax,
 		PCO2  : lung.PCO2,
 		SCO2  : lung.SCO2,
 		VCO2  : lung.VtCO2,
@@ -41,13 +48,12 @@ sv.logPerc = function(lung, vent){
 	};
 }
 
-sv.sygVol = function(x, ymax, ymin, xid, kid){
-	return y;
+sv.sygY = function(x, ymin, ymax, xid, kid){
+	return ymin + (ymax - ymin)/(1.0+Math.exp(-(x - xid)/kid))
 };
 
-
-sv.Rsyg = function(y) {
-	return this.Pid - (this.Kid * Math.log(((this.Vmax - this.Vmin)/(this.Vabs- this.Vmin))-1));
+sv.sygX = function(y, ymin, ymax, xid, kid){
+	return xid - (kid * Math.log(((ymax - ymin)/(y - ymin))-1));
 };
 
 sv.avg = function(dataset, data, Nroll){
@@ -65,6 +71,9 @@ sv.avg = function(dataset, data, Nroll){
 	}
 }
 
+//****************************
+// Lung models
+//****************************
 
 sv.Lung = class {
 	constructor() {
@@ -77,6 +86,11 @@ sv.Lung = class {
 			PACO2  : 35.0,
 			Slope2 : 0.003,
 			Slope3 : 5,
+			// Variable parameters
+			Vti	:  0,
+			Vte	:  0,
+			Vtmax:0,
+			PCO2:0,
 			Vabs    : 0
 		};
 
@@ -90,6 +104,7 @@ sv.Lung = class {
 	}
 
 	get Palv() {return this.Pel - this.Pmus;}
+	get Vt() {return this.Vtmax -this.Vte;}
 
 	appliquer_pression(pression, duree) {
 
@@ -98,8 +113,9 @@ sv.Lung = class {
 
 		while (time < duree){
 			var deltaP = pression - this.Palv;
-			this.flow = deltaP / this.Raw;
-			this.appliquer_debit(this.flow, this.Tsampl);
+			var flow = deltaP / this.Raw;
+			//this.flow = deltaP / this.Raw;
+			this.appliquer_debit(flow, this.Tsampl);
 
 			time += this.Tsampl;
 		}
@@ -114,17 +130,20 @@ sv.Lung = class {
 		this.flow = flow ; // l/s
 		var deltaVolume = this.flow * duration; // l
 		this.Vabs+= deltaVolume; // l
-		this.Vti += deltaVolume;
+		// this.Vti += deltaVolume;
 
 		if (this.flow > 0){
+			// We are inhaling
+
+			this.Vti += deltaVolume;
 			this.Vtmax = this.Vti;
 			this.PCO2 = 0;
 			this.Vte = 0;
 			this.VtCO2 = 0;
-			}
+		}
 
 		else {
-			//this.Vte = this.Vtmax - this.Vt;
+			this.Vti = 0;
 			this.Vte -= deltaVolume;
 			this.updateCO2();
 			this.VtCO2 += this.SCO2 * (-deltaVolume);
@@ -133,10 +152,12 @@ sv.Lung = class {
 	}
 
 	updateCO2() {
-
-		var co2 = this.PiCO2 +
-			(this.PplCO2 - this.PiCO2)/
-			(1 + Math.pow(Math.E,((this.Vdaw - this.Vte)/this.Slope2)));
+		var co2 = sv.sygY(
+				this.Vte,
+				this.PiCO2, 
+				this.PplCO2, 
+				this.Vdaw, 
+				this.Slope2);
 
 		if (this.Vte > this.Vdaw) {
 			co2 += this.Slope3 * (this.Vte - this.Vdaw);
@@ -217,14 +238,14 @@ sv.SygLung = class extends sv.Lung{
 
 		super();
 		this.defaults = {
-					 // Mechanical parameters
-					 Vmax : 4.0,
-					 Vmin : 0.0,
-					 Pid : 5.0,
-					 Kid : 20.0,
-					 Pmus:0,
-					 Raw : 5.0 // cmH2O/l/s
-					 };
+			 // Mechanical parameters
+			 Vmax : 4.0,
+			 Vmin : 0.0,
+			 Pid : 5.0,
+			 Kid : 20.0,
+			 Pmus:0,
+			 Raw : 5.0 // cmH2O/l/s
+		 };
 
 		this.parseDefaults();
 
@@ -238,16 +259,14 @@ sv.SygLung = class extends sv.Lung{
 
 		this.flow = 0.0;
 		this.Vabs = this.volume(0);
-		console.log(this.Vabs);
 	}
 
-
 	volume(P){
-		return this.Vmin + (this.Vmax - this.Vmin)/(1.0+Math.exp(-(P - this.Pid)/this.Kid))
+		return sv.sygY(P, this.Vmin, this.Vmax, this.Pid, this.Kid);
 	}
 
 	get Pel() {
-		return this.Pid - (this.Kid * Math.log(((this.Vmax - this.Vmin)/(this.Vabs- this.Vmin))-1));
+		return sv.sygX(this.Vabs, this.Vmin, this.Vmax, this.Pid, this.Kid);
 	}
 };
 
@@ -257,13 +276,15 @@ sv.RLung = class extends sv.Lung {
 		this.defaults = {
 				  // Mechanical parameters
 				  Vmax : 4.0,
-				  VmaxExp : 4.0,
 				  Vmin : 0.0,
+				  Pid : 0,
+				  Kid : 20.0,
+
+				  VmaxExp : 4.0,
 				  VminInsp : 0.0,
 				  PidInsp : 10.0,
 				  PidExp : -10.0,
-				  Pid : 0,
-				  Kid : 20.0,
+
 				  Raw : 5.0,// cmH2O/l/s
 				  flow : 0.0,
 				  lastFlow : 0.0,
@@ -271,7 +292,7 @@ sv.RLung = class extends sv.Lung {
 				  Vtmax : 0
 		};
 		this.parseDefaults();
-		this.Vabs= this.volume(0);
+		this.Vabs = this.volume(0);
 
 		this.mechParams = {
 			Vmax: {unit: "l"},
@@ -281,41 +302,64 @@ sv.RLung = class extends sv.Lung {
 			Kid: {unit: "cmH₂O"},
 			Raw: {unit: "cmH₂O/l/s"}
 		};
-		}
+	}
 
 	volume(P){
-		return this.Vmin + (this.Vmax - this.Vmin)/(1.0+Math.exp(-(P - this.Pid)/this.Kid))
-		}
+		return sv.sygY(P, this.Vmin, this.Vmax, this.Pid, this.Kid);
+	}
+
+	fitInsp(){
+		var N = 1 + Math.pow(Math.E,-((this.lastPel - this.PidInsp)/this.Kid));
+		this.VminInsp = (N * this.Vabs - this.Vmax)/(N-1);
+	}
+	
+	fitExp(){
+		var N = 1 + Math.pow(Math.E,-((this.lastPel - this.PidExp)/this.Kid));
+		this.VmaxExp = this.Vmin + (this.Vabs- this.Vmin) * N;
+	}
 
 	fit(){
-			//console.log("RLung.fir()");
-			if (this.flow > 0 && this.lastFlow < 0){
-				var N = 1 + Math.pow(Math.E,-((this.Palv - this.PidInsp)/this.Kid));
-				this.VminInsp = (N * this.Vabs- this.Vmax)/(N-1);
-			}
-			else if (this.flow < 0 && this.lastFlow > 0){
-				var N = 1 + Math.pow(Math.E,-((this.Palv - this.PidExp)/this.Kid));
-				this.VmaxExp = this.Vmin + (this.Vabs- this.Vmin) * N;
-			}
+		//console.log("RLung.fit()");
+		if (this.flow > 0 && this.lastFlow < 0){
+			// We were exhaling and are now inhaling
+			this.fitInsp();
+		}
 
-			this.lastFlow = this.flow;
-			}
+		else if (this.flow < 0 && this.lastFlow > 0){
+			// We were inhaling and and are now exhaling
+			this.fitExp();
+		}
 
-	get Palv(){
-		//console.log("RLung.get(palv)");
-		//this.fit();
+		this.lastFlow = this.flow;
+	}
+
+	get Pel(){
+		this.fit();
 
 		if (this.flow > 0){
-			//console.log("Flow > 0");
-			return this.PidInsp - (this.Kid * Math.log(((this.Vmax - this.VminInsp)/(this.Vabs- this.VminInsp))-1));
-			}
+			var p = sv.sygX(
+					this.Vabs, 
+					this.VminInsp, 
+					this.Vmax, 
+					this.PidInsp, 
+					this.Kid);
+			this.lastPel = p;
+			return p;
+		}
 
 		else {
-			//console.log("Flow < 0");
-			return this.PidExp - (this.Kid * Math.log(((this.VmaxExp - this.Vmin)/(this.Vabs - this.Vmin))-1));
-			}
+			var p = sv.sygX(
+					this.Vabs, 
+					this.Vmin, 
+					this.VmaxExp, 
+					this.PidExp, 
+					this.Kid);
+			this.lastPel = p;
+			return p;
 		}
-	};
+	}
+};
+
 //******************************
 //	Ventilator models
 //******************************
@@ -335,6 +379,7 @@ sv.Ventilator = class {
 
 	updateCalcParams(){ console.log("updateCalcParams is deprecated"); }
 };
+
 sv.PressureAssistor = class extends sv.Ventilator{
 
 	constructor() {
@@ -422,7 +467,6 @@ sv.PressureControler = class extends sv.Ventilator {
 			var tdeb = this.time;
 
 			this.Pao = this.Pinspi;
-			lung.Vti = 0;
 			while(this.time < (tdeb + this.Ti)){
 				lung.appliquer_pression(this.Pao, this.Tsampl)
 
@@ -452,7 +496,7 @@ sv.PressureControler = class extends sv.Ventilator {
 			timeData: timeData,
 			respd:respd
 		};
-	};
+	}
 
 
 };
@@ -461,7 +505,8 @@ sv.PVCurve = class extends sv.Ventilator{
 
 	constructor() {
 		super();
-		this.Pstart = -100.0;
+		//this.Pstart = -100.0;
+		this.Pstart = 0;
 		this.Pmax = 100;
 		this.Pstop = -100;
 		this.Pstep = 10;
@@ -489,7 +534,6 @@ sv.PVCurve = class extends sv.Ventilator{
 		while(this.Pao < this.Pmax){
 
 			var tdeb = this.time;
-			lung.Vti = 0;
 
 			while(this.time < (tdeb + this.Ti)){
 				lung.appliquer_pression(this.Pao, this.Tsampl)
@@ -503,7 +547,6 @@ sv.PVCurve = class extends sv.Ventilator{
 		while(this.Pao > this.Pstop){
 
 			var tdeb = this.time;
-			lung.Vti = 0;
 
 			while(this.time < (tdeb + this.Ti)){
 				lung.appliquer_pression(this.Pao, this.Tsampl)
@@ -523,6 +566,7 @@ sv.PVCurve = class extends sv.Ventilator{
 };
 
 sv.Phasitron = {};
+
 sv.Phasitron.Fop = function(Fip, Pao){
 	if(Pao >= 0 && Pao <=40){
 		return Fip + (Fip * (5 -(Pao/8)));
@@ -604,7 +648,7 @@ sv.VDR = class extends sv.Ventilator{
 	}
 
 	percussiveInspiration (lung, inFlow){
-		// Must be executed in a scope where te timeData container is defined
+		// Must be executed in a scope where the timeData container is defined
 		this.stateP = 1;
 		lung.Vtip = 0;
 		this.Fip = inFlow
@@ -728,7 +772,6 @@ sv.FlowControler = class extends sv.Ventilator{
 		for (this.time = 0; this.time < this.Tvent; ){
 			var tdeb = this.time;
 
-			lung.Vti = 0;
 			while(this.time < (tdeb + this.Ti)){
 				lung.appliquer_debit(this.Flow, this.Tsampl)
 				this.Pao = lung.Palv + (this.Flow * lung.Raw);
@@ -762,6 +805,7 @@ sv.FlowControler = class extends sv.Ventilator{
 }
 
 sv.Protocol = class {
+
 	constructor() {
 
 	 }
