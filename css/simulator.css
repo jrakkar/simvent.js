@@ -37,6 +37,7 @@ caption {
 }
 #control input {
 	width: 100%;
+	display: block;
 }
 #control td input {
 	width: 50px;
