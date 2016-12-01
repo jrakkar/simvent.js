@@ -1,3 +1,14 @@
+/**
+ * @overview simvent.js is a javascritp library aimed at 
+ * simulating ventilation of the lung by medical mechanical ventilator.
+ *
+ * @author Nicolas Blais St-Laurent
+ */
+
+/**
+ * All simvent.js class and functions are members of the <em>sv</em> object.
+ * @namespace {Object} sv
+ */
 sv = {}
 
 //****************************
@@ -75,11 +86,20 @@ sv.avg = function(dataset, data, Nroll){
 // Lung models
 //****************************
 
+/**
+ * Lung models
+ */
+
+/** 
+ * Base lung class uppon wich other models are bulid
+ */
+
 sv.Lung = class {
 	constructor() {
 
 		this.defaults = {
 			Tsampl: 0.001,
+			Raw: 5,
 			// Gaz exchange parameters
 			Vdaw   : 0.1,
 			PiCO2  : 0.0,
@@ -105,6 +125,13 @@ sv.Lung = class {
 
 	get Palv() {return this.Pel - this.Pmus;}
 	get Vt() {return this.Vtmax -this.Vte;}
+
+	/**
+	 * Simulate a pressure being applied to airway openning of the lung
+	 * @param {number} pressure The pressure (in cmH₂O) applied
+	 * @param {number} duration The time (in secconds) for which
+	 * the pressure is applied
+	 */
 
 	appliquer_pression(pression, duree) {
 
@@ -171,13 +198,17 @@ sv.Lung = class {
 	get PplCO2() { return this.PACO2 - (this.Slope3 * (this.VcAlv / 2)); }
 }
 
+/** 
+ * Basic lung model with linear compliance.
+ * @extends sv.Lung
+ */
+
 sv.SimpleLung = class extends sv.Lung {
 	constructor(params) {
 		super();
 
 		this.defaults = {
 			Crs : 50.0,// ml/cmH2O
-			Raw : 5.0,
 			Pmus   : 0,// cmH2O/l/s
 			Vfrc: 2.5
 			};
@@ -194,6 +225,11 @@ sv.SimpleLung = class extends sv.Lung {
 
 }
 
+/** 
+ * Lung model with linear compliance and spontaneous breathing.
+ * @extends sv.Lung
+ */
+
 sv.SptLung = class extends sv.Lung{
 
 	constructor() {
@@ -201,7 +237,6 @@ sv.SptLung = class extends sv.Lung{
 		super();
 		this.defaults = {
 			Crs : 30.0 ,// ml/cmH2O
-			Raw : 20.0 ,// cmH2O/l/s
 			Fspt : 14.0 ,// c/min
 			Ti : 1 , // sec
 			Pmax : 6.5, // cmH20
@@ -233,6 +268,11 @@ sv.SptLung = class extends sv.Lung{
 	get Pel() {return 1000 * this.Vabs/ this.Crs;}
 }
 
+/** 
+ * Lung model with sygmoïd complianceg
+ * @extends sv.Lung
+ */
+
 sv.SygLung = class extends sv.Lung{
 	constructor() {
 
@@ -244,7 +284,6 @@ sv.SygLung = class extends sv.Lung{
 			 Pid : 5.0,
 			 Kid : 20.0,
 			 Pmus:0,
-			 Raw : 5.0 // cmH2O/l/s
 		 };
 
 		this.parseDefaults();
@@ -270,6 +309,11 @@ sv.SygLung = class extends sv.Lung{
 	}
 };
 
+/** 
+ * Lung model with sygmoïd pressure - volume relation and inspiratory - expiratory histeresis.
+ * @extends sv.Lung
+ */
+
 sv.RLung = class extends sv.Lung {
 	constructor() {
 		super();
@@ -285,7 +329,6 @@ sv.RLung = class extends sv.Lung {
 				  PidInsp : 10.0,
 				  PidExp : -10.0,
 
-				  Raw : 5.0,// cmH2O/l/s
 				  flow : 0.0,
 				  lastFlow : 0.0,
 				  Pmus: 0,
@@ -364,10 +407,39 @@ sv.RLung = class extends sv.Lung {
 //	Ventilator models
 //******************************
 
+/**
+ * Lung object created with one of the simvent.js lung classes :
+ * 
+ * - {@link sv.SimpleLung}
+ * - {@link sv.SptLung}
+ * - {@link sv.SygLung}
+ * - {@link sv.RLung}
+ * @typedef LungObject
+ */
+
+/**
+ * Base ventilator class uppon wich ventilator models are built
+ */
+
 sv.Ventilator = class {
+
 	constructor() {
 		this.time = 0;
-		this.Tvent= 12; //The length of time the lung will be ventilated
+
+		/**
+		 * Duration of the simulation in seconds
+		 * @type {number}
+		 */
+
+		this.Tvent= 12;
+
+		/** 
+		 * Time in seconds between each iteration. 
+		 * Higher value will result in faster simulation. 
+		 * Lower values will result in more accurate simulation. 
+		 * @type {number}
+		 * */
+
 		this.Tsampl = 0.01;
 
 		this.simParams = {
@@ -378,12 +450,30 @@ sv.Ventilator = class {
 	}
 
 	updateCalcParams(){ console.log("updateCalcParams is deprecated"); }
+
+	/**
+	 * Ventilate a lung object
+	 * @param {LungObject} lung lung object
+	 * @return {object} ventResult
+	 */
+
+	ventilate(){}
+
 };
+
+/**
+ * Flow trigered, pressure controled, flow cycled ventilator.
+ * @extends sv.Ventilator
+ */
 
 sv.PressureAssistor = class extends sv.Ventilator{
 
 	constructor() {
 		super();
+
+		/** Inspiratory assistance (in cmH₂O)
+		 * @member {number} */
+
 		this.Passist = 25.0;
 		this.PEEP = 0.0;
 		this.Cycling = 10;
@@ -397,7 +487,6 @@ sv.PressureAssistor = class extends sv.Ventilator{
 		};
 
 	}
-
 
 	ventilate (lung){
 
@@ -432,8 +521,12 @@ sv.PressureAssistor = class extends sv.Ventilator{
 		return {timeData: timeData};
 	};
 
-
 }
+
+/**
+ * Time trigered, pressure controled, time cycled ventilator.
+ * @extends sv.Ventilator
+ */
 
 sv.PressureControler = class extends sv.Ventilator {
 	
@@ -500,6 +593,11 @@ sv.PressureControler = class extends sv.Ventilator {
 
 
 };
+
+/**
+ * Quasi-static (low flow), stepwise, pressure - volume loop maneuver
+ * @extends sv.Ventilator
+ */
 
 sv.PVCurve = class extends sv.Ventilator{
 
@@ -574,6 +672,11 @@ sv.Phasitron.Fop = function(Fip, Pao){
 	else if(Pao > 40){return Fip;}
 	else if(Pao < 0){return 6 * Fip;}
 };
+
+/**
+ * High frequency ventilator imitating Percussionaire's VDR-4.
+ * @extends sv.Ventilator
+ */
 
 sv.VDR = class extends sv.Ventilator{
 
@@ -739,6 +842,11 @@ sv.VDR = class extends sv.Ventilator{
 		};
 	};
 };
+
+/**
+ * Time trigered, flow controled, time cycled ventilator.
+ * @extends sv.Ventilator
+ */
 
 sv.FlowControler = class extends sv.Ventilator{
 	
