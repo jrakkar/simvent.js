@@ -35,7 +35,10 @@ caption {
 	font-weight: bold;
 	margin-bottom: 3px;
 }
-input {
+#control input {
+	width: 100%;
+}
+#control td input {
 	width: 50px;
 	text-align: right;
 }
