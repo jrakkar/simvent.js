@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width"/>
+	<title>simvent.js test page</title>
+
+	<script src="../simvent.js"></script>
+	<!-- We dont need to plot anyting
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+	<script src="graphsimple.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.js"></script>
+	<link rel="stylesheet" href="http://rawgit.com/ProgRT/graphsimple.js/master/css/graphsimple-clear.css" />
+	-->
+	<link href="../css/table.css" rel="stylesheet"/>
+	<style>
+		body {
+			text-align:center;
+		}
+
+		.graph {
+			width: 600px;
+			height: 200px;
+		}
+	</style>
+</head>
+
+<body>
+	<table id="benchmarkResults"></table>
+
+	<script>
+function chrono(vent, lung){
+	var v = new sv[vent];
+	var l = new sv[lung];
+
+	var tStart = Date.now();
+	var r = v.ventilate(l).timeData;
+	var tEnd = Date.now();
+	var duration = tEnd -tStart;
+
+	var rLine = document.createElement("tr");
+
+	var c1 = document.createElement("td");
+	var c2 = document.createElement("td");
+	var c3 = document.createElement("td");
+	var c4 = document.createElement("td");
+
+	c1.textContent = lung;
+	c2.textContent = r.length;
+	c3.textContent = duration;
+	c4.textContent = duration / r.length;
+
+
+	rLine.appendChild(c1);
+	rLine.appendChild(c2);
+	rLine.appendChild(c3);
+	rLine.appendChild(c4);
+	document.getElementById("benchmarkResults").appendChild(rLine);
+	
+}
+
+
+function benchL(){
+	var rLine = document.createElement("tr");
+
+	var c1 = document.createElement("th");
+	var c2 = document.createElement("th");
+	var c3 = document.createElement("th");
+	var c4 = document.createElement("th");
+
+	c1.textContent = "Lung";
+	c2.textContent = "Iterations";
+	c3.textContent = "Duration (ms)";
+	c4.textContent = "Duration/iteration (ms)";
+
+
+	rLine.appendChild(c1);
+	rLine.appendChild(c2);
+	rLine.appendChild(c3);
+	rLine.appendChild(c4);
+	document.getElementById("benchmarkResults").appendChild(rLine);
+	var lungList = [
+		"SimpleLung",
+		"SptLung",
+		"SygLung",
+		"RLung"
+	];
+
+	for(i in lungList){
+		chrono("FlowControler", lungList[i]);
+	}
+
+}
+
+benchL();
+	</script>
+
+</body>
+
