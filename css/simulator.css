@@ -35,9 +35,11 @@ caption {
 	font-weight: bold;
 	margin-bottom: 3px;
 }
-#control input {
-	width: 100%;
+#control select {
+	width: 90%;
 	display: block;
+	margin-right: auto;
+	margin-left: auto;
 }
 #control td input {
 	width: 50px;
