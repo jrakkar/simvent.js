@@ -1,7 +1,7 @@
 ---
 title: Volumetric capnogram
 ---
-<svg id="svg{{ page.id | replace: "/", "" }}" class="square surface"></svg>
+<svg id="svg{{ page.id | replace: "/", "" }}" class="square"></svg>
 
 	<svg id="svg{{ page.id | replace: "/", "" }}" class="square"></svg>
 
@@ -26,7 +26,7 @@ title: Volumetric capnogram
 <script>
 
 	var lung = new sv.SimpleLung();
-	var ventilator = new sv.PresureControler();
+	var ventilator = new sv.PressureControler();
 	ventilator.nbcycles = 1;
 	ventilator.Tsampl = .001;
 	var data = ventilator.ventilate(lung);
