@@ -6,10 +6,10 @@ order: 1
 <div id="graphics"></div>
 <div id="control" class="hidden"></div>
 
-<script src="https://rawgit.com/ProgRT/FrontPanelJS/master/dygraph-combined.js"></script>
-<script src="https://rawgit.com/ProgRT/FrontPanelJS/master/synchronizer.js"></script>
-<script src="https://rawgit.com/ProgRT/FrontPanelJS/master/dict.js"></script>
-<script src="https://rawgit.com/ProgRT/FrontPanelJS/master/frontPanel.js"></script>
+<script src="http://rawgit.com/ProgRT/FrontPanelJS/master/dygraph-combined.js"></script>
+<script src="http://rawgit.com/ProgRT/FrontPanelJS/master/synchronizer.js"></script>
+<script src="http://rawgit.com/ProgRT/FrontPanelJS/master/dict.js"></script>
+<script src="http://rawgit.com/ProgRT/FrontPanelJS/master/frontPanel.js"></script>
 <script>
 fp.dygraphConf.axisLabelWidth = 25;
 fp.dygraphConf.titleHeight = 30;
