@@ -38,7 +38,7 @@ Adding beautyful ventilator waveforms to your html documents or presentations is
 <script>
 
 var lung = new sv.SimpleLung();
-var vent = new sv.PresureControler();
+var vent = new sv.PressureControler();
 var timeData = vent.ventilate(lung).timeData;
 
 fx = function(d){return d.time};
