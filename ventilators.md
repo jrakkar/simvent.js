@@ -65,7 +65,7 @@ sv.PVCurve is a pressure steps based low flow pressure - volume curve maneuver.
 	fy2 = function(d){return d.Pao};
 	fy3 = function(d){return d.Palv};
 
-	var ventilator = new sv.PresureControler();
+	var ventilator = new sv.PressureControler();
 	var data = ventilator.ventilate(lung);
 	var graph = gs.quickGraph( "#svg1", data.timeData, fx, fy1).setidx("Time").setidy("Flow");
 
