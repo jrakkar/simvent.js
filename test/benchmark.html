@@ -5,16 +5,24 @@
 	<title>simvent.js test page</title>
 
 	<script src="../simvent.js"></script>
+	<!--
 	<link href="../css/table.css" rel="stylesheet"/>
+	-->
 	<style>
 		body {
 			text-align:center;
 		}
 
-		.graph {
-			width: 600px;
-			height: 200px;
-		}
+table {
+  margin-left: auto;
+  margin-right: auto;
+  border-collapse: collapse; }
+
+td, th {
+  padding-left: 5px;
+  padding-right: 5px;
+  text-align: left;
+  border-bottom: 1px solid black; }
 	</style>
 </head>
 
@@ -52,7 +60,6 @@ function chrono(vent, lung, target){
 	
 }
 
-
 function benchL(){
 	var lungList = [
 		"SimpleLung",
@@ -62,10 +69,10 @@ function benchL(){
 	];
 
 	var ventList = [
+		"VDR",
 		"PressureControler",
 		"PressureAssistor",
 		"FlowControler",
-		"VDR",
 		"PVCurve"
 	];
 
@@ -96,7 +103,6 @@ function benchL(){
 		c3.textContent = "Duration (ms)";
 		c4.textContent = "Duration/iteration (ms)";
 
-
 		rLine.appendChild(c1);
 		rLine.appendChild(c2);
 		rLine.appendChild(c3);
@@ -107,7 +113,6 @@ function benchL(){
 			chrono(vent, lungList[i], t);
 		}
 	}
-
 }
 
 benchL();
