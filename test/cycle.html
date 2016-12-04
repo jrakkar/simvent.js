@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width"/>
+	<title>simvent.js test page</title>
+
+	<script src="../simvent.js"></script>
+	<!--
+	<link href="../css/table.css" rel="stylesheet"/>
+	-->
+	<style>
+		body {
+			text-align:center;
+		}
+
+table {
+  margin-left: auto;
+  margin-right: auto;
+  border-collapse: collapse; }
+
+td, th {
+  padding-left: 5px;
+  padding-right: 5px;
+  text-align: left;
+  border-bottom: 1px solid black; }
+	</style>
+</head>
+
+<body>
+	<table id="benchmarkResults"></table>
+
+	<script>
+var v = new sv.FlowControler();
+document.write(v.Tvent + "<br/>");
+var l = new sv.SimpleLung();
+
+var r1 = v.ventilate(l).timeData;
+document.write(r1.length + "<br/>");
+document.write(v.time + "<br/>");
+var r2 = v.ventilate(l).timeData;
+document.write(r2.length + "<br/>");
+document.write(v.time + "<br/>");
+var r3 = v.ventilate(l).timeData;
+document.write(r3.length + "<br/>");
+document.write(v.time + "<br/>");
+	</script>
+
+</body>
+

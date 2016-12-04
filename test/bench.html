@@ -49,7 +49,7 @@ function chrono(vent, lung, target){
 	c1.textContent = lung;
 	c2.textContent = r.length;
 	c3.textContent = duration;
-	c4.textContent = duration / r.length;
+	c4.textContent = r.length /duration;
 
 
 	rLine.appendChild(c1);
@@ -69,10 +69,10 @@ function benchL(){
 	];
 
 	var ventList = [
-		"VDR",
 		"PressureControler",
 		"PressureAssistor",
 		"FlowControler",
+		"VDR",
 		"PVCurve"
 	];
 
@@ -101,7 +101,7 @@ function benchL(){
 		c1.textContent = "Lung";
 		c2.textContent = "Iterations";
 		c3.textContent = "Duration (ms)";
-		c4.textContent = "Duration/iteration (ms)";
+		c4.textContent = "Iterations / ms";
 
 		rLine.appendChild(c1);
 		rLine.appendChild(c2);

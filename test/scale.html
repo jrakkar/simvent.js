@@ -29,15 +29,15 @@
 	var conf1 = {class: "half"}
 
 	var params = [
-		
 		"Pao",
+		/*
 		"Flung",
 		"Vti",
 		"Vtmax",
 		"Vte",
 		"Vt",
+		*/
 		"PCO2"
-
 	];
 
 	function plot(param){
@@ -60,24 +60,22 @@
 	}
 
 	var lung = new sv.RLung();
-	var ventilator = new sv.FlowControler();	
-	ventilator.Tvent=20;
-	ventilator.Fconv=30;
-	ventilator.Ti=1.5;
+	var ventilator = new sv.VDR();	
 	var Tvdeb = Date.now();
-	var data = ventilator.ventilate(lung).timeData;
+	var d1 = ventilator.ventilate(lung);
+	var data = d1.timeData;
+
 	var Tvend = Date.now();
-	console.log(Tvend - Tvdeb);
 	
 	var Tplotdeb = Date.now();
 	for ( p in params ) {
 		plot(params[p]);
 	}
 
+/*
 	loop("Palv", "Vabs");
 	loop("Pel", "Vabs");
 	loop("Vte", "PCO2");
+	*/
 	var Tplotend = Date.now();
-
-	console.log(Tplotend - Tplotdeb);
 </script>
