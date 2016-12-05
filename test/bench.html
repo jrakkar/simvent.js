@@ -32,7 +32,7 @@ td, th {
 	<script>
 function chrono(vent, lung, target){
 	var v = vent;
-	var l = new sv[lung];
+	var l = new lung();
 
 	var tStart = Date.now();
 	var r = v.ventilate(l).timeData;
@@ -46,7 +46,7 @@ function chrono(vent, lung, target){
 	var c3 = document.createElement("td");
 	var c4 = document.createElement("td");
 
-	c1.textContent = lung;
+	c1.textContent = lung.name;
 	c2.textContent = r.length;
 	c3.textContent = duration;
 	c4.textContent = r.length /duration;
@@ -61,33 +61,17 @@ function chrono(vent, lung, target){
 }
 
 function benchL(){
-	var lungList = [
-		"SimpleLung",
-		"SptLung",
-		"SygLung",
-		"RLung"
-	];
-
-	var ventList = [
-		"PressureControler",
-		"PressureAssistor",
-		"FlowControler",
-		"VDR",
-		"PVCurve"
-	];
-
-	for(i in ventList){
-		var v = ventList[i];
-		var vent = new sv[v];
+	for(i in sv.ventilators){
+		var vent = new sv.ventilators[i];
 		var b = document.getElementsByTagName("body")[0];
 
 		var h = document.createElement("h2");
-		h.textContent=v;
+		h.textContent=vent.constructor.name;
 		b.appendChild(h);
 
-		var p = document.createElement("p");
-		p.textContent="Tvent: " + vent.Tvent;
-		b.appendChild(p);
+		//var p = document.createElement("p");
+		//p.textContent="Tvent: " + vent.Tvent;
+		//b.appendChild(p);
 
 		var t = document.createElement("table");
 		b.appendChild(t);
@@ -109,8 +93,8 @@ function benchL(){
 		rLine.appendChild(c4);
 		t.appendChild(rLine);
 		
-		for(var i in lungList){
-			chrono(vent, lungList[i], t);
+		for(var i in sv.lungs){
+			chrono(vent, sv.lungs[i], t);
 		}
 	}
 }

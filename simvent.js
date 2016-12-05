@@ -94,7 +94,7 @@ sv.avg = function(dataset, data, Nroll){
  * Base lung class uppon wich other models are bulid
  */
 
-sv.Lung = class {
+sv.Lung = class Lung{
 	constructor() {
 
 		this.defaults = {
@@ -203,7 +203,7 @@ sv.Lung = class {
  * @extends sv.Lung
  */
 
-sv.SimpleLung = class extends sv.Lung {
+sv.SimpleLung = class SimpleLung extends sv.Lung {
 	constructor(params) {
 		super();
 
@@ -230,7 +230,7 @@ sv.SimpleLung = class extends sv.Lung {
  * @extends sv.Lung
  */
 
-sv.SptLung = class extends sv.Lung{
+sv.SptLung = class SptLung extends sv.Lung{
 
 	constructor() {
 
@@ -273,7 +273,7 @@ sv.SptLung = class extends sv.Lung{
  * @extends sv.Lung
  */
 
-sv.SygLung = class extends sv.Lung{
+sv.SygLung = class SygLung extends sv.Lung{
 	constructor() {
 
 		super();
@@ -314,7 +314,7 @@ sv.SygLung = class extends sv.Lung{
  * @extends sv.Lung
  */
 
-sv.RLung = class extends sv.Lung {
+sv.RLung = class RLung extends sv.Lung {
 	constructor() {
 		super();
 		this.defaults = {
@@ -421,7 +421,7 @@ sv.RLung = class extends sv.Lung {
  * Base ventilator class uppon wich ventilator models are built
  */
 
-sv.Ventilator = class {
+sv.Ventilator = class Ventilator{
 
 	constructor() {
 		this.time = 0;
@@ -503,7 +503,7 @@ sv.Ventilator = class {
  * @extends sv.Ventilator
  */
 
-sv.PressureAssistor = class extends sv.Ventilator{
+sv.PressureAssistor = class PressureAssistor extends sv.Ventilator{
 
 	constructor() {
 		super();
@@ -565,7 +565,7 @@ sv.PressureAssistor = class extends sv.Ventilator{
  * @extends sv.Ventilator
  */
 
-sv.PressureControler = class extends sv.Ventilator {
+sv.PressureControler = class PressureControler extends sv.Ventilator {
 	
 	constructor(){
 			super();
@@ -636,7 +636,7 @@ sv.PressureControler = class extends sv.Ventilator {
  * @extends sv.Ventilator
  */
 
-sv.PVCurve = class extends sv.Ventilator{
+sv.PVCurve = class PVCurve extends sv.Ventilator{
 
 	constructor() {
 		super();
@@ -715,7 +715,7 @@ sv.Phasitron.Fop = function(Fip, Pao){
  * @extends sv.Ventilator
  */
 
-sv.VDR = class extends sv.Ventilator{
+sv.VDR = class VDR extends sv.Ventilator{
 
 	constructor(){
 		super();
@@ -889,7 +889,7 @@ sv.VDR = class extends sv.Ventilator{
  * @extends sv.Ventilator
  */
 
-sv.FlowControler = class extends sv.Ventilator{
+sv.FlowControler = class FlowControler extends sv.Ventilator{
 	
 	constructor(){
 		super();
@@ -971,7 +971,7 @@ sv.FlowControler = class extends sv.Ventilator{
 
 }
 
-sv.Protocol = class {
+sv.Protocol = class Protocol {
 
 	constructor() {
 
@@ -981,3 +981,18 @@ sv.Protocol = class {
 		  
 	}
 }
+
+sv.ventilators = [
+	sv.PressureControler,
+	sv.FlowControler,
+	sv.PressureAssistor,
+	sv.VDR,
+	sv.PVCurve
+];
+
+sv.lungs = [
+	sv.SimpleLung,
+	sv.SptLung,
+	sv.SygLung,
+	sv.RLung
+];
