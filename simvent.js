@@ -21,6 +21,10 @@ sv.translate = function(toTranslate, form, lang){
 	finally {return translated;}
 }
 
+/**
+ * Allo
+ * @function
+ */
 sv.log = function(lung, vent){
 	return {
 		// Lung variables
@@ -92,6 +96,7 @@ sv.avg = function(dataset, data, Nroll){
 
 /** 
  * Base lung class uppon wich other models are bulid
+ * @memberof sv
  */
 
 sv.Lung = class Lung{
@@ -491,6 +496,7 @@ sv.Ventilator = class Ventilator{
 	/**
 	 * Ventilation algorithm. Wille be repeated by the **ventilate** function
 	 * for the duration of **Tvent**.
+	 * @virtual
 	 */
 
 	ventilationCycle(){

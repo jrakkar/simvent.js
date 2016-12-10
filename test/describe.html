@@ -52,6 +52,10 @@ sv.describeVent = function(vent){
 	c1.textContent = "Parameter";
 	rLine.appendChild(c1);
 
+	var c3 = document.createElement("th");
+	c3.textContent = "Default";
+	rLine.appendChild(c3);
+
 	var c2 = document.createElement("th");
 	c2.textContent = "Unit";
 	rLine.appendChild(c2);
@@ -59,6 +63,7 @@ sv.describeVent = function(vent){
 	t.appendChild(rLine);
 
 	for(id in v.ventParams){
+		console.log(id);
 		var param = v.ventParams[id];
 		if(param.calculated != true){
 		var rLine = document.createElement("tr");
@@ -66,6 +71,10 @@ sv.describeVent = function(vent){
 		var c1 = document.createElement("td");
 		c1.textContent = id;
 		rLine.appendChild(c1);
+
+		var c3 = document.createElement("td");
+		c3.textContent = v[id];
+		rLine.appendChild(c3);
 
 		var c2 = document.createElement("td");
 		c2.textContent = param.unit;

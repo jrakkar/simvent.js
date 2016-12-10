@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width"/>
+	<title>simvent.js test page</title>
+
+	<script src="../simvent.js"></script>
+	<script src="../../graphsimple.js/graphsimple.js"></script>
+	<script src="../../graphsimple.js/d3.v3.min.js"></script>
+	<link rel="stylesheet" href="../../graphsimple.js/css/gs-grid-clear.css"/>
+	<script src="../ventyaml.js"></script>
+	<script src="../sandbox/yaml.js/dist/yaml.js"></script>
+
+	<style>
+		body {
+			text-align:center;
+		}
+
+		div {
+			width: 100%;
+				height: 600px;
+			border: 1px dashed red;
+		}
+
+		svg {
+			display: block;
+			margin-left: auto;
+			margin-right:auto;
+			border: 1px dashed blue;
+			height: 300px;
+			width: 800px;
+		}
+table {
+  margin-left: auto;
+  margin-right: auto;
+  border-collapse: collapse; }
+
+td, th {
+  padding-left: 5px;
+  padding-right: 5px;
+  text-align: left;
+  border-bottom: 1px solid black; }
+
+  textarea {
+	  width: 50%;
+	  height: 200px;
+  }
+	</style>
+</head>
+
+<body>
+
+	<textarea id="vyamltest1">Ventilateur: 
+   Mode: PressureAssistor
+   PEEP: 10
+Poumon:
+   Type: SptLung
+   Crs: 100
+Courbes:
+   - Pao</textarea>
+	<script>
+var vyaml = new ventyaml('vyamltest1');
+	</script>
+
+</body>
+
