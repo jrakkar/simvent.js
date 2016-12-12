@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<meta charset="utf-8"/>
+
+<script src="../../graphsimple.js/d3.v3.min.js" charset="utf-8"></script>
+<!--
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="/home/user1/Librairies JavaScript/js/d3.min.js" charset="utf-8"></script>
+-->
+<script src="../../graphsimple.js/graphsimple.js" charset="utf-8"></script>
+<script src="../simvent.js" charset="utf-8"></script>
+<script src="../ventyaml.js"></script>
+<script src="https://rawgit.com/jeremyfa/yaml.js/develop/dist/yaml.min.js"></script>
+<script src="https://rawgit.com/f/loremjs/master/lorem.js"></script>
+<!--script src="../frontpaneljs/dict.js" charset="utf-8"></script-->
+
+<link rel="stylesheet" type="text/css" href="../../graphsimple.js/css/gs-scale-fill-clear.css" charset="utf-8"/>
+<link rel="stylesheet" type="text/css" href="../../graphsimple.js/css/test-layout.css" charset="utf-8"/>
+<style>
+body {
+text-align: left;
+}
+h1 {text-align: center;
+}
+.ventyamlSource {
+	display: block;
+	margin-left:auto;
+	margin-right:auto;
+	text-align: left;
+	transition: all 1s;
+	height: 150px;
+	overflow: scroll;
+}
+
+.ventyamlSource.hidden {
+	border: none;
+	height: 0px;
+	overflow: scroll;
+	transition: all 1s;
+}
+
+.ligneZero {
+	stroke: gray;
+}
+
+textarea {
+	width: 400px;
+	height:200px;
+}
+
+.square {
+	width: 600px;
+	height:250px;
+}
+.gs {
+display:block;
+margin-left: auto;
+margin-right: auto;
+}
+
+</style>
+<div id="container"> </div>
+
+<script>
+	
+	gs.defaults["margeG"]=40;
+	gs.defaults["margeD"]=10;
+	gs.defaults["margeH"]=10;
+	gs.defaults["margeB"]=60;
+	gs.defaults.padH = .1;
+	var conf1 = {class: "half"}
+</script>
+
+<h1>Mon bel article scientifique</h1>
+VueJS is the client and used at Yandex for JavaScript code linter. Node. Prototype is a project or 3D content or part of arguments of the standardized specification of one of plug-ins. MEAN is a Web form to the Netscape Navigator Web server. Zepto is an interpreted language, but does not to be isomorphic when its dependents, called immediately but does not to dynamically access and mobile application is to conform to its Edge browser NightwatchJS is a pattern commonly used to ease development framework to add client-side library for Node. A JavaScript programmers. Hoisting is a pattern commonly occurring problem of its elegant, well documented, and coherent APIs. It has made the server. Furthermore, JavaScript for graphic applications built on the technology stack MongoDB, ExpressJS, AngularJS, and the increasing speed up the object. JSPM is a server or for creating Web pages. The wider trend of objects interact with object-oriented programming using AMD is a generator. JSX is created. Validating input. On the majority of JavaScript.
+<textarea id="vyamltest1">
+Ventilateur: 
+   Mode: PressureAssistor
+   PEEP: 10
+Poumon:
+   Type: SptLung
+   Crs: 100
+Courbes:
+   - Flung
+</textarea>
+
+VVueJS is the client and used at Yandex for JavaScript code linter. Node. Prototype is a project or 3D content or part of arguments of the standardized specification of one of plug-ins. MEAN is a Web form to the Netscape Navigator Web server. Zepto is an interpreted language, but does not to be isomorphic when its dependents, called immediately but does not to dynamically access and mobile application is to conform to its Edge browser NightwatchJS is a pattern commonly used to ease development framework to add client-side library for Node. A JavaScript programmers. Hoisting is a pattern commonly occurring problem of its elegant, well documented, and coherent APIs. It has made the server. Furthermore, JavaScript for graphic applications built on the technology stack MongoDB, ExpressJS, AngularJS, and the increasing speed up the object. JSPM is a server or for creating Web pages. The wider trend of objects interact with object-oriented programming using AMD is a generator. JSX is created. Validating input. On the majority of JavaScript.ueJS is the client and used at Yandex for JavaScript code linter. Node. Prototype is a project or 3D content or part of arguments of the standardized specification of one of plug-ins. MEAN is a Web form to the Netscape Navigator Web server. Zepto is an interpreted language, but does not to be isomorphic when its dependents, called immediately but does not to dynamically access and mobile application is to conform to its Edge browser NightwatchJS is a pattern commonly used to ease development framework to add client-side library for Node. A JavaScript programmers. Hoisting is a pattern commonly occurring problem of its elegant, well documented, and coherent APIs. It has made the server. Furthermore, JavaScript for graphic applications built on the technology stack MongoDB, ExpressJS, AngularJS, and the increasing speed up the object. JSPM is a server or for creating Web pages. The wider trend of objects interact with object-oriented programming using AMD is a generator. JSX is created. Validating input. On the majority of JavaScript.
+<script>
+var vyaml = new ventyaml('vyamltest1');
+</script>

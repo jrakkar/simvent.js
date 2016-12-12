@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html>
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width"/>
@@ -7,11 +8,13 @@
 	<script src="../simvent.js"></script>
 	<script src="../../graphsimple.js/graphsimple.js"></script>
 	<script src="../../graphsimple.js/d3.v3.min.js"></script>
-	<link rel="stylesheet" href="../../graphsimple.js/css/gs-grid-clear.css"/>
+	<link rel="stylesheet" href="../../graphsimple.js/css/graphsimple-clear.css"/>
 	<script src="../ventyaml.js"></script>
 	<script src="../sandbox/yaml.js/dist/yaml.js"></script>
+	<script src="https://rawgit.com/jeremyfa/yaml.js/develop/dist/yaml.min.js"></script>
 
 	<style>
+		/*
 		body {
 			text-align:center;
 		}
@@ -21,15 +24,13 @@
 				height: 600px;
 			border: 1px dashed red;
 		}
-
+*/
 		svg {
-			display: block;
-			margin-left: auto;
-			margin-right:auto;
 			border: 1px dashed blue;
 			height: 300px;
 			width: 800px;
 		}
+		/*
 table {
   margin-left: auto;
   margin-right: auto;
@@ -45,6 +46,7 @@ td, th {
 	  width: 50%;
 	  height: 200px;
   }
+	*/
 	</style>
 </head>
 
@@ -63,4 +65,4 @@ var vyaml = new ventyaml('vyamltest1');
 	</script>
 
 </body>
-
+</html>
