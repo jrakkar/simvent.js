@@ -12,6 +12,7 @@
 		}
 
 table {
+	border: 1px solid black;
   border-collapse: collapse; }
 
 td, th {
@@ -19,6 +20,11 @@ td, th {
   padding-right: 5px;
   text-align: left;
   border-bottom: 1px solid black; }
+
+th {
+	background-color: silver;
+	border-top: 1px solid black;
+}
 	</style>
 </head>
 
@@ -35,13 +41,15 @@ sv.describeVent = function(vent){
 	var v = new vent();
 	var b = document.getElementsByTagName("body")[0];
 
-	var h = document.createElement("h2");
+	var h = document.createElement("h3");
 	h.textContent=v.constructor.name;
 	b.appendChild(h);
 
+	/*
 	var h = document.createElement("h3");
 	h.textContent="Ventilation parameters";
 	b.appendChild(h);
+	*/
 
 	var t = document.createElement("table");
 	b.appendChild(t);
@@ -85,6 +93,9 @@ sv.describeVent = function(vent){
 	}
 };
 
+</script>
+<h2>Ventilator models</h2>
+<script>
 for(var i in sv.ventilators){
 	sv.describeVent(sv.ventilators[i]);
 }
