@@ -1,23 +1,13 @@
-if (! YAML){throw "ventyaml: YAML library not loaded."}
 class ventyaml {
 	constructor(textarea) {
 		if (! YAML){throw "ventyaml: YAML library not loaded."}
 		this.textarea = document.getElementById(textarea);
-		this.parentDiv = this.textarea.parentNode;
-		if(his.textarea.tagName !== "textarea"){
-			console.log("converting source to textrarea");
-			this.yaml = this.textarea.textContent;
-			this.parentDiv.removeChild(this.textarea);
-			this.textarea = document.createElement("textarea");
-			this.textarea.value = this.yaml;
-		}
 		this.textarea.classList.add("ventyamlSource");
 		this.textarea.classList.add("hidden");
 		this.textarea.contentEditable = true;
 
 		// Replace source element with codemirror if available
 		
-		/*
 		if(typeof window.CodeMirror !== "undefined"){
 			console.log("Codemirror is available");
 			function cmf(elt){
@@ -26,9 +16,9 @@ class ventyaml {
 			this.cm = CodeMirror(cmf, {value: this.textarea.textContent});
 		}
 		else{console.log("Codemirror not available");}
-		*/
 
 		// Create waveform container div
+		this.parentDiv = this.textarea.parentNode;
 		this.waveformContainer = document.createElement("div");
 		this.waveformContainer.classList.add("vyamlwc");
 		var containerId = "vyamlwc" + (document.getElementsByClassName("vyamlwc").length +1);
