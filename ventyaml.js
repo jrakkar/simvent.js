@@ -1,12 +1,11 @@
-//if (typeof YAML == "undefined"){throw "ventyaml: YAML library not loaded."}
-//console.log("Ok, the libraries are loaded");
+if (! YAML){throw "ventyaml: YAML library not loaded."}
 class ventyaml {
 	constructor(textarea) {
-		//if (! YAML){throw "ventyaml: YAML library not loaded."}
+		if (! YAML){throw "ventyaml: YAML library not loaded."}
 		this.textarea = document.getElementById(textarea);
 		this.parentDiv = this.textarea.parentNode;
 		if(his.textarea.tagName !== "textarea"){
-			//console.log("converting source to textrarea");
+			console.log("converting source to textrarea");
 			this.yaml = this.textarea.textContent;
 			this.parentDiv.removeChild(this.textarea);
 			this.textarea = document.createElement("textarea");
@@ -44,7 +43,6 @@ class ventyaml {
 
 	update(){
 		this.yaml = this.textarea.value;
-		if (! YAML){throw "ventyaml: YAML library not loaded."}
 		this.json = YAML.parse(this.yaml);
 		this.updateLung();
 		this.updateVent();
@@ -120,7 +118,7 @@ class ventyaml {
 	initGraph(){}
 
 	updateGraph(){
-		//console.log("Updating graph");
+		console.log("Updating graph");
 // 1- Clear all graph
 		var wc = this.waveformContainer;
 		while(wc.firstChild){
