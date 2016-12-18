@@ -2,15 +2,26 @@ class ventyaml {
 	constructor(sourceNode) {
 		if (! YAML){throw "ventyaml: YAML library not loaded."}
 		this.parentDiv = sourceNode.parentNode;
+
+		this.container = document.createElement("figure");
+		this.container.classList.add("ventyaml");
+
+		this.parentDiv.insertBefore(this.container, sourceNode);
+
 		if(sourceNode.tagName == "TEXTAREA"){
 			this.textarea = sourceNode;
+			//this.parentDiv.removeChild(this.textarea);
+			//this.container.appendChild(this.textarea);
 		}
 		else{
 			this.textarea = document.createElement("textarea");
 			this.textarea.value = sourceNode.textContent;
-			this.parentDiv.insertBefore(this.textarea, sourceNode);
+			//this.parentDiv.insertBefore(this.textarea, sourceNode);
 			this.parentDiv.removeChild(sourceNode);
 		}
+
+		this.container.appendChild(this.textarea);
+
 		this.textarea.classList.add("ventyamlSource");
 		this.textarea.classList.add("hidden");
 		this.textarea.value = this.textarea.value.trim();
@@ -23,7 +34,7 @@ class ventyaml {
 		this.waveformContainer.classList.add("vyamlwc");
 		var containerId = "vyamlwc" + (document.getElementsByClassName("vyamlwc").length +1);
 		this.waveformContainer.id = containerId;
-		this.parentDiv.insertBefore(this.waveformContainer, this.textarea);
+		this.container.insertBefore(this.waveformContainer, this.textarea);
 		this.waveformContainer.addEventListener("click", this.toggleSource.bind(this));
 
 		// Operate the magic
@@ -31,9 +42,6 @@ class ventyaml {
 		this.update();
 	}
 
-	toTArea(){
-		
-	}
 	createCM(){
 
 		// Replace source element with codemirror if available
