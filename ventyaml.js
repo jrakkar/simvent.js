@@ -1,22 +1,64 @@
 class ventyaml {
-	constructor(textarea) {
+	constructor(sourceNode) {
 		if (! YAML){throw "ventyaml: YAML library not loaded."}
-		this.textarea = document.getElementById(textarea);
-		this.yaml = this.textarea.value;
-		this.json = YAML.parse(this.yaml);
+		this.parentDiv = sourceNode.parentNode;
+
+		this.container = document.createElement("figure");
+		this.container.classList.add("ventyaml");
+
+		this.parentDiv.insertBefore(this.container, sourceNode);
+
+		if(sourceNode.tagName == "TEXTAREA"){
+			this.textarea = sourceNode;
+			//this.parentDiv.removeChild(this.textarea);
+			//this.container.appendChild(this.textarea);
+		}
+		else{
+			this.textarea = document.createElement("textarea");
+			this.textarea.value = sourceNode.textContent;
+			//this.parentDiv.insertBefore(this.textarea, sourceNode);
+			this.parentDiv.removeChild(sourceNode);
+		}
+
+		this.container.appendChild(this.textarea);
+
+		this.textarea.classList.add("ventyamlSource");
+		this.textarea.classList.add("hidden");
+		this.textarea.value = this.textarea.value.trim();
+		//this.textarea.contentEditable = true;
+
 
 		// Create waveform container div
-		this.parentDiv = this.textarea.parentNode;
+		//this.parentDiv = this.textarea.parentNode;
 		this.waveformContainer = document.createElement("div");
 		this.waveformContainer.classList.add("vyamlwc");
-		this.parentDiv.insertBefore(this.waveformContainer, this.textarea);
+		var containerId = "vyamlwc" + (document.getElementsByClassName("vyamlwc").length +1);
+		this.waveformContainer.id = containerId;
+		this.container.insertBefore(this.waveformContainer, this.textarea);
+		this.waveformContainer.addEventListener("click", this.toggleSource.bind(this));
 
 		// Operate the magic
 
 		this.update();
 	}
 
+	createCM(){
+
+		// Replace source element with codemirror if available
+		
+		if(typeof window.CodeMirror !== "undefined"){
+			console.log("Codemirror is available");
+			function cmf(elt){
+				this.textarea.parentNode.replaceChild(elt, this.textarea);
+			}
+			this.cm = CodeMirror(cmf, {value: this.textarea.textContent});
+		}
+		else{console.log("Codemirror not available");}
+	}
+
 	update(){
+		this.yaml = this.textarea.value;
+		this.json = YAML.parse(this.yaml);
 		this.updateLung();
 		this.updateVent();
 		this.run();
@@ -85,45 +127,77 @@ class ventyaml {
 	}
 
 	run(){
-		this.data = this.vent.ventilate(this.lung);
+		this.data = this.vent.ventilate(this.lung).timeData;
 	}
 
 	initGraph(){}
 
 	updateGraph(){
-		console.log("Updating graph");
 // 1- Clear all graph
-
+		var wc = this.waveformContainer;
+		while(wc.firstChild){
+			wc.removeChild(wc.firstChild);
+		}
+		//
 // 2- Check what must be ploted and plot it
+
 		if("Courbes" in this.json){
 			var courbes = this.json.Courbes;
+			
 			if(typeof courbes == "object"){
 				console.log("We seem to have a waveform list");
 				for(var i in courbes){
 					if(typeof courbes[i] == "string"){
 						function fx(d){return d.time;}
 						function fy(d){return d[courbes[i]];}
-						var graphid = "graph" + (document.getElementsByTagName("svg").length +1);
-						this.svg = document.createElement("svg");
-						this.svg.id = graphid;
-						this.waveformContainer.appendChild(this.svg);
-
-						var graph = gs.graph("#" + graphid, this.data.timeData, fx, fy);
-						graph.setscale(this.data.timeData, fx, fy);
-						graph.tracer(this.data.timeData, fx, fy);
-						graph.setidX(d[courbes[i]]);
+						gs.addGraph(this.waveformContainer.id, this.data, fx, fy);
 					}
 				}
 			}
+			else{console.log("ventyaml: Value for courbes must be a string list")}
 		}
-	}
-
-	addWave(yParam){
-		// Create new svg element in waveform container div
+		else if("Courbe" in this.json){
+			var courbe = this.json.Courbe;
+			
+			if(typeof courbe == "string"){
+				console.log("We seem to have a single waveform");
+				function fx(d){return d.time;}
+				function fy(d){return d[courbe];}
+				gs.addGraph(this.waveformContainer.id, this.data, fx, fy);
+			}
+			else{console.log("ventyaml: Value for courbes must be a string")}
+		}
+		else{
+			var courbe = "Flung";
+			
+			if(typeof courbe == "string"){
+				console.log("Using default waveform");
+				function fx(d){return d.time;}
+				function fy(d){return d[courbe];}
+				gs.addGraph(this.waveformContainer.id, this.data, fx, fy);
+			}
+			else{console.log("ventyaml: Value for courbes must be a string")}
+		}
 		
-		// Plot the data
 	}
 
-	addLoop(yParam, xParam){}
 
+	toggleSource(){
+	//	this.textarea.classList.toggle("hidden");	
+		if(this.textarea.classList.contains("hidden")){
+			this.textarea.classList.remove("hidden");
+			}
+		else{
+			this.update();
+			this.textarea.classList.add("hidden");
+			}
+	}
+
+}
+
+function ventyamlEverything(selector){
+	var preS = document.querySelectorAll(selector);
+	for(var i in preS){
+		var ventyamlInstance = new ventyaml(preS[i]);
+	}
 }

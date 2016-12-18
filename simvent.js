@@ -531,38 +531,30 @@ sv.PressureAssistor = class PressureAssistor extends sv.Ventilator{
 
 	}
 
-	ventilate (lung){
+	ventilationCycle(lung){
+		// Attente d'un declecnchement
 
-		var timeData = [];
-		var respd = [];
-		this.time = 0.0;
-
-		while(this.time <= this.Tvent){
-			// Attente d'un declecnchement
-
-			this.Fstop = 0;
-			this.Fmax = 0;
-			this.Pao = this.PEEP;
-			while (lung.flow < this.Ftrig && this.time <= this.Tvent){
-				lung.appliquer_pression(this.PEEP, this.Tsampl)
-				timeData.push(sv.log(lung, this));
-				this.time += this.Tsampl;
-			}
-
-			// Phase inspiratoire
-			this.Pao = this.Passist;
-			while (lung.flow > this.Fstop && this.time <= this.Tvent){
-				lung.appliquer_pression(this.Passist, this.Tsampl)
-				timeData.push(sv.log(lung, this));
-				this.time += this.Tsampl;
-
-				if (lung.flow > this.Fmax) {this.Fmax = lung.flow;}
-				this.Fstop = this.Cycling * this.Fmax / 100;
-			}
-			lung.appliquer_pression(this.PEEP, this.Tsampl)
+		this.Fmax = 0;
+		this.Pao = this.PEEP;
+		while (lung.flow < this.Ftrig && this.time <= this.simulationStop){
+			lung.appliquer_pression(this.PEEP, this.Tsampl);
+			this.timeData.push(sv.log(lung, this));
+			this.time += this.Tsampl;
 		}
-		return {timeData: timeData};
-	};
+
+		// Phase inspiratoire
+		this.Pao = this.Passist;
+		while (lung.flow > this.Fstop && this.time <= this.simulationStop){
+			lung.appliquer_pression(this.Passist, this.Tsampl);
+			this.timeData.push(sv.log(lung, this));
+			this.time += this.Tsampl;
+
+			if (lung.flow > this.Fmax) {this.Fmax = lung.flow;}
+		}
+		lung.appliquer_pression(this.PEEP, this.Tsampl)
+	}
+
+	get Fstop(){return this.Fmax * this.Cycling / 100;}
 
 }
 
@@ -594,46 +586,28 @@ sv.PressureControler = class PressureControler extends sv.Ventilator {
 	get Tcycle() { return 60 / this.Fconv; }
 	get Te() { return this.Tcycle - this.Ti; }
 
-	ventilate (lung){
+	ventilationCycle(lung){
 
-		var timeData = [];
-		var respd = [];
-		this.time = 0.0;
-		for (this.time = 0; this.time < this.Tvent;){
 			var tdeb = this.time;
+			var tStop = this.time + this.Ti;
 
 			this.Pao = this.Pinspi;
-			while(this.time < (tdeb + this.Ti)){
+			while(this.time < tStop && this.time<=this.simulationStop){
 				lung.appliquer_pression(this.Pao, this.Tsampl)
-
-				timeData.push(sv.log(lung, this));
+				this.timeData.push(sv.log(lung, this));
 
 				this.time += this.Tsampl;
 			}
 
+			var tStop = this.time + this.Te;
 			this.Pao = this.PEEP
-			while(this.time < (tdeb + (60/this.Fconv))){
-				this.Pao = this.PEEP
+			while(this.time < tStop && this.time<=this.simulationStop){
 				lung.appliquer_pression(this.Pao, this.Tsampl)
-				timeData.push(sv.log(lung, this));
+				this.timeData.push(sv.log(lung, this));
+
 				this.time += this.Tsampl;
 			}
-			var pmeco2 = ((760-47) * lung.veco2/lung.vce);
-			respd.push({
-				pmeco2:pmeco2,
-				petco2:lung.pco2,
-				pAco2: lung.PACO2,
-				fowler: lung.Vem/lung.vce,
-				bohr: (lung.PACO2 - pmeco2)/lung.PACO2,
-			});
-		}
-
-		return {
-			timeData: timeData,
-			respd:respd
-		};
 	}
-
 
 };
 
@@ -847,47 +821,11 @@ sv.VDR = class VDR extends sv.Ventilator{
 	get Tip(){return (60/this.Fperc)*this.Rit;}
 	get Tep(){return (60/this.Fperc)-this.Tip;}
 		
-	Aventilate (lung){
-
-		this.timeData = [];
-		this.convData = [];
-		this.percData = [];
-
-		while (this.time < this.Tvent){
-			this.convectiveExpiration(lung);
-			this.convectiveInspiration(lung);
-		}
-
-		if(this.lowPass > 1){
-
-			for (var index in this.dataToFilter){
-				var id = this.dataToFilter[index];
-				var smoothed = this.timeData[0][id];
-				for (var jndex = 1, len = this.timeData.length; jndex<len; ++jndex){
-					var currentValue = this.timeData[jndex][id];
-					smoothed += (currentValue - smoothed) / this.lowPass;
-					this.timeData[jndex][id] = smoothed;
-				}
-			}
-		}
-
-		if(this.rAvg >= 2){
-
-			for (index in this.dataToFilter){
-				sv.avg(this.timeData, this.dataToFilter[index], this.rAvg);
-			}
-		}
-		
-		return {
-			timeData: this.timeData,
-			percData: this.percData,
-			convData: this.convData
-		};
-	};
 	ventilationCycle(lung){
 			this.convectiveExpiration(lung);
 			this.convectiveInspiration(lung);
 	}
+
 };
 
 /**
