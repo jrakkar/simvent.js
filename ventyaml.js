@@ -133,18 +133,17 @@ class ventyaml {
 	initGraph(){}
 
 	updateGraph(){
-		console.log("Updating graph");
 // 1- Clear all graph
 		var wc = this.waveformContainer;
 		while(wc.firstChild){
 			wc.removeChild(wc.firstChild);
 		}
-		/*
-		this.waveformContainer.innerHtml = "";
-		*/
+		//
 // 2- Check what must be ploted and plot it
+
 		if("Courbes" in this.json){
 			var courbes = this.json.Courbes;
+			
 			if(typeof courbes == "object"){
 				console.log("We seem to have a waveform list");
 				for(var i in courbes){
@@ -155,16 +154,33 @@ class ventyaml {
 					}
 				}
 			}
+			else{console.log("ventyaml: Value for courbes must be a string list")}
 		}
-	}
-
-	addWave(yParam){
-		// Create new svg element in waveform container div
+		else if("Courbe" in this.json){
+			var courbe = this.json.Courbe;
+			
+			if(typeof courbe == "string"){
+				console.log("We seem to have a single waveform");
+				function fx(d){return d.time;}
+				function fy(d){return d[courbe];}
+				gs.addGraph(this.waveformContainer.id, this.data, fx, fy);
+			}
+			else{console.log("ventyaml: Value for courbes must be a string")}
+		}
+		else{
+			var courbe = "Flung";
+			
+			if(typeof courbe == "string"){
+				console.log("Using default waveform");
+				function fx(d){return d.time;}
+				function fy(d){return d[courbe];}
+				gs.addGraph(this.waveformContainer.id, this.data, fx, fy);
+			}
+			else{console.log("ventyaml: Value for courbes must be a string")}
+		}
 		
-		// Plot the data
 	}
 
-	addLoop(yParam, xParam){}
 
 	toggleSource(){
 	//	this.textarea.classList.toggle("hidden");	
