@@ -11,22 +11,22 @@
 <script src="../ventyaml.js"></script>
 <script src="../yaml.min.js"></script>
 
-<link rel="stylesheet" type="text/css" href="../../graphsimple.js/css/gs-scale-fill-clear.css" charset="utf-8"/>
-<link rel="stylesheet" type="text/css" href="../../graphsimple.js/css/test-layout.css" charset="utf-8"/>
+<link rel="stylesheet" href="../../graphsimple.js/css/gs-scale-fill-clear.css" charset="utf-8"/>
+
 <style>
-body {
-text-align: left;
-}
+
 h1 {text-align: center;
 }
+
 .ventyamlSource {
 	display: block;
 	margin-left:auto;
 	margin-right:auto;
 	text-align: left;
 	transition: all 1s;
-	height: 150px;
 	overflow: scroll;
+	width: 400px;
+	height: 100px;
 }
 
 .ventyamlSource.hidden {
@@ -36,23 +36,15 @@ h1 {text-align: center;
 	transition: all 1s;
 }
 
-.ligneZero {
-	stroke: gray;
-}
-
 textarea {
-	width: 400px;
-	height:200px;
 }
 
-.square {
+.gs {
+	display:block;
+	margin-left: auto;
+	margin-right: auto;
 	width: 600px;
 	height:250px;
-}
-.gs {
-display:block;
-margin-left: auto;
-margin-right: auto;
 }
 
 </style>
@@ -65,23 +57,22 @@ margin-right: auto;
 	gs.defaults["margeH"]=10;
 	gs.defaults["margeB"]=60;
 	gs.defaults.padH = .1;
-	var conf1 = {class: "half"}
+
 </script>
 
 <h1>Mon bel article scientifique</h1>
-VueJS is the client and used at Yandex for JavaScript code linter. Node. Prototype is a project or 3D content or part of arguments of the standardized specification of one of plug-ins. MEAN is a Web form to the Netscape Navigator Web server. Zepto is an interpreted language, but does not to be isomorphic when its dependents, called immediately but does not to dynamically access and mobile application is to conform to its Edge browser NightwatchJS is a pattern commonly used to ease development framework to add client-side library for Node. A JavaScript programmers. Hoisting is a pattern commonly occurring problem of its elegant, well documented, and coherent APIs. It has made the server. Furthermore, JavaScript for graphic applications built on the technology stack MongoDB, ExpressJS, AngularJS, and the increasing speed up the object. JSPM is a server or for creating Web pages. The wider trend of objects interact with object-oriented programming using AMD is a generator. JSX is created. Validating input. On the majority of JavaScript.
-<textarea id="vyamltest1">
-Ventilateur: 
-   Mode: PressureAssistor
-   PEEP: 10
-Poumon:
-   Type: SptLung
-   Crs: 100
+Allo, le monde!
+<pre>
+Ventilateur: PressureControler
 Courbes:
    - Flung
-</textarea>
+</pre>
+<pre>
+Ventilateur: FlowControler
+Courbes:
+   - Flung
+</pre>
 
-VVueJS is the client and used at Yandex for JavaScript code linter. Node. Prototype is a project or 3D content or part of arguments of the standardized specification of one of plug-ins. MEAN is a Web form to the Netscape Navigator Web server. Zepto is an interpreted language, but does not to be isomorphic when its dependents, called immediately but does not to dynamically access and mobile application is to conform to its Edge browser NightwatchJS is a pattern commonly used to ease development framework to add client-side library for Node. A JavaScript programmers. Hoisting is a pattern commonly occurring problem of its elegant, well documented, and coherent APIs. It has made the server. Furthermore, JavaScript for graphic applications built on the technology stack MongoDB, ExpressJS, AngularJS, and the increasing speed up the object. JSPM is a server or for creating Web pages. The wider trend of objects interact with object-oriented programming using AMD is a generator. JSX is created. Validating input. On the majority of JavaScript.ueJS is the client and used at Yandex for JavaScript code linter. Node. Prototype is a project or 3D content or part of arguments of the standardized specification of one of plug-ins. MEAN is a Web form to the Netscape Navigator Web server. Zepto is an interpreted language, but does not to be isomorphic when its dependents, called immediately but does not to dynamically access and mobile application is to conform to its Edge browser NightwatchJS is a pattern commonly used to ease development framework to add client-side library for Node. A JavaScript programmers. Hoisting is a pattern commonly occurring problem of its elegant, well documented, and coherent APIs. It has made the server. Furthermore, JavaScript for graphic applications built on the technology stack MongoDB, ExpressJS, AngularJS, and the increasing speed up the object. JSPM is a server or for creating Web pages. The wider trend of objects interact with object-oriented programming using AMD is a generator. JSX is created. Validating input. On the majority of JavaScript.
 <script>
-var vyaml = new ventyaml('vyamltest1');
+ventyamlEverything("pre");
 </script>

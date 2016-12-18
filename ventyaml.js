@@ -1,10 +1,40 @@
 class ventyaml {
-	constructor(textarea) {
+	constructor(sourceNode) {
 		if (! YAML){throw "ventyaml: YAML library not loaded."}
-		this.textarea = document.getElementById(textarea);
+		this.parentDiv = sourceNode.parentNode;
+		if(sourceNode.tagName == "TEXTAREA"){
+			this.textarea = sourceNode;
+		}
+		else{
+			this.textarea = document.createElement("textarea");
+			this.textarea.value = sourceNode.textContent;
+			this.parentDiv.insertBefore(this.textarea, sourceNode);
+			this.parentDiv.removeChild(sourceNode);
+		}
 		this.textarea.classList.add("ventyamlSource");
 		this.textarea.classList.add("hidden");
-		this.textarea.contentEditable = true;
+		this.textarea.value = this.textarea.value.trim();
+		//this.textarea.contentEditable = true;
+
+
+		// Create waveform container div
+		//this.parentDiv = this.textarea.parentNode;
+		this.waveformContainer = document.createElement("div");
+		this.waveformContainer.classList.add("vyamlwc");
+		var containerId = "vyamlwc" + (document.getElementsByClassName("vyamlwc").length +1);
+		this.waveformContainer.id = containerId;
+		this.parentDiv.insertBefore(this.waveformContainer, this.textarea);
+		this.waveformContainer.addEventListener("click", this.toggleSource.bind(this));
+
+		// Operate the magic
+
+		this.update();
+	}
+
+	toTArea(){
+		
+	}
+	createCM(){
 
 		// Replace source element with codemirror if available
 		
@@ -16,19 +46,6 @@ class ventyaml {
 			this.cm = CodeMirror(cmf, {value: this.textarea.textContent});
 		}
 		else{console.log("Codemirror not available");}
-
-		// Create waveform container div
-		this.parentDiv = this.textarea.parentNode;
-		this.waveformContainer = document.createElement("div");
-		this.waveformContainer.classList.add("vyamlwc");
-		var containerId = "vyamlwc" + (document.getElementsByClassName("vyamlwc").length +1);
-		this.waveformContainer.id = containerId;
-		this.parentDiv.insertBefore(this.waveformContainer, this.textarea);
-		this.waveformContainer.addEventListener("click", this.toggleSource.bind(this));
-
-		// Operate the magic
-
-		this.update();
 	}
 
 	update(){
@@ -126,19 +143,7 @@ class ventyaml {
 					if(typeof courbes[i] == "string"){
 						function fx(d){return d.time;}
 						function fy(d){return d[courbes[i]];}
-						/*
-						var graphid = "graph" + (document.getElementsByTagName("svg").length +1);
-						this.svg = document.createElement("svg");
-						this.svg.classList.add("half");
-						this.svg.id = graphid;
-						this.waveformContainer.appendChild(this.svg);
-
-						var graph = gs.graph("#container");
-						graph.setscale(this.data.timeData, fx, fy);
-						graph.tracer(this.data.timeData, fx, fy);
-						graph.setidx(courbes[i]);
-						*/
-						gs.addGraph(this.waveformContainer.id, this.data, fx, fy, {class: "square"});
+						gs.addGraph(this.waveformContainer.id, this.data, fx, fy);
 					}
 				}
 			}
@@ -164,4 +169,11 @@ class ventyaml {
 			}
 	}
 
+}
+
+function ventyamlEverything(selector){
+	var preS = document.querySelectorAll(selector);
+	for(var i in preS){
+		var ventyamlInstance = new ventyaml(preS[i]);
+	}
 }
