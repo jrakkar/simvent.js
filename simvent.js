@@ -86,6 +86,49 @@ sv.avg = function(dataset, data, Nroll){
 	}
 }
 
+sv.defaultsTable = function(obj){
+	var b = document.getElementsByTagName("body")[0];
+	var t = document.createElement("table");
+	b.appendChild(t);
+
+	var rLine = document.createElement("tr");
+
+	var c1 = document.createElement("th");
+	c1.textContent = "Parameter";
+	rLine.appendChild(c1);
+
+	var c3 = document.createElement("th");
+	c3.textContent = "Default";
+	rLine.appendChild(c3);
+
+	var c2 = document.createElement("th");
+	c2.textContent = "Unit";
+	rLine.appendChild(c2);
+
+	t.appendChild(rLine);
+
+	for(id in obj){
+		var param = obj[id];
+		if(param.calculated != true){
+			var rLine = document.createElement("tr");
+
+			var c1 = document.createElement("td");
+			c1.textContent = id;
+			rLine.appendChild(c1);
+
+			var c3 = document.createElement("td");
+			c3.textContent = this[id];
+			rLine.appendChild(c3);
+
+			var c2 = document.createElement("td");
+			c2.textContent = param.unit;
+			rLine.appendChild(c2);
+
+			t.appendChild(rLine);
+		}
+	}
+};
+
 //****************************
 // Lung models
 //****************************
@@ -130,6 +173,9 @@ sv.Lung = class Lung{
 
 	get Palv() {return this.Pel - this.Pmus;}
 	get Vt() {return this.Vtmax -this.Vte;}
+	get SCO2() { return this.PCO2/(760-47); }
+	get VcAlv() { return this.Vtmax - this.Vdaw; }
+	get PplCO2() { return this.PACO2 - (this.Slope3 * (this.VcAlv / 2)); }
 
 	/**
 	 * Simulate a pressure being applied to airway openning of the lung
@@ -198,9 +244,23 @@ sv.Lung = class Lung{
 		this.PCO2 = co2;
 	};
 
-	get SCO2() { return this.PCO2/(760-47); }
-	get VcAlv() { return this.Vtmax - this.Vdaw; }
-	get PplCO2() { return this.PACO2 - (this.Slope3 * (this.VcAlv / 2)); }
+	complianceCurve(){
+		var vent = new sv.PVCurve;
+		var data = vent.ventilate(this).timeData;
+		var idsvg = "svg" + document.querySelectorAll("svg").length;
+		document.write("<svg id='" + idsvg +"'></svg>");
+		function fx(d){return d.Pel;}
+		function fy(d){return d.Vabs;}
+		var graph = new gs.graph("#"+idsvg); 
+		graph.setscale(data, fx, fy);
+		graph.tracer(data, fx, fy);
+		graph.setidx("Elastic recoil pressure (cmH₂O)");
+		graph.setidy("Volume (l)");
+	}
+
+	defaultsTable(){
+		sv.defaultsTable.call(this,this.mechParams);
+	}
 }
 
 /** 
@@ -447,6 +507,8 @@ sv.Ventilator = class Ventilator{
 
 		this.Tsampl = 0.01;
 
+		this.demoLung = sv.SimpleLung;
+
 		this.simParams = {
 			Tsampl:{unit: "s"},
 			Tvent: {uni: "s"}
@@ -502,6 +564,28 @@ sv.Ventilator = class Ventilator{
 	ventilationCycle(){
 		throw "ventilationCycle() must be implemented i high level ventilator model.";
 	}
+
+	sampleWaveform(){
+		var lung = new this.demoLung();
+		var data = this.ventilate(lung).timeData;
+
+		var params = ["Pao"];
+		for(var i in params){
+			var idsvg = "svg" + document.querySelectorAll("svg").length;
+			document.write("<svg id='" + idsvg +"' class='ventSample'></svg>");
+			function fx(d){return d.time;}
+			function fy(d){return d[params[i]];}
+			var graph = new gs.graph("#"+idsvg); 
+			graph.setscale(data, fx, fy);
+			graph.tracer(data, fx, fy);
+			graph.setidx("Time (s)");
+			graph.setidy(params[i]);
+		}
+	}
+
+	defaultsTable(){
+		sv.defaultsTable.call(this,this.ventParams);
+	}
 };
 
 /**
@@ -521,6 +605,7 @@ sv.PressureAssistor = class PressureAssistor extends sv.Ventilator{
 		this.PEEP = 0.0;
 		this.Cycling = 10;
 		this.Ftrig = 0.1;
+		this.demoLung = sv.SptLung;
 
 		this.ventParams = {
 			Passist:{unit: "cmH₂O"},
@@ -572,6 +657,7 @@ sv.PressureControler = class PressureControler extends sv.Ventilator {
 			this.PEEP = 0.0;
 			this.Ti = 1;
 			this.Fconv = 12;
+
 
 			this.ventParams = {
 				Pinspi:{unit: "cmH₂O"},
