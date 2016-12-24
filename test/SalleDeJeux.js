@@ -1,5 +1,5 @@
 var sj = {
-	updateDelay: 500
+	updateDelay: 1000
 };
 
 function inputHandler(){

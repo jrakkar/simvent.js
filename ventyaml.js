@@ -142,73 +142,54 @@ class ventyaml {
 			var courbes = this.json.Courbes;
 			
 			if(typeof courbes == "object"){
-				console.log("We seem to have a waveform list");
 				for(var i in courbes){
-					if(typeof courbes[i] == "string"){
-						function fx(d){return d.time;}
-						function fy(d){return d[courbes[i]];}
-						var graph = gs.addGraph(this.waveformContainer.id, this.data, fx, fy);
-						graph.setidx("Time (s)");
-						graph.setidy(courbes[i]);
-					}
+					this.createWaveform(courbes[i]);
 				}
 			}
-			else{console.log("ventyaml: Value for courbes must be a string list")}
+			else{console.log("ventyaml: Value for courbes must be a string list");}
 		}
 		else if("Courbe" in this.json){
-			var courbe = this.json.Courbe;
-			
-			if(typeof courbe == "string"){
-				console.log("We seem to have a single waveform");
-				function fx(d){return d.time;}
-				function fy(d){return d[courbe];}
-				gs.addGraph(this.waveformContainer.id, this.data, fx, fy);
-			}
-			else{console.log("ventyaml: Value for courbes must be a string")}
-		}
-		else{
-			var courbe = "Flung";
-			
-			if(typeof courbe == "string"){
-				console.log("Using default waveform");
-				function fx(d){return d.time;}
-				function fy(d){return d[courbe];}
-				gs.addGraph(this.waveformContainer.id, this.data, fx, fy);
-			}
-			else{console.log("ventyaml: Value for courbes must be a string")}
+			this.createWaveform(this.json.Courbe);
 		}
 		if("Boucles" in this.json){
-			var courbes = this.json.Courbes;
-			
-			if(typeof courbes == "object"){
-				console.log("We seem to have a waveform list");
-				for(var i in courbes){
-					if(typeof courbes[i] == "string"){
-						function fx(d){return d.time;}
-						function fy(d){return d[courbes[i]];}
-						var graph = gs.addGraph(this.waveformContainer.id, this.data, fx, fy);
-						graph.setidx("Time (s)");
-						graph.setidy(courbes[i]);
-					}
-				}
+			for(var i in this.json.Boucles){
+				this.createLoop(this.json.Boucles[i])
 			}
-			else{console.log("ventyaml: Value for courbes must be a string list")}
-		}
-		else if("Boucle" in this.json){
-			var boucle = this.json.Boucle;
-			
-			if(typeof boucle == "object"){
-				function fx(d){return d[boucle["x"]];}
-				function fy(d){return d[boucle["y"]];}
-				var graph = gs.addGraph(this.waveformContainer.id, this.data, fx, fy, {class: "loop"});
-				graph.setidx(boucle["x"]);
-				graph.setidy(boucle["y"]);
-			}
-			else{console.log("ventyaml: invalid loop description")}
 		}
 		
+		else if("Boucle" in this.json){
+			var boucle = this.json.Boucle;
+			this.createLoop(boucle);
+		}
+
+		if(!('Courbes' in this.json) 
+				&& ! ('Courbe' in this.json)
+				&& ! ('Boucle' in this.json)
+				&& ! ('Boucles' in this.json)){
+			this.createWaveform("Flung");
+		}
 	}
 
+	createWaveform(courbe){
+		if(typeof courbe == "string"){
+			console.log("We seem to have a single waveform");
+			function fx(d){return d.time;}
+			function fy(d){return d[courbe];}
+			gs.addGraph(this.waveformContainer.id, this.data, fx, fy);
+		}
+		else{console.log("ventyaml: Value for courbes must be a string")}
+	}	
+
+	createLoop(boucle){
+		if(typeof boucle == "object"){
+			function fx(d){return d[boucle["x"]];}
+			function fy(d){return d[boucle["y"]];}
+			var graph = gs.addGraph(this.waveformContainer.id, this.data, fx, fy, {class: "loop"});
+			graph.setidx(boucle["x"]);
+			graph.setidy(boucle["y"]);
+		}
+		else{console.log("ventyaml: invalid loop description")}
+	}
 
 	toggleSource(){
 	//	this.textarea.classList.toggle("hidden");	
