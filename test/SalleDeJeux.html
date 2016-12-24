@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<meta charset="utf-8"/>
+<meta name='viewport' content='width=device-width'/>
+<script src="../../graphsimple.js/d3.v3.min.js" charset="utf-8"></script>
+<!--
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="/home/user1/Librairies JavaScript/js/d3.min.js" charset="utf-8"></script>
+-->
+<script src="../graphsimple.js" charset="utf-8"></script>
+<script src="../simvent.js" charset="utf-8"></script>
+<script src="../ventyaml.js"></script>
+<script src="../yaml.min.js"></script>
+
+<link rel="stylesheet" href="../../graphsimple.js/css/gs-scale-clear.css" charset="utf-8"/>
+<link rel="stylesheet" href="../css/SalleDeJeux.css" charset="utf-8"/>
+
+<div id="container"> </div>
+
+<ul class="menu">
+	<li><a href="describe.html">Aide</a>
+</ul>
+<pre>
+Ventilateur: PressureAssistor
+Poumon: SptLung
+</pre>
+
+<script>
+gs.defaults["margeG"]=60;
+gs.defaults["margeD"]=10;
+gs.defaults["margeH"]=10;
+gs.defaults["margeB"]=60;
+gs.defaults.padH = .1;
+//ventyamlEverything("pre");
+var myVentyaml = new ventyaml(document.querySelector('pre'));
+if('vyamlSource' in localStorage){
+	myVentyaml.textarea.value = localStorage.vyamlSource;
+	myVentyaml.update();
+}
+</script>
+<script src="SalleDeJeux.js"></script>
