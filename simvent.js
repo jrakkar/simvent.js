@@ -505,7 +505,7 @@ sv.Ventilator = class Ventilator{
 		 * @type {number}
 		 * */
 
-		this.Tsampl = 0.01;
+		this.Tsampl = 0.003;
 
 		this.demoLung = sv.SimpleLung;
 
