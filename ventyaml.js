@@ -172,7 +172,6 @@ class ventyaml {
 
 	createWaveform(courbe){
 		if(typeof courbe == "string"){
-			console.log("We seem to have a single waveform");
 			function fx(d){return d.time;}
 			function fy(d){return d[courbe];}
 			gs.addGraph(this.waveformContainer.id, this.data, fx, fy);

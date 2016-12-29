@@ -1,3 +1,7 @@
+if(typeof d3 == 'undefined'){
+	throw 'graphsimple.js: d3 library not loaded.';
+}
+
 var gs = {};
 
 gs.defaults = {
@@ -120,6 +124,8 @@ gs.graph = function(idsvg, conf) {
 			.domain([this.ymin, this.ymax])
 			.range([this.height - (this.margeB + this.padB), this.margeH + this.padH]);
 
+		this.getlf(d, fx, fy);
+		this.getsf(d, fx, fy);
 		return this;
 	}
 
@@ -144,18 +150,25 @@ gs.graph = function(idsvg, conf) {
 	this.tracer = function(donnees, fonctionx, fonctiony){
 		this.donnees = donnees;
 		var times = this.donnees.map(function(d){return d.Time});
-		this.animTime = Math.max(...times) * 1000;
+		this.animTime = Math.max(times) * 1000;
 
-		this.getlf(donnees, fonctionx, fonctiony);
-		this.getsf(donnees, fonctionx, fonctiony);
 		var coord = this.lf(donnees, fonctionx, fonctiony);
 		var surface = this.sf(donnees, fonctionx, fonctiony);
-		
-		this.drawGridY();
-		this.drawGridX();
+		if(!("gridY"in this)){
+			this.drawGridY();
+		}
+		if(!("gridX"in this)){
+			this.drawGridX();
+		}
+
+		if(!('waveformGroup' in this)){
+			this.waveformGroup = this.svg.append("g")
+				.attr("id", "waveformGroup");
+		}
 
 		this.clip = this.defs.append("clipPath")
-			.attr("id", this.idsvg.replace("#","") + "clip");
+			.attr("id", this.idsvg + "clip");
+			//.attr("id", this.idsvg.replace("#","") + "clip");
 		
 		this.clipRect = this.clip.append("rect")
 			.attr("x", this.margeG + this.padG)
@@ -172,36 +185,26 @@ gs.graph = function(idsvg, conf) {
 
 		this.axes()
 
-		this.courbe = this.svg.append("path")
+		this.courbe = this.waveformGroup.append("path")
 			.attr("d", coord)
 			.style("clip-path", "url(" + this.idsvg + "clip)")
-			;
+			.classed('dataPath', true);
 		//this.playSimb();
 		return this;
 	}
 
 	this.ajouter = function(donnees, fonctionx, fonctiony){
-		this.donnees = donnees;
 
-		this.getlf(donnees, fonctionx, fonctiony);
 		var coord = this.lf(donnees, fonctionx, fonctiony);
 
-		//if (this.ligneZeroX == undefined) {this.tracerZeroX();}
-
-		this.clip = this.defs.append("clipPath")
-			.attr("id", this.idsvg + "clip");
-		
-		this.clipRect = this.clip.append("rect")
-			.attr("x", this.margeG + this.padG)
-			.attr("y", this.margeH + this.padH - 2)
-			.attr("width", this.width - (this.margeD + this.margeG + this.padD + this.padG) + 2)
-			.attr("height", this.height - (this.margeH + this.margeB + this.padH + this.padB));
-
-		this.courbe2 = this.svg.append("path")
+		this.courbe2 = this.waveformGroup.append("path")
 			.attr("d", coord)
 			.style("clip-path", "url(#" + this.idsvg + "clip)")
-			.style("opacity", 0);
+			.style("opacity", 0)
+			.classed('dataPath', true);
+
 		this.courbe2.transition().duration(this.durAnim).style("opacity", 1);
+
 		this.anotations.push(this.courbe2);
 
 		return this;
