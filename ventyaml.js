@@ -10,13 +10,10 @@ class ventyaml {
 
 		if(sourceNode.tagName == "TEXTAREA"){
 			this.textarea = sourceNode;
-			//this.parentDiv.removeChild(this.textarea);
-			//this.container.appendChild(this.textarea);
 		}
 		else{
 			this.textarea = document.createElement("textarea");
 			this.textarea.value = sourceNode.textContent;
-			//this.parentDiv.insertBefore(this.textarea, sourceNode);
 			this.parentDiv.removeChild(sourceNode);
 		}
 
@@ -172,7 +169,6 @@ class ventyaml {
 
 	createWaveform(courbe){
 		if(typeof courbe == "string"){
-			console.log("We seem to have a single waveform");
 			function fx(d){return d.time;}
 			function fy(d){return d[courbe];}
 			gs.addGraph(this.waveformContainer.id, this.data, fx, fy);
