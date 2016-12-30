@@ -1,3 +1,7 @@
+if(typeof d3 == 'undefined'){
+	throw 'graphsimple.js: d3 library not loaded.';
+}
+
 var gs = {};
 
 gs.defaults = {
@@ -32,68 +36,70 @@ gs.stat = function(iddiv, respd){
 };
 
 
-gs.graph = function(idsvg, conf) {
+gs.graph = class {
+	constructor(idsvg, conf){
 
-	this.idsvg = idsvg;
+		this.idsvg = idsvg;
 
-	for(index in gs.defaults){
-		this[index] = gs.defaults[index];
+		for(var index in gs.defaults){
+			this[index] = gs.defaults[index];
+		}
+
+		for(var index in conf){
+			this[index] = conf[index];
+		}
+
+		this.svg = d3.select(idsvg)
+			.classed("gs", true);
+
+		this.animations = [];
+		this.anotations = [];
+		this.plages = [];
+		this.curAnim = 0;
+
+		this.width = this.svg.style("width");
+		this.width = this.width.substr(0, this.width.length-2);
+
+		this.height = this.svg.style("height");
+		this.height = this.height.substr(0, this.height.length-2);
+
+		this.defs = this.svg.append("defs");
+
+		this.defs.append("marker")
+			.attr("id", "flechep")
+			.attr("refY", "7")
+			.attr("refX", "7")
+			.attr("markerWidth", "21")
+			.attr("markerHeight", "14")
+			.attr("orient", "auto")
+			.attr("markerUnits", "userSpaceOnUse")
+			.append("path")
+			.attr("d", "M5,3 L9,7 L5,11");
+
+		this.defs.append("marker")
+			.attr("id", "fleches")
+			.attr("refY", "7")
+			.attr("refX", "14")
+			.attr("markerWidth", "21")
+			.attr("markerHeight", "14")
+			.attr("orient", "auto")
+			.attr("markerUnits", "userSpaceOnUse")
+			.append("path")
+			.attr("d", "M16,3 L12,7 L16,11");
+
+		this.defs.append("marker")
+			.attr("id", "flecheg")
+			.attr("refY", "10")
+			.attr("refX", "7")
+			.attr("markerWidth", "21")
+			.attr("markerHeight", "18")
+			.attr("orient", "auto")
+			.attr("markerUnits", "userSpaceOnUse")
+			.append("path")
+			.attr("d", "M3,5 L9,10 L3,15");
 	}
 
-	for(index in conf){
-		this[index] = conf[index];
-	}
-
-	this.svg = d3.select(idsvg)
-		.classed("gs", true);
-
-	this.animations = [];
-	this.anotations = [];
-	this.plages = [];
-	this.curAnim = 0;
-
-	this.width = this.svg.style("width");
-	this.width = this.width.substr(0, this.width.length-2);
-
-	this.height = this.svg.style("height");
-	this.height = this.height.substr(0, this.height.length-2);
-
-	this.defs = this.svg.append("defs");
-
-	this.defs.append("marker")
-		.attr("id", "flechep")
-		.attr("refY", "7")
-		.attr("refX", "7")
-		.attr("markerWidth", "21")
-		.attr("markerHeight", "14")
-		.attr("orient", "auto")
-		.attr("markerUnits", "userSpaceOnUse")
-		.append("path")
-		.attr("d", "M5,3 L9,7 L5,11");
-
-	this.defs.append("marker")
-		.attr("id", "fleches")
-		.attr("refY", "7")
-		.attr("refX", "14")
-		.attr("markerWidth", "21")
-		.attr("markerHeight", "14")
-		.attr("orient", "auto")
-		.attr("markerUnits", "userSpaceOnUse")
-		.append("path")
-		.attr("d", "M16,3 L12,7 L16,11");
-
-	this.defs.append("marker")
-		.attr("id", "flecheg")
-		.attr("refY", "10")
-		.attr("refX", "7")
-		.attr("markerWidth", "21")
-		.attr("markerHeight", "18")
-		.attr("orient", "auto")
-		.attr("markerUnits", "userSpaceOnUse")
-		.append("path")
-		.attr("d", "M3,5 L9,10 L3,15");
-
-	this.setscale = function(d, fx, fy){
+	setscale (d, fx, fy){
 		this.ymin = Math.min(d3.min(d, fy),0);
 		this.ymax = d3.max(d, fy);
 		this.xmin = d3.min(d, fx);
@@ -120,10 +126,12 @@ gs.graph = function(idsvg, conf) {
 			.domain([this.ymin, this.ymax])
 			.range([this.height - (this.margeB + this.padB), this.margeH + this.padH]);
 
+		this.getlf(d, fx, fy);
+		this.getsf(d, fx, fy);
 		return this;
 	}
 
-	this.getlf = function(d, fx, fy){
+	getlf(d, fx, fy){
 
 		this.lf = d3.svg.line()
 			.x(function(d) {return this.echellex(fx(d))})
@@ -131,7 +139,7 @@ gs.graph = function(idsvg, conf) {
 			.interpolate("linear");
 	}
 
-	this.getsf = function(d, fx, fy){
+	getsf (d, fx, fy){
 
 		this.sf = d3.svg.area()
 			.x(function(d) {return this.echellex(fx(d))})
@@ -141,21 +149,28 @@ gs.graph = function(idsvg, conf) {
 	}
 
 
-	this.tracer = function(donnees, fonctionx, fonctiony){
+	tracer (donnees, fonctionx, fonctiony){
 		this.donnees = donnees;
 		var times = this.donnees.map(function(d){return d.Time});
-		this.animTime = Math.max(...times) * 1000;
+		this.animTime = Math.max(times) * 1000;
 
-		this.getlf(donnees, fonctionx, fonctiony);
-		this.getsf(donnees, fonctionx, fonctiony);
 		var coord = this.lf(donnees, fonctionx, fonctiony);
 		var surface = this.sf(donnees, fonctionx, fonctiony);
-		
-		this.drawGridY();
-		this.drawGridX();
+		if(!("gridY"in this)){
+			this.drawGridY();
+		}
+		if(!("gridX"in this)){
+			this.drawGridX();
+		}
+
+		if(!('waveformGroup' in this)){
+			this.waveformGroup = this.svg.append("g")
+				.attr("id", "waveformGroup");
+		}
 
 		this.clip = this.defs.append("clipPath")
-			.attr("id", this.idsvg.replace("#","") + "clip");
+			.attr("id", this.idsvg + "clip");
+			//.attr("id", this.idsvg.replace("#","") + "clip");
 		
 		this.clipRect = this.clip.append("rect")
 			.attr("x", this.margeG + this.padG)
@@ -172,36 +187,26 @@ gs.graph = function(idsvg, conf) {
 
 		this.axes()
 
-		this.courbe = this.svg.append("path")
+		this.courbe = this.waveformGroup.append("path")
 			.attr("d", coord)
 			.style("clip-path", "url(" + this.idsvg + "clip)")
-			;
+			.classed('dataPath', true);
 		//this.playSimb();
 		return this;
 	}
 
-	this.ajouter = function(donnees, fonctionx, fonctiony){
-		this.donnees = donnees;
+	ajouter (donnees, fonctionx, fonctiony){
 
-		this.getlf(donnees, fonctionx, fonctiony);
 		var coord = this.lf(donnees, fonctionx, fonctiony);
 
-		//if (this.ligneZeroX == undefined) {this.tracerZeroX();}
-
-		this.clip = this.defs.append("clipPath")
-			.attr("id", this.idsvg + "clip");
-		
-		this.clipRect = this.clip.append("rect")
-			.attr("x", this.margeG + this.padG)
-			.attr("y", this.margeH + this.padH - 2)
-			.attr("width", this.width - (this.margeD + this.margeG + this.padD + this.padG) + 2)
-			.attr("height", this.height - (this.margeH + this.margeB + this.padH + this.padB));
-
-		this.courbe2 = this.svg.append("path")
+		this.courbe2 = this.waveformGroup.append("path")
 			.attr("d", coord)
 			.style("clip-path", "url(#" + this.idsvg + "clip)")
-			.style("opacity", 0);
+			.style("opacity", 0)
+			.classed('dataPath', true);
+
 		this.courbe2.transition().duration(this.durAnim).style("opacity", 1);
+
 		this.anotations.push(this.courbe2);
 
 		return this;
@@ -211,7 +216,7 @@ gs.graph = function(idsvg, conf) {
 	// we plot the entire time serie, hidden by a zero width clip rectangle, and then
 	// gradually unhide it.
 	
-	this.animate = function(){
+	animate (){
 		this.clipRect.attr("width", 0);
 
 		this.clipRect.transition().ease("linear").duration(this.animTime)
@@ -219,23 +224,8 @@ gs.graph = function(idsvg, conf) {
 		return this;
 	}
 
-	this.anotter = function(texte, x, y){
-		var a = this.svg.append("text")
-			.attr("x", this.echellex(x))
-			.attr("y", this.echelley(y))
-			.attr("text-anchor", "middle")
-			.attr("dominant-baseline", "middle")
-			.text(texte)
-			.attr("class", "anottation")
-			.style("opacity", "0");
 
-		a.transition().duration(1500).style("opacity", "1");
-		this.anotations.push(a);
-
-		return this;
-	}
-
-	this.raz = function(){
+	raz (){
 		for(i in this.anotations){
 			this.anotations[i].transition().duration(this.durAnim).style("opacity", 0);
 			this.anotations[i].transition().delay(this.durAnim).remove();
@@ -248,7 +238,7 @@ gs.graph = function(idsvg, conf) {
 		}
 	}
 
-	this.tracerZeroX = function(){
+	tracerZeroX (){
 		console.log("tracerZeroX");
 		this.ligneZeroX = this.svg.append("line")
 			.attr("x1", this.margeG)
@@ -260,7 +250,7 @@ gs.graph = function(idsvg, conf) {
 			.attr("class", "ligneZero");
 	}
 
-	this.axes = function(){
+	axes (){
 		//if(this.hasOwnProperty("axex")){console.log("Axe X déja présent");}
 		//else{
 			this.axex = this.svg.append("line")
@@ -285,7 +275,7 @@ gs.graph = function(idsvg, conf) {
 		//}
 	}
 
-	this.zoomX = function(xmin, xmax) {
+	zoomX (xmin, xmax) {
 
 		this.echellex = d3.scale.linear()
 			.domain([0, 3])
@@ -297,7 +287,7 @@ gs.graph = function(idsvg, conf) {
 			.attr("d", this.lf(this.donnees));
 	}
 
-	this.plagex = function(min, max, id){
+	plagex (min, max, id){
 		var durAnim = 1000;
 		var pad = this.padPlage;
 		var plage = {};
@@ -323,7 +313,7 @@ gs.graph = function(idsvg, conf) {
 
 	}
 
-	this.setidx = function(texte){
+	setidx (texte){
 		var y = this.height - (.2 * this.margeB);
 
 		if(this.idPos == "center"){
@@ -347,7 +337,7 @@ gs.graph = function(idsvg, conf) {
 		return this;
 	}
 
-	this.setidy = function(texte){
+	setidy (texte){
 
 		if(this.idPos == "center"){
 			var x = this.margeG/3;
@@ -372,7 +362,7 @@ gs.graph = function(idsvg, conf) {
 		return this;
 	}
 
-	this.pointy = function(val, id){
+	pointy (val, id){
 		var ligne = this.svg.append("line")
 			.attr("x1", this.margeG)
 			.attr("x2", this.margeG)
@@ -391,7 +381,7 @@ gs.graph = function(idsvg, conf) {
 		this.anotations.push(texte);
 	}
 
-	this.pointx = function(val, id){
+	pointx (val, id){
 		var an = this.svg.append("line")
 			.attr("x1", this.echellex(val))
 			.attr("x2", this.echellex(val))
@@ -409,7 +399,7 @@ gs.graph = function(idsvg, conf) {
 		this.anotations.push(an);
 	}
 
-	this.drawGridY = function(){
+	drawGridY (){
 
 		this.gridY = d3.svg.axis()
 			.orient("left")
@@ -425,7 +415,7 @@ gs.graph = function(idsvg, conf) {
 		return this;
 	}
 
-	this.drawGridX = function(){
+	drawGridX (){
 
 		this.gridX = d3.svg.axis()
 			.tickSize(- (this.height - this.margeH - this.margeB - this.padH))
@@ -440,7 +430,7 @@ gs.graph = function(idsvg, conf) {
 		return this;
 	}
 
-	this.drawGradY = function(){
+	drawGradY (){
 
 		this.gradY = d3.svg.axis()
 			.tickSize(20)
@@ -456,7 +446,7 @@ gs.graph = function(idsvg, conf) {
 		return this;
 	}
 
-	this.drawGradX = function(){
+	drawGradX (){
 
 		this.gradX = d3.svg.axis()
 			.scale(this.echellex);
@@ -469,17 +459,19 @@ gs.graph = function(idsvg, conf) {
 
 		return this;
 	}
-	this.playSimb = function(){
+
+	playSimb (){
 		this.svg.append("polygon")
 			.attr("class", "playSimb")
 			.attr("points", "0,0 0,50 43.3,25 0,0");
 		return this;
 	}
-	return this;
+
+//	return this;
 }
 
 gs.quickGraph = function(div, data, fx, fy, conf){
-	return gs.graph(div, conf)
+	return new gs.graph(div, conf)
 		.setscale(data, fx, fy)
 		.tracer(data, fx, fy);
 }
