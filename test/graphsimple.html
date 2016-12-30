@@ -19,7 +19,6 @@ body {
 	border: 1px dashed red;
 	padding: none;
 	margin-top: none;
-	background-color: gray;
 }
 html {
 	box-sizing: border-box;
@@ -46,39 +45,39 @@ html {
 </style>
 <body>
 	<svg id="svg1"></svg>
+	<script>
+gs.defaults["margeG"]=90;
+gs.defaults["margeD"]=10;
+gs.defaults["margeH"]=10;
+gs.defaults["margeB"]=60;
+gs.defaults.padH=.1;
+
+var lung1 = new sv.SimpleLung();
+lung1.Crs=50;
+
+var lung2 = new sv.SimpleLung();
+lung2.Crs=75;
+
+var lung3 = new sv.SimpleLung();
+lung3.Crs=25;
+
+var vent = new sv.PressureControler();	
+
+var dat1 = vent.ventilate(lung1).timeData;
+
+vent.time = 0;
+var dat2 = vent.ventilate(lung2).timeData;
+
+vent.time = 0;
+var dat3 = vent.ventilate(lung3).timeData;
+
+function fx(d){return d.time;}
+function fy(d){return d.Flung;}
+
+var plot = new gs.graph("#svg1");
+plot.setscale(dat1,fx,fy);
+plot.tracer(dat1,fx,fy);
+plot.tracer(dat2,fx,fy);
+plot.tracer(dat3,fx,fy);
+	</script>
 </body>
-<script>
-	gs.defaults["margeG"]=90;
-	gs.defaults["margeD"]=10;
-	gs.defaults["margeH"]=10;
-	gs.defaults["margeB"]=60;
-	gs.defaults.padH=.1;
-
-	var lung1 = new sv.SimpleLung();
-	lung1.Crs=50;
-
-	var lung2 = new sv.SimpleLung();
-	lung2.Crs=75;
-
-	var lung3 = new sv.SimpleLung();
-	lung3.Crs=25;
-
-	var vent = new sv.PressureControler();	
-
-	var dat1 = vent.ventilate(lung1).timeData;
-
-	vent.time = 0;
-	var dat2 = vent.ventilate(lung2).timeData;
-
-	vent.time = 0;
-	var dat3 = vent.ventilate(lung3).timeData;
-
-	function fx(d){return d.time;}
-	function fy(d){return d.Flung;}
-
-	var plot = new gs.graph("#svg1");
-	plot.setscale(dat1,fx,fy);
-	plot.tracer(dat1,fx,fy);
-	plot.tracer(dat2,fx,fy);
-	plot.tracer(dat3,fx,fy);
-</script>

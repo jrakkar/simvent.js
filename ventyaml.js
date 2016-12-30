@@ -10,13 +10,10 @@ class ventyaml {
 
 		if(sourceNode.tagName == "TEXTAREA"){
 			this.textarea = sourceNode;
-			//this.parentDiv.removeChild(this.textarea);
-			//this.container.appendChild(this.textarea);
 		}
 		else{
 			this.textarea = document.createElement("textarea");
 			this.textarea.value = sourceNode.textContent;
-			//this.parentDiv.insertBefore(this.textarea, sourceNode);
 			this.parentDiv.removeChild(sourceNode);
 		}
 
