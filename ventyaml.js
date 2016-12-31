@@ -177,7 +177,8 @@ class ventyaml {
 	}	
 
 	createLoop(boucle){
-		if(typeof boucle == "object"){
+		if( typeof boucle == "object" && 'x' in boucle && 'y' in boucle && boucle.x != null && boucle.y != null){
+			console.log("y: " + boucle.y);
 			function fx(d){return d[boucle["x"]];}
 			function fy(d){return d[boucle["y"]];}
 			var graph = gs.addGraph(this.waveformContainer.id, this.data, fx, fy, {class: "loop"});
@@ -191,11 +192,11 @@ class ventyaml {
 	//	this.textarea.classList.toggle("hidden");	
 		if(this.textarea.classList.contains("hidden")){
 			this.textarea.classList.remove("hidden");
-			}
+		}
 		else{
 			this.update();
 			this.textarea.classList.add("hidden");
-			}
+		}
 	}
 
 }
