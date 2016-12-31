@@ -9,21 +9,19 @@
 <script src="../graphsimple.js" charset="utf-8"></script>
 <script src="../simvent.js" charset="utf-8"></script>
 <!--script src="../frontpaneljs/dict.js" charset="utf-8"></script-->
-<link rel="stylesheet" type="text/css" href="../../graphsimple.js/css/gs-scale-fill-clear.css" charset="utf-8"/>
+<link rel="stylesheet" type="text/css" href="../css/gs-grid-clear-rainbow.css" charset="utf-8"/>
 <!--link rel="stylesheet" type="text/css" href="../../graphsimple.js/css/test-layout.css" charset="utf-8"/-->
 
 <style>
 body {
 	box-sizing: border-box;
 	height: 100%;
-	border: 1px dashed red;
 	padding: none;
 	margin-top: none;
 }
 html {
 	box-sizing: border-box;
 	height: 100%;
-	border: 1px dashed blue;
 	padding-top: none;
 	margin: none;
 }
@@ -31,7 +29,7 @@ html {
 	width: 100%;
 	height: 100%;
 }
-
+/*
 .gs #waveformGroup path:nth-child(1){
 	stroke: red;
 }
@@ -42,6 +40,7 @@ html {
 .gs #waveformGroup path:nth-child(3){
 	stroke: green;
 }
+*/
 </style>
 <body>
 	<svg id="svg1"></svg>
@@ -50,26 +49,17 @@ gs.defaults["margeG"]=90;
 gs.defaults["margeD"]=10;
 gs.defaults["margeH"]=10;
 gs.defaults["margeB"]=60;
-gs.defaults.padH=.1;
+gs.defaults.padH=.05;
+gs.defaults.padB=.1;
 
 var lung1 = new sv.SimpleLung();
-lung1.Crs=50;
-
-var lung2 = new sv.SimpleLung();
-lung2.Crs=75;
-
-var lung3 = new sv.SimpleLung();
-lung3.Crs=25;
+lung1.Crs=100;
 
 var vent = new sv.PressureControler();	
+vent.Tvent = 4;
+vent.Ti = 1.2;
 
 var dat1 = vent.ventilate(lung1).timeData;
-
-vent.time = 0;
-var dat2 = vent.ventilate(lung2).timeData;
-
-vent.time = 0;
-var dat3 = vent.ventilate(lung3).timeData;
 
 function fx(d){return d.time;}
 function fy(d){return d.Flung;}
@@ -77,7 +67,12 @@ function fy(d){return d.Flung;}
 var plot = new gs.graph("#svg1");
 plot.setscale(dat1,fx,fy);
 plot.tracer(dat1,fx,fy);
-plot.tracer(dat2,fx,fy);
-plot.tracer(dat3,fx,fy);
+for (var i = 2; i<9; i++){
+	var lung = new sv.SimpleLung();
+	lung.Crs=100 - i * 10;
+	vent.time = 0;
+	var data = vent.ventilate(lung).timeData;
+	plot.tracer(data,fx,fy);
+}
 	</script>
 </body>
