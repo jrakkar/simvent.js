@@ -73,9 +73,9 @@ h2, h3{
 }
 h2 {
 	border-bottom: 1px solid black;
+	counter-reset: h3;
 }
 h2::before {
-	counter-reset: h3;
 	counter-increment: h2;
 	content: counter(h2) ". ";
 }
