@@ -61,32 +61,21 @@ class ventyaml {
 	}
 
 	updateVent(){
+		this.vents = [];
 
-		if(!("Ventilateur" in this.json)){
-			this.vent = new sv.PressureControler();
+		if( !("Ventilateur" in this.json) &&!("Ventilateurs" in this.json)){
+			this.vents.push(new sv.PressureControler());
 		}
 
-		else if(typeof this.json.Ventilateur == 'string'){
-			if(this.json.Ventilateur in sv){
-				this.vent = new sv[this.json.Ventilateur]();
-			}
+		else if('Ventilateur' in this.json){
+			console.log('Parsing single ventilator');
+			this.vents.push(this.createvent(this.json.Ventilateur));
 		}
 
-		else if(typeof this.json.Ventilateur == 'object'){
-			var ventDesc = this.json.Ventilateur;
-			if(!("Mode" in ventDesc)){
-				this.vent = new sv.PressureControler();
-			}
-
-			else if(ventDesc.Mode in sv){
-				this.vent = new sv[ventDesc.Mode]();
-			}
-			else {console.log( "Does not seems to be a valid ventilator mode")}
-
-			for(var id in ventDesc){
-				if(id!=="Mode" && ventDesc[id] != null){
-					this.vent[id] = ventDesc[id];
-				}
+		else if(typeof this.json.Ventilateurs == 'object'){
+			console.log('Parsing multiple ventilators');
+			for(var i in this.json.Ventilateurs){
+				this.vents.push(this.createvent(this.json.Ventilateurs[i]));
 			}
 		}
 	}
@@ -104,8 +93,33 @@ class ventyaml {
 		}
 		else{
 			//this.lung = this.createlung('SimpleLung');
-			this.lungs.push(this.createlung(his.json.Poumons[i]));
+			this.lungs.push(this.createlung('SimpleLung'));
 		}
+	}
+
+	createvent(ventDesc){
+		if(typeof ventDesc == 'string'){
+			if(ventDesc in sv){
+				var vent = new sv[ventDesc]();
+			}
+		}
+		else if(typeof ventDesc == 'object'){
+			if(!("Mode" in ventDesc)){
+				var vent = new sv.PressureControler();
+			}
+
+			else if(ventDesc.Mode in sv){
+				var vent = new sv[ventDesc.Mode]();
+			}
+			else {console.log( "Does not seems to be a valid vent type")}
+
+			for(var id in ventDesc){
+				if(id!=="Mode" && typeof ventDesc[id] == 'number'){
+					vent[id] = ventDesc[id];
+				}
+			}
+		}
+		if(typeof vent != 'undefined'){return vent;}
 	}
 
 	createlung(lungDesc){
@@ -136,9 +150,12 @@ class ventyaml {
 	run(){
 		//this.data = this.vent.ventilate(this.lung).timeData;
 		this.data = [];
-		for(var i in this.lungs){
-			this.vent.time = 0;
-			this.data.push(this.vent.ventilate(this.lungs[i]).timeData);
+		for(var i in this.vents){
+			var vent = this.vents[i];
+			for(var i in this.lungs){
+				vent.time = 0;
+				this.data.push(vent.ventilate(this.lungs[i]).timeData);
+			}
 		}
 	}
 
