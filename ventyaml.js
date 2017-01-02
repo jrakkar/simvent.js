@@ -99,7 +99,7 @@ class ventyaml {
 		}
 		else if ('Poumons' in this.json){
 			for(var i in this.json.Poumons){
-				this.lungs.push(this.createlung('SimpleLung'));
+				this.lungs.push(this.createlung(this.json.Poumons[i]));
 			}
 		}
 		else{
@@ -137,6 +137,7 @@ class ventyaml {
 		//this.data = this.vent.ventilate(this.lung).timeData;
 		this.data = [];
 		for(var i in this.lungs){
+			this.vent.time = 0;
 			this.data.push(this.vent.ventilate(this.lungs[i]).timeData);
 		}
 	}
@@ -184,15 +185,12 @@ class ventyaml {
 
 	createWaveform(courbe){
 		if(typeof courbe == "string"){
-			console.log('Number of datasets: '+ this.data.length)
 			function fx(d){return d.time;}
 			function fy(d){return d[courbe];}
 			var graph = gs.addGraph(this.waveformContainer.id, this.data[0], fx, fy);
 			if(this.data.length>1){
-				console.log('Adding a second dataset');
 				for(var i = 1; i< this.data.length;i++){
-					console.log('We\'r in' );
-					graph.ajouter(this.data[i],fx,fy);
+					graph.tracer(this.data[i],fx,fy);
 				}
 			}
 
@@ -208,6 +206,11 @@ class ventyaml {
 			var graph = gs.addGraph(this.waveformContainer.id, this.data[0], fx, fy, {class: "loop"});
 			graph.setidx(boucle["x"]);
 			graph.setidy(boucle["y"]);
+			if(this.data.length>1){
+				for(var i = 1; i< this.data.length;i++){
+					graph.tracer(this.data[i],fx,fy);
+				}
+			}
 		}
 		else{console.log("ventyaml: invalid loop description")}
 	}

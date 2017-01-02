@@ -27,7 +27,9 @@ h1 {
   height: 200px; }
 
 .gs.loop {
-  width: 50%; }
+  width: 50%;
+  height: 300px;
+  }
 
 div.vyamlwc {
   box-sizing: border-box;
