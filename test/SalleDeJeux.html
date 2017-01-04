@@ -11,16 +11,20 @@
 <script src="../ventyaml.js"></script>
 <script src="../yaml.min.js"></script>
 
+<script src="../sandbox/codemirror-5.20.2/lib/codemirror.js"></script>
+<script src="../sandbox/codemirror-5.20.2/mode/yaml/yaml.js"></script>
+<script src="../sandbox/codemirror-5.20.2/keymap/vim.js"></script>
+<script src="../sandbox/codemirror-5.20.2/addon/dialog/dialog.js"></script>
+<script src="../sandbox/codemirror-5.20.2/addon/search/search.js"></script>
+<script src="../sandbox/codemirror-5.20.2/addon/edit/matchbrackets.js"></script>
+
+<link rel="stylesheet" href="../sandbox/codemirror-5.20.2/lib/codemirror.css"/>
+<link rel="stylesheet" href="../sandbox/codemirror-5.20.2/theme/solarized.css"/>
+<link rel="stylesheet" href="../sandbox/codemirror-5.20.2/theme/midnight.css"/>
+<link rel="stylesheet" href="../sandbox/codemirror-5.20.2/addon/dialog/dialog.css"/>
 <link rel="stylesheet" type="text/css" href="../css/gs-grid-clear-rainbow.css" charset="utf-8"/>
 <link rel="stylesheet" href="../css/SalleDeJeux.css" charset="utf-8"/>
 <style>
-path  {
-	fill: none;
-	stroke: black;
-}
-line{
-	stroke: black;
-} 
 </style>
 
 <ul class="menu">
@@ -38,10 +42,12 @@ gs.defaults["margeD"]=10;
 gs.defaults["margeH"]=10;
 gs.defaults["margeB"]=60;
 gs.defaults.padH = .1;
-//ventyamlEverything("pre");
+
 var myVentyaml = new ventyaml(document.querySelector('pre'));
+
 if('vyamlSource' in localStorage){
-	myVentyaml.textarea.value = localStorage.vyamlSource;
+	//myVentyaml.textarea.value = localStorage.vyamlSource;
+	myVentyaml.setValue(localStorage.vyamlSource);
 	myVentyaml.update();
 }
 </script>

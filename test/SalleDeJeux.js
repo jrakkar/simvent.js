@@ -10,8 +10,13 @@ function inputHandler(){
 }
 
 function updateAndSave(){
+	console.log('Updateandsave');
+	if('cm' in myVentyaml){
+		myVentyaml.cm.save();
+	}
 	myVentyaml.update.bind(myVentyaml)();
 	localStorage.vyamlSource = myVentyaml.textarea.value;
 }
 
 myVentyaml.textarea.addEventListener("input", inputHandler);
+//myVentyaml.cm.on("change", inputHandler);

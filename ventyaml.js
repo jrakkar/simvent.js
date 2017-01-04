@@ -22,6 +22,7 @@ class ventyaml {
 		this.textarea.classList.add("ventyamlSource");
 		this.textarea.classList.add("hidden");
 		this.textarea.value = this.textarea.value.trim();
+		//this.createCM();
 
 
 		// Create waveform container div
@@ -37,21 +38,33 @@ class ventyaml {
 		this.update();
 	}
 
+	setValue(value){
+		this.textarea.value = value;
+		if('cm' in this){
+			console.log('We have a codemirror instance');
+			this.cm.setValue(value);
+		}
+	}
+
 	createCM(){
 
 		// Replace source element with codemirror if available
 
 		if(typeof window.CodeMirror !== "undefined"){
-			console.log("Codemirror is available");
-			function cmf(elt){
-				this.textarea.parentNode.replaceChild(elt, this.textarea);
-			}
-			this.cm = CodeMirror(cmf, {value: this.textarea.textContent});
+			this.cm  = CodeMirror.fromTextArea(this.textarea,{
+				//keyMap: "vim",
+				theme: "midnight",
+				mode: "yaml",
+				matchBrackets: true,
+				showCursorWhenSelecting: true,
+				//lineNumbers: true
+			});
 		}
 		else{console.log("Codemirror not available");}
 	}
 
 	update(){
+//		this.cm.save();
 		this.yaml = this.textarea.value;
 		this.json = YAML.parse(this.yaml);
 		this.updateLung();
@@ -68,12 +81,10 @@ class ventyaml {
 		}
 
 		else if('Ventilateur' in this.json){
-			console.log('Parsing single ventilator');
 			this.vents.push(this.createvent(this.json.Ventilateur));
 		}
 
 		else if(typeof this.json.Ventilateurs == 'object'){
-			console.log('Parsing multiple ventilators');
 			for(var i in this.json.Ventilateurs){
 				this.vents.push(this.createvent(this.json.Ventilateurs[i]));
 			}

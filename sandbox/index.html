@@ -22,7 +22,7 @@ html {
 </head>
 <body>
 
-<textarea id="myTextArea" class=".cm-s-3024-night">Ventilateur:
+<textarea id="myTextArea">Ventilateur:
    Mode: PressureControler
    Fconv: 12
    Pvent: 15
@@ -38,8 +38,6 @@ var cm = CodeMirror.fromTextArea(tArea,{
         showCursorWhenSelecting: true,
 		  lineNumbers: true
 		  });
-document.write(cm.getValue());
-document.write(tArea.value);
 </script>
 
 </body>
