@@ -413,7 +413,7 @@ sv.RLung = class RLung extends sv.Lung {
 	}
 
 	volume(P){
-		return sv.sygY(P, this.Vmin, this.Vmax, this.Pid, this.Kid);
+		return sv.sygY(P, this.Vmin, this.Vmax, this.PidInsp, this.Kid);
 	}
 
 	fitInsp(){
