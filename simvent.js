@@ -745,7 +745,7 @@ sv.PVCurve = class PVCurve extends sv.Ventilator{
 			this.Pao += this.Pstep;
 		}
 
-		while(this.Pao > this.Pstop){
+		while(this.Pao >= this.Pstop){
 
 			var tdeb = this.time;
 
