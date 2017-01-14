@@ -301,7 +301,7 @@ sv.SptLung = class SptLung extends sv.Lung{
 
 		super();
 		this.defaults = {
-			Crs : 30.0 ,// ml/cmH2O
+			Crs : 50.0 ,// ml/cmH2O
 			Fspt : 14.0 ,// c/min
 			Ti : 1 , // sec
 			Pmax : 6.5, // cmH20
@@ -383,24 +383,37 @@ sv.RLung = class RLung extends sv.Lung {
 	constructor() {
 		super();
 		this.defaults = {
-				  // Mechanical parameters
-				  Vmax : 4.0,
-				  Vmin : 0.0,
-				  Pid : 0,
-				  Kid : 20.0,
+			// Mechanical parameters
+			Vmax : 4.0,
+			Vmin : 0.0,
+			Pid : 20,
+			Kid : 20.0,
+			Phister: 20,
 
-				  VmaxExp : 4.0,
-				  VminInsp : 0.0,
-				  PidInsp : 10.0,
-				  PidExp : -10.0,
-
-				  flow : 0.0,
-				  lastFlow : 0.0,
-				  Pmus: 0,
-				  Vtmax : 0
+			flow : 0.0,
+			lastFlow : 0.0,
+			Pmus: 0,
+			Vtmax : 0,
+			lastPel: 0
 		};
+
 		this.parseDefaults();
+
+		this.VmaxExp=this.Vmax;
+		this.VminInsp=this.Vmin;
 		this.Vabs = this.volume(0);
+		console.log('Palv = ' + this.Palv);
+		console.log('Palv = ' + this.Palv);
+		this.fitInsp();
+		//console.log('Palv = ' + this.Palv);
+		this.fitExp();
+		this.appliquer_pression(1,3);
+		this.appliquer_pression(-1,3);
+		this.appliquer_pression(1,3);
+		this.appliquer_pression(-1,3);
+		console.log('Palv = ' + this.Palv);
+		console.log('VminInsp = ' + this.VminInsp);
+		console.log('VmaxExp = ' + this.VmaxExp);
 
 		this.mechParams = {
 			Vmax: {unit: "l"},
@@ -413,23 +426,23 @@ sv.RLung = class RLung extends sv.Lung {
 	}
 
 	volume(P){
-		return sv.sygY(P, this.Vmin, this.Vmax, this.PidInsp, this.Kid);
+		return sv.sygY(P, this.Vmin, this.Vmax, this.Pid, this.Kid);
 	}
 
 	fitInsp(){
+		console.log('fitInsp');
 		var N = 1 + Math.pow(Math.E,-((this.lastPel - this.PidInsp)/this.Kid));
 		this.VminInsp = (N * this.Vabs - this.Vmax)/(N-1);
 	}
 	
 	fitExp(){
+		console.log('fitExp');
 		var N = 1 + Math.pow(Math.E,-((this.lastPel - this.PidExp)/this.Kid));
 		this.VmaxExp = this.Vmin + (this.Vabs- this.Vmin) * N;
 	}
 
 	fit(){
-		//console.log("RLung.fit()");
 		if (this.flow > 0 && this.lastFlow < 0){
-			// We were exhaling and are now inhaling
 			this.fitInsp();
 		}
 
@@ -444,7 +457,7 @@ sv.RLung = class RLung extends sv.Lung {
 	get Pel(){
 		this.fit();
 
-		if (this.flow > 0){
+		if (this.flow >= 0){
 			var p = sv.sygX(
 					this.Vabs, 
 					this.VminInsp, 
@@ -455,7 +468,7 @@ sv.RLung = class RLung extends sv.Lung {
 			return p;
 		}
 
-		else {
+		else /*if (this.flow < 0)*/{
 			var p = sv.sygX(
 					this.Vabs, 
 					this.Vmin, 
@@ -465,7 +478,22 @@ sv.RLung = class RLung extends sv.Lung {
 			this.lastPel = p;
 			return p;
 		}
+			/*
+		else {
+			var p = sv.sygX(
+					this.Vabs, 
+					this.Vmin, 
+					this.VmaxExp, 
+					this.Pid, 
+					this.Kid);
+			this.lastPel = p;
+			return p;
+		}
+		*/
 	}
+
+	get PidInsp() {return this.Pid + (this.Phister/2);}
+	get PidExp() {return this.Pid - (this.Phister/2);}
 };
 
 //******************************
@@ -601,9 +629,9 @@ sv.PressureAssistor = class PressureAssistor extends sv.Ventilator{
 		/** Inspiratory assistance (in cmH₂O)
 		 * @member {number} */
 
-		this.Passist = 25.0;
-		this.PEEP = 0.0;
-		this.Cycling = 10;
+		this.Passist = 12.0;
+		this.PEEP = 5.0;
+		this.Cycling = 25;
 		this.Ftrig = 0.1;
 		this.demoLung = sv.SptLung;
 
@@ -628,7 +656,7 @@ sv.PressureAssistor = class PressureAssistor extends sv.Ventilator{
 		}
 
 		// Phase inspiratoire
-		this.Pao = this.Passist;
+		this.Pao = this.Passist + this.PEEP;
 		while (lung.flow > this.Fstop && this.time <= this.simulationStop){
 			lung.appliquer_pression(this.Passist, this.Tsampl);
 			this.timeData.push(sv.log(lung, this));
@@ -654,7 +682,7 @@ sv.PressureControler = class PressureControler extends sv.Ventilator {
 			super();
 
 			this.Pinspi = 10.0;
-			this.PEEP = 0.0;
+			this.PEEP = 5.0;
 			this.Ti = 1;
 			this.Fconv = 12;
 
@@ -677,7 +705,7 @@ sv.PressureControler = class PressureControler extends sv.Ventilator {
 			var tdeb = this.time;
 			var tStop = this.time + this.Ti;
 
-			this.Pao = this.Pinspi;
+			this.Pao = this.Pinspi + this.PEEP;
 			while(this.time < tStop && this.time<=this.simulationStop){
 				lung.appliquer_pression(this.Pao, this.Tsampl)
 				this.timeData.push(sv.log(lung, this));
@@ -709,9 +737,9 @@ sv.PVCurve = class PVCurve extends sv.Ventilator{
 		//this.Pstart = -100.0;
 		this.Pstart = 0;
 		this.Pmax = 100;
-		this.Pstop = -100;
-		this.Pstep = 10;
-		this.Tman = 10;
+		this.Pstop = 0;
+		this.Pstep = 2;
+		this.Tman = 20;
 
 		this.ventParams = {
 			Pstart: {unit: "cmH₂O"},
@@ -925,7 +953,7 @@ sv.FlowControler = class FlowControler extends sv.Ventilator{
 		super();
 
 		this.Vt = 0.5;
-		this.PEEP = 0.0;
+		this.PEEP = 5.0;
 		this.Ti = 1;
 		this.Fconv = 12;
 
