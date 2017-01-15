@@ -292,21 +292,34 @@ gs.graph = class {
 		var pad = this.padPlage;
 		var plage = {};
 
-		plage.ligne = this.svg.append("line")
-			.attr("y1", this.echelley(min) - pad)
-			.attr("y2", this.echelley(min)- pad - 6)
+		plage.ligneHaut = this.svg.append("line")
+			.attr("y1", this.echelley(min + (max-min)/2) - pad)
+			.attr("y2", this.echelley(min + (max-min)/2) - pad)
 			.attr("class", "help")
-			.attr("style", "marker-start: url(#fleches);marker-end: url(#flechep);");
+			.attr("style", "marker-end: url(#flechep);");
+
+		plage.ligneBas = this.svg.append("line")
+			.attr("y2", this.echelley(min + (max-min)/2) + pad)
+			.attr("y1", this.echelley(min + (max-min)/2) + pad)
+			.attr("class", "help")
+			.attr("style", "marker-end: url(#flechep);");
 
 		if(this.annotateOnRight == true){
-			plage.ligne
+			plage.ligneHaut
+				.attr("x1", this.width - this.margeD/2)
+				.attr("x2", this.width - this.margeD/2);
+			plage.ligneBas
 				.attr("x1", this.width - this.margeD/2)
 				.attr("x2", this.width - this.margeD/2);
 		}
 
-		plage.ligne.transition()
+		plage.ligneHaut.transition()
 			.duration(this.durAnim)
 			.attr("y2", this.echelley(max) + pad);
+
+		plage.ligneBas.transition()
+			.duration(this.durAnim)
+			.attr("y2", this.echelley(min) - pad)
 
 		plage.texte = this.svg.append("text")
 			.attr("class", "help")
