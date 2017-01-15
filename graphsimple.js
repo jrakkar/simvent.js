@@ -14,6 +14,7 @@ gs.defaults = {
 	padH: 0,
 	padB: 0,
 	idPos: "center",
+	annotateOnRight: true,
 	durAnim: 1500,
 	padPlage: 5
 };
@@ -287,8 +288,7 @@ gs.graph = class {
 			.attr("d", this.lf(this.donnees));
 	}
 
-	plagex (min, max, id){
-		var durAnim = 1000;
+	plagey (min, max, id){
 		var pad = this.padPlage;
 		var plage = {};
 		plage.ligne = this.svg.append("line")
@@ -300,7 +300,32 @@ gs.graph = class {
 			.attr("y2", this.height - this.margeB/1.5)
 			.attr("class", "axe")
 			.attr("style", "marker-start: url(#fleches);marker-end: url(#flechep);");
-			plage.ligne.transition().duration(durAnim).attr("x2", this.echellex(max)- pad);
+			plage.ligne.transition().duration(this.durAnim).attr("x2", this.echellex(max)- pad);
+
+		plage.texte = this.svg.append("text")
+			.attr("x", this.echellex(min + (max - min)/2))
+			.attr("y", this.height - this.margeB/2 + 20)
+			.attr("text-anchor", "middle")
+			.text(id)
+			.attr("opacity", 0);
+
+		plage.texte.transition().duration(this.durAnim).attr("opacity",1);
+
+		this.plages.push(plage);
+
+	}
+
+	plagex (min, max, id){
+		var pad = this.padPlage;
+		var plage = {};
+		plage.ligne = this.svg.append("line")
+			.attr("x1", this.echellex(min) + pad)
+			.attr("x2", this.echellex(min)+ pad + 6)
+			.attr("y1", this.height - this.margeB/1.5)
+			.attr("y2", this.height - this.margeB/1.5)
+			.attr("class", "axe")
+			.attr("style", "marker-start: url(#fleches);marker-end: url(#flechep);");
+			plage.ligne.transition().duration(this.durAnim).attr("x2", this.echellex(max)- pad);
 
 		plage.texte = this.svg.append("text")
 			.attr("x", this.echellex(min + (max - min)/2))
@@ -308,7 +333,7 @@ gs.graph = class {
 			.attr("text-anchor", "middle")
 			.text(id)
 			.attr("opacity", 0)
-		plage.texte.transition().duration(durAnim).attr("opacity",1);
+		plage.texte.transition().duration(this.durAnim).attr("opacity",1);
 		this.plages.push(plage);
 
 	}
@@ -363,21 +388,33 @@ gs.graph = class {
 	}
 
 	pointy (val, id){
+
 		var ligne = this.svg.append("line")
 			.attr("x1", this.margeG)
 			.attr("x2", this.margeG)
 			.attr("y1", this.echelley(val))
 			.attr("y2", this.echelley(val))
 			.attr("class", "help");
-		ligne.transition().duration(this.durAnim).attr("x2", this.width - this.margeD);
+
+		ligne
+			.transition()
+			.duration(this.durAnim)
+			.attr("x2", this.width - this.margeD);
+
 		this.anotations.push(ligne);
 
 		var texte = this.svg.append("text")
-			.attr("x", this.margeG/2)
-			.attr("y", this.echelley(val))
-			.attr("dy", 8)
 			.attr("text-anchor", "middle")
+			.attr("y", this.echelley(val))
+			.attr("dy", 0)
+			.attr("class", "help")
 			.text(id);
+		
+		if(this.annotateOnRight == true){
+
+			texte.attr("x", this.width - this.margeD/2);
+		} 
+
 		this.anotations.push(texte);
 	}
 
