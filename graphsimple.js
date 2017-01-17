@@ -36,7 +36,6 @@ gs.stat = function(iddiv, respd){
 	$(iddiv).append(tableau);
 };
 
-
 gs.graph = class {
 	constructor(idsvg, conf){
 
@@ -52,6 +51,12 @@ gs.graph = class {
 
 		this.svg = d3.select(idsvg)
 			.classed("gs", true);
+
+		this.plageGroup = this.svg.append("g")
+			.attr("id", "plageGroup");
+
+		this.waveformGroup = this.svg.append("g")
+			.attr("id", "waveformGroup");
 
 		this.animations = [];
 		this.anotations = [];
@@ -127,8 +132,6 @@ gs.graph = class {
 			.domain([this.ymin, this.ymax])
 			.range([this.height - (this.margeB + this.padB), this.margeH + this.padH]);
 
-		this.getlf(d, fx, fy);
-		this.getsf(d, fx, fy);
 		return this;
 	}
 
@@ -149,9 +152,10 @@ gs.graph = class {
 			.interpolate("linear");
 	}
 
-
 	tracer (donnees, fonctionx, fonctiony){
 		this.donnees = donnees;
+		this.getlf(donnees, fonctionx, fonctiony);
+		this.getsf(donnees, fonctionx, fonctiony);
 		var times = this.donnees.map(function(d){return d.Time});
 		this.animTime = Math.max(times) * 1000;
 
@@ -197,6 +201,8 @@ gs.graph = class {
 	}
 
 	ajouter (donnees, fonctionx, fonctiony){
+		this.getlf(donnees, fonctionx, fonctiony);
+		this.getsf(donnees, fonctionx, fonctiony);
 
 		var coord = this.lf(donnees, fonctionx, fonctiony);
 
@@ -292,13 +298,13 @@ gs.graph = class {
 		var pad = this.padPlage;
 		var plage = {};
 
-		plage.ligneHaut = this.svg.append("line")
+		plage.ligneHaut = this.plageGroup.append("line")
 			.attr("y1", this.echelley(min + (max-min)/2) - pad)
 			.attr("y2", this.echelley(min + (max-min)/2) - pad)
 			.attr("class", "help")
 			.attr("style", "marker-end: url(#flechep);");
 
-		plage.ligneBas = this.svg.append("line")
+		plage.ligneBas = this.plageGroup.append("line")
 			.attr("y2", this.echelley(min + (max-min)/2) + pad)
 			.attr("y1", this.echelley(min + (max-min)/2) + pad)
 			.attr("class", "help")
@@ -320,6 +326,12 @@ gs.graph = class {
 		plage.ligneBas.transition()
 			.duration(this.durAnim)
 			.attr("y2", this.echelley(min) - pad)
+
+		plage.rect = this.plageGroup.append("rect")
+			.attr('x', this.margeG)
+			.attr('y', this.echelley(max))
+			.attr('width', this.width - this.margeD - this.margeG)
+			.attr('height', this.echelley(min) - this.echelley(max));
 
 		plage.texte = this.svg.append("text")
 			.attr("class", "help")
