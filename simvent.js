@@ -861,6 +861,7 @@ sv.VDR = class VDR extends sv.Ventilator{
 
 	get Fhz (){ return this.Fperc / 60; }
 	get Fconv (){ return 60 / (this.Tic + this.Tec); }
+	get Tcc (){ return this.Tic + this.Tec; }
 
 	percussiveExpiration (lung, Rexp){
 		// Must be executed in a scope where the timeData container is defined
@@ -892,6 +893,12 @@ sv.VDR = class VDR extends sv.Ventilator{
 		while (this.time < tStopPerc){
 
 			this.Fip = inFlow;
+			/*
+			if(this.time % this.Tcc > this.Tec){
+				this.Fip = this.Fiph;
+			}
+			else{this.Fip = this.Fipl;}
+			*/
 			this.Pao = (this.Fop * lung.Raw) + lung.Palv;
 			this.Fop = sv.Phasitron.Fop(this.Fip, this.Pao);
 			lung.appliquer_debit(this.Fop, this.Tsampl);
@@ -902,7 +909,8 @@ sv.VDR = class VDR extends sv.Ventilator{
 	}
 
 	convectiveInspiration (lung){
-		var tStopConv = this.time + this.Tic;
+		//var tStopConv = this.time + this.Tic;
+		var tStopConv = this.Tcc * Math.ceil(this.time/this.Tcc);
 		var tCPR = this.time + 0.8;
 		this.CycleC=1;
 		while (this.time < tStopConv && this.time < this.simulationStop){
@@ -923,7 +931,8 @@ sv.VDR = class VDR extends sv.Ventilator{
 	}
 
 	convectiveExpiration (lung){
-		var tStopConv = this.time + this.Tec;
+		//var tStopConv = this.time + this.Tec;
+		var tStopConv = this.Tcc * Math.floor(this.time/this.Tcc)+ this.Tec;
 		this.CycleC=0;
 		while (this.time < tStopConv && this.time < this.simulationStop){
 			this.percussiveInspiration(lung, this.Fipl);

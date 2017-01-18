@@ -294,6 +294,38 @@ gs.graph = class {
 			.attr("d", this.lf(this.donnees));
 	}
 
+	plagex (min, max, id){
+		var pad = this.padPlage;
+		var plage = {};
+
+		plage.ligne = this.plageGroup.append("line")
+			.attr("x1", this.echellex(min) + pad)
+			.attr("x2", this.echellex(max) - pad)
+			.attr("y1", this.height - this.margeB*.66)
+			.attr("y2", this.height - this.margeB*.66)
+			.attr("class", "help")
+			.attr("style", "marker-start: url(#fleches);marker-end: url(#flechep);");
+
+		plage.rect = this.plageGroup.append("rect")
+			.attr('y', this.margeH)
+			.attr('x', this.echellex(min))
+			.attr('width', this.echellex(max)- this.echellex(min))
+			.attr('height', this.height - this.margeH - this.margeB);
+
+		plage.texte = this.svg.append("text")
+			.attr("class", "help")
+			.attr("x", this.echellex(min + (max - min)/2))
+			.attr("y", this.height - this.margeB/2)
+			.attr("text-anchor", "middle")
+			.text(id)
+			.attr("opacity", 0);
+
+		plage.texte.transition().duration(this.durAnim).attr("opacity",1);
+
+		this.plages.push(plage);
+
+	}
+
 	plagey (min, max, id){
 		var pad = this.padPlage;
 		var plage = {};
@@ -347,29 +379,6 @@ gs.graph = class {
 
 	}
 
-	plagex (min, max, id){
-		var pad = this.padPlage;
-		var plage = {};
-		plage.ligne = this.svg.append("line")
-			.attr("x1", this.echellex(min) + pad)
-			.attr("x2", this.echellex(min)+ pad + 6)
-			.attr("y1", this.height - this.margeB/1.5)
-			.attr("y2", this.height - this.margeB/1.5)
-			.attr("class", "axe")
-			.attr("style", "marker-start: url(#fleches);marker-end: url(#flechep);");
-			plage.ligne.transition().duration(this.durAnim).attr("x2", this.echellex(max)- pad);
-
-		plage.texte = this.svg.append("text")
-			.attr("x", this.echellex(min + (max - min)/2))
-			.attr("y", this.height - this.margeB/2 + 20)
-			.attr("text-anchor", "middle")
-			.text(id)
-			.attr("opacity", 0)
-		plage.texte.transition().duration(this.durAnim).attr("opacity",1);
-		this.plages.push(plage);
-
-	}
-
 	setidx (texte){
 		var y = this.height - (.2 * this.margeB);
 
@@ -392,6 +401,14 @@ gs.graph = class {
 			.text(texte);
 
 		return this;
+	}
+
+	texte(x,y,texte){
+		var t = this.svg.append('text')
+			.attr("text-anchor", 'middle')
+			.attr('x', this.echellex(x))
+			.attr('y', this.echelley(y))
+			.text(texte);
 	}
 
 	setidy (texte){

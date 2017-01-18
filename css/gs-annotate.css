@@ -1,6 +1,11 @@
 rect {
-  fill: red;
-  opacity: 0.15; }
+  opacity: 0.1; }
+
+rect:nth-of-type(odd) {
+  fill: blue; }
+
+rect:nth-of-type(even) {
+  fill: green; }
 
 line {
   stroke: black; }
