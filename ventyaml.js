@@ -1,9 +1,16 @@
 class ventyaml {
 	constructor(sourceNode) {
+		this.clsList = sourceNode.classList;
+		for(var cls in sourceNode.classList.keys()){
+			console.log(cls);
+		}
+
 		if (! YAML){throw "ventyaml: YAML library not loaded."}
+
 		this.parentDiv = sourceNode.parentNode;
 
 		this.container = document.createElement("figure");
+		this.container.className =this.clsList;
 		this.container.classList.add("ventyaml");
 
 		this.parentDiv.insertBefore(this.container, sourceNode);
@@ -259,6 +266,8 @@ class ventyaml {
 function ventyamlEverything(selector){
 	var preS = document.querySelectorAll(selector);
 	for(var i in preS){
-		var ventyamlInstance = new ventyaml(preS[i]);
+		if(typeof preS[i].tagName != 'undefined'){//Why the hell must I filter this?
+			var ventyamlInstance = new ventyaml(preS[i]);
+		}
 	}
 }

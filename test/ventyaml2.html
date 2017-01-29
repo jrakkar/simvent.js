@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <meta charset="utf-8"/>
-<script src="../simvent-complete.min.js" charset="utf-8"></script>
+<script src="../d3.v3.min.js" charset="utf-8"></script>
+<script src="../yaml.min.js" charset="utf-8"></script>
+<script src="../simvent.min.js" charset="utf-8"></script>
+<script src="../ventyaml.js" charset="utf-8"></script>
+<script src="../graphsimple.min.js" charset="utf-8"></script>
 
-<link rel="stylesheet" href="../../graphsimple.js/css/gs-scale-fill-clear.css" charset="utf-8"/>
+<link rel="stylesheet" href="../css/blueOrRed.css" charset="utf-8"/>
 
 <style>
 
@@ -19,11 +23,11 @@ pre, .ventyamlSource {
 	overflow: scroll;
 	width: 100%;
 	height: 100px;
-	color: white;
+	/*color: white;*/
 	font-weight: bold;
 	line-height: 140%;
 	font-size: 120%;
-	background-color: hsl(0, 0%, 30%);
+	/*background-color: hsl(0, 0%, 30%);*/
 }
 
 .ventyamlSource.hidden {
@@ -52,14 +56,27 @@ pre, figure.ventyaml {
 	border: 1px solid black;
 		*/
 }
+
+.blue {
+	border: 1px dashed blue;
+}
+.red {
+	border: 1px dashed red;
+}
 </style>
 <div id="container"> </div>
 
 <h1>Mon bel article scientifique</h1>
 Allo, le monde!
-<pre>
+
+<pre class='blue vyaml'>
 Ventilateur: PressureAssistor
 Poumon: SptLung
+</pre>
+
+<pre class='red vyaml'>
+Ventilateur: FlowControler
+Poumon: SimpleLung
 </pre>
 
 <script>
@@ -69,10 +86,13 @@ gs.defaults["margeH"]=10;
 gs.defaults["margeB"]=40;
 gs.defaults.padH = .1;
 
+/*
 window.onload = function(){
 	setTimeout(function(){
 	ventyamlEverything("pre");
 	}, 3);
 
 }
+*/
+ventyamlEverything("pre");
 </script>
