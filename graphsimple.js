@@ -52,6 +52,9 @@ gs.graph = class {
 		this.svg = d3.select(idsvg)
 			.classed("gs", true);
 
+		this.gridGroup = this.svg.append("g")
+			.attr("id", "gridGroup");
+
 		this.plageGroup = this.svg.append("g")
 			.attr("id", "plageGroup");
 
@@ -135,7 +138,7 @@ gs.graph = class {
 		return this;
 	}
 
-	getlf(d, fx, fy){
+	getlf (d, fx, fy){
 
 		this.lf = d3.svg.line()
 			.x(function(d) {return this.echellex(fx(d))})
@@ -161,10 +164,12 @@ gs.graph = class {
 
 		var coord = this.lf(donnees, fonctionx, fonctiony);
 		var surface = this.sf(donnees, fonctionx, fonctiony);
+
 		if(!("gridY"in this)){
 			this.drawGridY();
 		}
-		if(!("gridX"in this)){
+
+		if(!("iridX"in this)){
 			this.drawGridX();
 		}
 
@@ -492,7 +497,7 @@ gs.graph = class {
 			.tickSize(- (this.width - this.margeG - this.margeD))
 			.scale(this.echelley);
 
-		this.gridYGroup = this.svg.append("g")
+		this.gridYGroup = this.gridGroup.append("g")
 			.attr("class", "gridY")
 			.attr("transform", "translate(" + this.echellex(this.xmin) + ", 0)")
 			.call(this.gridY)
@@ -507,7 +512,7 @@ gs.graph = class {
 			.tickSize(- (this.height - this.margeH - this.margeB - this.padH))
 			.scale(this.echellex);
 
-		this.gridXGroup = this.svg.append("g")
+		this.gridXGroup = this.gridGroup.append("g")
 			.attr("class", "gridX")
 			.attr("transform", "translate(0, " + this.echelley(this.ymin) + ")")
 			.call(this.gridX)
