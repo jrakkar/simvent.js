@@ -52,6 +52,10 @@ gs.graph = class {
 		this.svg = d3.select(idsvg)
 			.classed("gs", true);
 
+		if('class' in this){
+			this.svg.classed(this.class, true);
+			console.log(this.class);
+		}
 		this.gridGroup = this.svg.append("g")
 			.attr("id", "gridGroup");
 
@@ -306,8 +310,8 @@ gs.graph = class {
 		plage.ligne = this.plageGroup.append("line")
 			.attr("x1", this.echellex(min) + pad)
 			.attr("x2", this.echellex(max) - pad)
-			.attr("y1", this.height - this.margeB*.66)
-			.attr("y2", this.height - this.margeB*.66)
+			.attr("y1", this.height - this.margeB*.5)
+			.attr("y2", this.height - this.margeB*.5)
 			.attr("class", "help")
 			.attr("style", "marker-start: url(#fleches);marker-end: url(#flechep);");
 
@@ -320,7 +324,7 @@ gs.graph = class {
 		plage.texte = this.svg.append("text")
 			.attr("class", "help")
 			.attr("x", this.echellex(min + (max - min)/2))
-			.attr("y", this.height - this.margeB/2)
+			.attr("y", this.height - this.margeB * .3)
 			.attr("text-anchor", "middle")
 			.text(id)
 			.attr("opacity", 0);
@@ -328,6 +332,8 @@ gs.graph = class {
 		plage.texte.transition().duration(this.durAnim).attr("opacity",1);
 
 		this.plages.push(plage);
+
+		return this;
 
 	}
 
@@ -381,6 +387,7 @@ gs.graph = class {
 		plage.texte.transition().duration(this.durAnim).attr("opacity",1);
 
 		this.plages.push(plage);
+		return this;
 
 	}
 
@@ -470,6 +477,7 @@ gs.graph = class {
 		} 
 
 		this.anotations.push(texte);
+		return this;
 	}
 
 	pointx (val, id){
@@ -488,6 +496,7 @@ gs.graph = class {
 			.attr("text-anchor", "middle")
 			.text(id);
 		this.anotations.push(an);
+		return this;
 	}
 
 	drawGridY (){

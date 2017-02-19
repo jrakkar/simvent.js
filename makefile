@@ -18,3 +18,9 @@ css: css/gs-flex.css
 
 css/gs-flex.css: _sass/gs-flex.sass _sass/mix-grid.sass _sass/mix-axes.sass _sass/mix-blackLines.sass
 	sass _sass/gs-flex.sass > css/gs-flex.css
+
+slides: test/slides/slides.html
+
+test/slides/slides.html: test/slides.md
+	rm -R slides
+	slideshow build -t d3p -o slides test/slides.md
