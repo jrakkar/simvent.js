@@ -26,7 +26,6 @@ gs.defaults.padPlage=12;
 function pOverT(data, opts){
 	var index = document.querySelectorAll('svg.gs').length +1;
 	var id = 'svg'+index;
-	console.log(id);
 	document.write("<svg id='"+id+"'></svg>");
 	
 	var fx = function(d){return d.time;}
@@ -89,17 +88,39 @@ var plot = pOverT(dat1, conf)
 # Résistances augmentées
 
 <script>
-var conf ={
-	class: 'right'
+function newPlot(){
+	var conf ={
+		class: 'right'
+	};
+	var index = document.querySelectorAll('svg.gs').length +1;
+	var id = 'svg'+index;
+	document.write("<svg id='"+id+"'></svg>");
+	var graph = new gs.graph(document.querySelector('#'+id), conf);
+	return graph;
 }
-function plotRaw(Raw){
-	var vent = new sv.VDR();
-	vent.Tvent = 5;
-	var lung = new sv.SimpleLung();
-	lung.Raw = Raw;
-	var dat = vent.ventilate(lung).timeData;
-	pOverT(dat, conf);
-}
-plotRaw(9);
-plotRaw(5);
+
+var vent1 = new sv.VDR();
+vent1.Tvent = 5;
+var vent2 = new sv.VDR();
+vent2.Tvent = 5;
+
+var lung1 = new sv.SimpleLung();
+var lung2 = new sv.SimpleLung();
+
+lung1.Raw = 2;
+lung2.Raw = 8.5;
+
+var dat1 = vent1.ventilate(lung1).timeData;
+var dat2 = vent2.ventilate(lung2).timeData;
+
+var fx = function(d){return d.time;}
+var fy = function fy(d){return d.Flung;}
+
+var graph1 = newPlot()
+	.setscale(dat1, fx, fy)
+	.tracer(dat2, fx, fy);
+
+var graph2 = newPlot()
+	.setscale(dat1, fx, fy)
+	.tracer(dat1, fx, fy);
 </script>
