@@ -2,10 +2,6 @@
 <meta charset="utf-8"/>
 
 <script src="../../graphsimple.js/d3.v3.min.js" charset="utf-8"></script>
-<!--
-<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-<script src="/home/user1/Librairies JavaScript/js/d3.min.js" charset="utf-8"></script>
--->
 <script src="../graphsimple.js" charset="utf-8"></script>
 <script src="../simvent.js" charset="utf-8"></script>
 <!--script src="../frontpaneljs/dict.js" charset="utf-8"></script-->
@@ -29,18 +25,10 @@ html {
 	width: 100%;
 	height: 100%;
 }
-/*
-.gs #waveformGroup path:nth-child(1){
-	stroke: red;
+.gs .controlsGroup {
+	opacity: .1;
+	font-size: 36pt;
 }
-
-.gs #waveformGroup path:nth-child(2){
-	stroke: blue;
-}
-.gs #waveformGroup path:nth-child(3){
-	stroke: green;
-}
-*/
 </style>
 <body>
 	<svg id="svg1"></svg>
@@ -51,6 +39,7 @@ gs.defaults["margeH"]=10;
 gs.defaults["margeB"]=60;
 gs.defaults.padH=.05;
 gs.defaults.padB=.1;
+gs.defaults.drawControlsSymbols=true;
 
 var lung1 = new sv.SimpleLung();
 lung1.Crs=100;

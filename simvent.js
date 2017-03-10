@@ -129,6 +129,39 @@ sv.defaultsTable = function(obj){
 	}
 };
 
+sv.download = function(objArray) {
+    var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+    var str = '';
+     
+    var line = '';
+    for (var index in array[0]) {
+	    if(line != '') line += '\t '
+
+		    line += index;
+    }
+
+    str += line + '\r\n';
+    for (var i = 0; i < array.length; i++) {
+        var line = '';
+        for (var index in array[i]) {
+            if(line != '') line += '\t '
+         
+            line += array[i][index];
+        }
+ 
+        str += line + '\r\n';
+    }
+ 
+    var link = document.createElement('a');
+    link.download = 'simvent.dat';
+    link.href = 'data:text/tsv;charset=utf-8,' + escape(str);
+    document.body.appendChild(link);
+    setTimeout(function(){
+		 link.click();
+		 document.body.removeChild(link);
+    }, 66);
+}
+
 //****************************
 // Lung models
 //****************************

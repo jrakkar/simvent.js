@@ -15,6 +15,7 @@ gs.defaults = {
 	padB: 0,
 	idPos: "center",
 	annotateOnRight: true,
+	drawControlsSymbols: false,
 	durAnim: 1500,
 	padPlage: 5
 };
@@ -40,6 +41,7 @@ gs.graph = class {
 	constructor(idsvg, conf){
 
 		this.idsvg = idsvg;
+		this.donnees = [];
 
 		for(var index in gs.defaults){
 			this[index] = gs.defaults[index];
@@ -64,6 +66,9 @@ gs.graph = class {
 
 		this.waveformGroup = this.svg.append("g")
 			.attr("id", "waveformGroup");
+
+		this.controlsGroup = this.svg.append("g")
+			.attr("class", "controlsGroup");
 
 		this.animations = [];
 		this.anotations = [];
@@ -110,6 +115,15 @@ gs.graph = class {
 			.attr("markerUnits", "userSpaceOnUse")
 			.append("path")
 			.attr("d", "M3,5 L9,10 L3,15");
+
+		if (this.drawControlsSymbols == true){
+			this.controlsGroup.append("text")
+				.attr("x", this.width - this.margeD - 80)
+				.attr("y", this.margeH + 80)
+				.attr("text-anchor", "middle")
+				.text('T')
+				.on('click', function(){alert('Allo !')});
+		}
 	}
 
 	setscale (d, fx, fy){
@@ -160,10 +174,10 @@ gs.graph = class {
 	}
 
 	tracer (donnees, fonctionx, fonctiony){
-		this.donnees = donnees;
+		this.donnees.push(donnees);
 		this.getlf(donnees, fonctionx, fonctiony);
 		this.getsf(donnees, fonctionx, fonctiony);
-		var times = this.donnees.map(function(d){return d.Time});
+		var times = donnees.map(function(d){return d.Time});
 		this.animTime = Math.max(times) * 1000;
 
 		var coord = this.lf(donnees, fonctionx, fonctiony);
@@ -564,6 +578,10 @@ gs.graph = class {
 		this.svg.append("polygon")
 			.attr("class", "playSimb")
 			.attr("points", "0,0 0,50 43.3,25 0,0");
+		return this;
+	}
+
+	controlSymbol(){
 		return this;
 	}
 
