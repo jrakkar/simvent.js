@@ -1,3 +1,6 @@
+@import gs-grid-clear
+@import gs-rainbow-lines
+
 html, body
   font-size: 4mm
   height: 100vh
@@ -42,11 +45,16 @@ div.vyamlwc
   width: 64%
   margin-left: 0px
 
-div.vyamlwc, .ventyamlSource, .CodeMirror
+div.vyamlwc, .ventyamlSource, .CodeMirror, div#downloads
   border: 2px solid silver
   border-radius: 4px
-  height: calc(100vh - 100px)
+
+div.vyamlwc, .ventyamlSource, .CodeMirror
+  height: calc(100vh - 140px)
   overflow: scroll
+
+div#downloads
+  padding: 5px
 
 figure.ventyaml 
   display: inline-block
@@ -68,3 +76,6 @@ ul.menu
     a
       color: inherit
 
+#downloads>a
+  padding-left: 10px
+  padding-right: 10px

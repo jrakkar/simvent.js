@@ -6,20 +6,21 @@
 		content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
 	<meta charset="utf-8">
 
-	<!--script src="firebug-lite.js#startOpened"></script-->
 	<script src="../frontpaneljs/jquery.min.js"></script>
 	<script src="../frontpaneljs/dygraph-combined.js"></script>
 	<script src="../frontpaneljs/synchronizer.js"></script>
 	<script src="../simvent.js"></script>
-	<!--
-	<script src="https://raw.githubusercontent.com/progrt/simvent.js/master/simvent.js"></script>
-	-->
 	<script src="../frontpaneljs/dict.js"></script>
 
-	<link rel="stylesheet" type="text/css" href="../frontpaneljs/css/demo.css" charset="utf-8" />
+	<link rel="stylesheet" type="text/css" href="../frontpaneljs/css/demo.css" />
+	<link rel="stylesheet" type="text/css" href="../css/controls.css" />
 </head>
 
 <body>
+	<ul class="controls">
+		<li><a onClick='fp.download(fp.data.timeData)' >T</a></li>
+	</ul>
+
 	<div id="panel"> 
 		<table id='fpParamTable'></table>
 	</div>

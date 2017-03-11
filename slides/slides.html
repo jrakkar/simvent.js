@@ -1,0 +1,204 @@
+
+
+
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->  <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	
+	<title></title>
+
+	<meta name="generator" content="">
+	<meta name="author"    content="">
+	<meta name="viewport"  content="width=1024, user-scalable=yes">
+
+	<link rel="stylesheet" href="d3p.css">
+	<!--link rel="stylesheet"  href="slides.css"-->
+	<link rel="stylesheet"  href="gs-flex.css">
+	<link rel="stylesheet"  href="ventyaml.css">
+	
+	<script src="js-bundle/d3p.js"></script>
+
+
+<script src='../simvent-complete.min.js'></script>
+<script>
+gs.defaults.margeB = 30;
+gs.defaults.margeG = 35;
+gs.defaults.margeD = 10;
+gs.defaults.margeH = 10;
+gs.defaults.padH = .08;
+gs.defaults.padPlage=12;
+
+function pOverT(data, opts){
+	var index = document.querySelectorAll('svg.gs').length +1;
+	var id = 'svg'+index;
+	document.write("<svg id='"+id+"'></svg>");
+	
+	var fx = function(d){return d.time;}
+	var fy = function fy(d){return d.Pao;}
+	var graph = new gs.graph(document.querySelector('#'+id), opts)
+		.setscale(data, fx, fy)
+		.tracer(data, fx, fy);
+	return graph;
+}
+</script>
+
+</head>
+
+<body class="deck-container">
+
+<section class="slide" id="title-slide">
+	<header>	
+		<h1></h1>
+		<P></p>
+		<p></p>
+
+<script>
+var opts = {
+	class: 'nogrid',
+	padD: .05
+}
+var lung = new sv.SimpleLung();
+var vent = new sv.VDR();	
+var data = vent.ventilate(lung).timeData;
+var graph = pOverT(data, opts);
+</script>
+
+		<p></p>
+	</header>
+</section>
+
+<!-- note: assumes no header (breaking slides w/ SLIDE directive) -->
+ 
+  <section class="slide" id="1"> <!--fix: add with filter? +1 toindex -title slide is 1 already -->
+    
+
+<!-- _S9SLIDE_ -->
+<h1 id="pression-motrice">Pression motrice</h1>
+
+<script>
+var lung1 = new sv.SimpleLung();
+var vent = new sv.VDR();	
+vent.Tvent=10;
+
+var dat1 = vent.ventilate(lung1).timeData;
+
+function fy2(d){return d.Palv;}
+
+var conf = {
+	margeD: 130
+};
+var plot = pOverT(dat1, conf)
+	.pointy(19, 'Moyenne insp.')
+	.pointy(6, 'Moyenne exp.')
+	.plagey(6,19, 'P. motrice');
+
+</script>
+
+
+
+  </section>
+ 
+  <section class="slide" id="2"> <!--fix: add with filter? +1 toindex -title slide is 1 already -->
+    <!-- _S9SLIDE_ -->
+<h1 id="cyclage">Cyclage</h1>
+
+<script>
+
+var conf = {
+	margeB: 70
+};
+
+var lung1 = new sv.SimpleLung();
+var vent = new sv.VDR();	
+vent.Tvent = 7;
+var dat1 = vent.ventilate(lung1).timeData;
+
+var plot = pOverT(dat1, conf)
+	.plagex(vent.Tec, vent.Tcc, 'Inspiration')
+	.plagex(vent.Tcc, vent.Tcc + vent.Tec, 'Expiration');
+
+</script>
+
+
+
+  </section>
+ 
+  <section class="slide" id="3"> <!--fix: add with filter? +1 toindex -title slide is 1 already -->
+    <!-- _S9SLIDE_ -->
+<h1 id="résistances-augmentées">Résistances augmentées</h1>
+
+<script>
+function newPlot(){
+	var conf ={
+		class: 'right'
+	};
+	var index = document.querySelectorAll('svg.gs').length +1;
+	var id = 'svg'+index;
+	document.write("<svg id='"+id+"'></svg>");
+	var graph = new gs.graph(document.querySelector('#'+id), conf);
+	return graph;
+}
+
+var vent1 = new sv.VDR();
+vent1.Tvent = 5;
+var vent2 = new sv.VDR();
+vent2.Tvent = 5;
+
+var lung1 = new sv.SimpleLung();
+var lung2 = new sv.SimpleLung();
+
+lung1.Raw = 2;
+lung2.Raw = 8;
+
+var dat1 = vent1.ventilate(lung1).timeData;
+var dat2 = vent2.ventilate(lung2).timeData;
+
+var fx = function(d){return d.time;}
+var fy = function fy(d){return d.Pao;}
+
+var graph1 = newPlot()
+	.setscale(dat2, fx, fy)
+	.tracer(dat2, fx, fy);
+
+var graph2 = newPlot()
+	.setscale(dat2, fx, fy)
+	.tracer(dat1, fx, fy);
+</script>
+
+
+  </section>
+
+
+<p class="deck-status">
+	<span class="deck-status-current"></span>
+	/
+	<span class="deck-status-total"></span>
+</p>
+
+<form action="." method="get" class="goto-form">
+	<label for="goto-slide">Go to slide:</label>
+	<input type="number" name="slidenum" id="goto-slide">
+	<input type="submit" value="Go">
+</form>
+
+<script src="extensions/menu/deck.menu.js"></script>
+<script src="extensions/goto/deck.goto.js"></script>
+<script src="extensions/status/deck.status.js"></script>
+
+<script>
+$(function() {
+	// Deck initialization
+	$.deck('.slide');
+});
+
+ventyamlEverything("pre");
+
+</script>
+
+</body>
+</html>

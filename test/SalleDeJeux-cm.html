@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<meta charset="utf-8"/>
+<meta name='viewport' content='width=device-width'/>
+<script src="../simvent-complete.min.js"></script>
+
+<script src="../sandbox/codemirror-5.20.2/lib/codemirror.js"></script>
+<script src="../sandbox/codemirror-5.20.2/mode/yaml/yaml.js"></script>
+<script src="../sandbox/codemirror-5.20.2/keymap/vim.js"></script>
+<script src="../sandbox/codemirror-5.20.2/addon/dialog/dialog.js"></script>
+<script src="../sandbox/codemirror-5.20.2/addon/search/search.js"></script>
+<script src="../sandbox/codemirror-5.20.2/addon/edit/matchbrackets.js"></script>
+
+<link rel="stylesheet" href="../sandbox/codemirror-5.20.2/lib/codemirror.css"/>
+<link rel="stylesheet" href="../sandbox/codemirror-5.20.2/theme/solarized.css"/>
+<link rel="stylesheet" href="../sandbox/codemirror-5.20.2/theme/midnight.css"/>
+<link rel="stylesheet" href="../sandbox/codemirror-5.20.2/addon/dialog/dialog.css"/>
+<link rel="stylesheet" type="text/css" href="../css/gs-grid-clear-rainbow.css" />
+<link rel="stylesheet" href="../css/SalleDeJeux.css" />
+<style>
+</style>
+
+<ul class="menu">
+	<li><a href="describe2.html">Aide</a>
+</ul>
+
+<pre>
+Ventilateur: PressureControler
+Poumon: SimpleLung
+</pre>
+<div id="downloads"></div>
+<script>
+gs.defaults["margeG"]=60;
+gs.defaults["margeD"]=10;
+gs.defaults["margeH"]=10;
+gs.defaults["margeB"]=60;
+gs.defaults.padH = .1;
+
+var myVentyaml = new ventyaml(document.querySelector('pre'));
+
+if('vyamlSource' in localStorage){
+	//myVentyaml.textarea.value = localStorage.vyamlSource;
+	myVentyaml.setValue(localStorage.vyamlSource);
+	myVentyaml.update();
+}
+</script>
+<script src="SalleDeJeux.js"></script>

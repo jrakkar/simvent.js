@@ -40,6 +40,8 @@ class ventyaml {
 		this.container.insertBefore(this.waveformContainer, this.textarea);
 		this.waveformContainer.addEventListener("click", this.toggleSource.bind(this));
 
+		this.downloadsDiv = document.querySelector('#downloads');
+
 		// Operate the magic
 
 		this.update();
@@ -168,11 +170,42 @@ class ventyaml {
 	run(){
 		//this.data = this.vent.ventilate(this.lung).timeData;
 		this.data = [];
+		var downloadLinks = document.querySelectorAll('#downloads>a');
+		for(var i = 0; i<downloadLinks.length; i ++){
+			this.downloadsDiv.removeChild(downloadLinks[i]);
+		}
+
 		for(var i in this.vents){
 			var vent = this.vents[i];
 			for(var i in this.lungs){
 				vent.time = 0;
-				this.data.push(vent.ventilate(this.lungs[i]).timeData);
+				var data = vent.ventilate(this.lungs[i]).timeData;
+				this.data.push(data);
+
+				var array = typeof data != 'object' ? JSON.parse(data) : data;
+				var str = '';
+
+				var line = '';
+				for (var index in array[0]) {
+					if(line != '') line += '\t ';
+					line += index;
+				}
+
+				str += line + '\r\n';
+				for (var i = 0; i < array.length; i++) {
+					var line = '';
+					for (var index in array[i]) {
+						if(line != '') line += '\t ';
+						line += array[i][index];
+					}
+					str += line + '\r\n';
+				}
+
+				var link = document.createElement('a');
+				link.download = 'simvent' + this.data.length + '.dat';
+				link.href = 'data:text/tsv;charset=utf-8,' + escape(str);
+				link.textContent = link.download + ' ';		
+				this.downloadsDiv.appendChild(link);
 			}
 		}
 	}
@@ -222,7 +255,9 @@ class ventyaml {
 		if(typeof courbe == "string"){
 			function fx(d){return d.time;}
 			function fy(d){return d[courbe];}
-			var graph = gs.addGraph(this.waveformContainer.id, this.data[0], fx, fy);
+			var graph = gs.addGraph(this.waveformContainer.id, this.data[0], fx, fy)
+				.setidx('Temps (s)')
+				.setidy(courbe);
 			if(this.data.length>1){
 				for(var i = 1; i< this.data.length;i++){
 					graph.tracer(this.data[i],fx,fy);
@@ -261,6 +296,9 @@ class ventyaml {
 		}
 	}
 
+	downloadData(){
+
+	}
 }
 
 function ventyamlEverything(selector){

@@ -14,10 +14,13 @@ simvent.min.js: simvent.js
 graphsimple.min.js: graphsimple.js
 	uglifyjs -mc -o graphsimple.min.js graphsimple.js
 
-css: css/gs-flex.css
+css: css/SalleDeJeux.css css/gs-flex.css
 
 css/gs-flex.css: _sass/gs-flex.sass _sass/mix-grid.sass _sass/mix-axes.sass _sass/mix-blackLines.sass
 	sass _sass/gs-flex.sass > css/gs-flex.css
+
+css/SalleDeJeux.css: _sass/SalleDeJeux.sass
+	sass _sass/SalleDeJeux.sass > css/SalleDeJeux.css
 
 slides: test/slides/slides.html
 

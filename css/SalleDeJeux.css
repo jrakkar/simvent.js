@@ -1,3 +1,54 @@
+.axe {
+  display: none; }
+
+path {
+  stroke: black;
+  fill: none; }
+
+.gridX line, .gridY line {
+  stroke-width: 1px;
+  stroke: silver;
+  stroke-dasharray: 5 5; }
+
+.gridX text {
+  transform: translate(0, 8px); }
+
+.gridY text {
+  transform: translate(-8px, 0); }
+
+path.surface {
+  stroke: none;
+  fill: none; }
+
+#waveformGroup path {
+  display: visible;
+  stroke-width: 1.5px;
+  fill: none; }
+
+#waveformGroup path:nth-child(1) {
+  stroke: #4d66b3; }
+
+#waveformGroup path:nth-child(2) {
+  stroke: #4db3b3; }
+
+#waveformGroup path:nth-child(3) {
+  stroke: #4db366; }
+
+#waveformGroup path:nth-child(4) {
+  stroke: #80b34d; }
+
+#waveformGroup path:nth-child(5) {
+  stroke: #b3994d; }
+
+#waveformGroup path:nth-child(6) {
+  stroke: #b34d4d; }
+
+#waveformGroup path:nth-child(7) {
+  stroke: #b34d99; }
+
+#waveformGroup path:nth-child(8) {
+  stroke: #804db3; }
+
 html, body {
   font-size: 4mm;
   height: 100vh;
@@ -43,11 +94,16 @@ div.vyamlwc {
   width: 64%;
   margin-left: 0px; }
 
-div.vyamlwc, .ventyamlSource, .CodeMirror {
+div.vyamlwc, .ventyamlSource, .CodeMirror, div#downloads {
   border: 2px solid silver;
-  border-radius: 4px;
-  height: calc(100vh - 100px);
+  border-radius: 4px; }
+
+div.vyamlwc, .ventyamlSource, .CodeMirror {
+  height: calc(100vh - 140px);
   overflow: scroll; }
+
+div#downloads {
+  padding: 5px; }
 
 figure.ventyaml {
   display: inline-block;
@@ -68,3 +124,7 @@ ul.menu {
     padding: none; }
     ul.menu > li a {
       color: inherit; }
+
+#downloads > a {
+  padding-left: 10px;
+  padding-right: 10px; }
