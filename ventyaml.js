@@ -27,7 +27,7 @@ class ventyaml {
 		this.container.appendChild(this.textarea);
 
 		this.textarea.classList.add("ventyamlSource");
-		this.textarea.classList.add("hidden");
+		this.container.classList.add("hidden");
 		this.textarea.value = this.textarea.value.trim();
 		//this.createCM();
 
@@ -40,7 +40,9 @@ class ventyaml {
 		this.container.insertBefore(this.waveformContainer, this.textarea);
 		this.waveformContainer.addEventListener("click", this.toggleSource.bind(this));
 
-		this.downloadsDiv = document.querySelector('#downloads');
+		this.downloadsDiv = document.createElement('div');
+		this.downloadsDiv.id = 'downloads';
+		this.container.appendChild(this.downloadsDiv);
 
 		// Operate the magic
 
@@ -286,13 +288,12 @@ class ventyaml {
 	}
 
 	toggleSource(){
-		//	this.textarea.classList.toggle("hidden");	
-		if(this.textarea.classList.contains("hidden")){
-			this.textarea.classList.remove("hidden");
+		if(this.container.classList.contains("hidden")){
+			this.container.classList.remove("hidden");
 		}
 		else{
 			this.update();
-			this.textarea.classList.add("hidden");
+			this.container.classList.add("hidden");
 		}
 	}
 

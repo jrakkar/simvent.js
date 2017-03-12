@@ -12,7 +12,7 @@ pre, .ventyamlSource {
   line-height: 140%;
   font-size: 120%; }
 
-.ventyamlSource.hidden {
+figure.ventyaml.hidden .ventyamlSource, figure.ventyaml.hidden #downloads {
   opacity: 0;
   border: none;
   padding: none;

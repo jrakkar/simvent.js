@@ -103,7 +103,8 @@ div.vyamlwc, .ventyamlSource, .CodeMirror {
   overflow: scroll; }
 
 div#downloads {
-  padding: 5px; }
+  padding: 5px;
+  margin-top: 10px; }
 
 figure.ventyaml {
   display: inline-block;
