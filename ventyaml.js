@@ -41,7 +41,7 @@ class ventyaml {
 		this.waveformContainer.addEventListener("click", this.toggleSource.bind(this));
 
 		this.downloadsDiv = document.createElement('div');
-		this.downloadsDiv.id = 'downloads';
+		this.downloadsDiv.classList.add('downloads');
 		this.container.appendChild(this.downloadsDiv);
 
 		// Operate the magic
@@ -170,9 +170,9 @@ class ventyaml {
 	}
 
 	run(){
-		//this.data = this.vent.ventilate(this.lung).timeData;
 		this.data = [];
-		var downloadLinks = document.querySelectorAll('#downloads>a');
+		//var downloadLinks = document.querySelectorAll('#downloads>a');
+		var downloadLinks = this.downloadsDiv.children;
 		for(var i = 0; i<downloadLinks.length; i ++){
 			this.downloadsDiv.removeChild(downloadLinks[i]);
 		}
