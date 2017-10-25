@@ -1,0 +1,36 @@
+@import table
+
+$panelWidth : 225px
+
+#panel
+  float: right
+  width : $panelWidth
+  border: none
+  padding: 3px
+
+  table
+    width: 100%
+    margin-top: 6px
+
+  input
+    width: 40px
+  
+  select
+    width: 100%
+
+  button
+    float: right
+    margin-top: 6px
+
+#graphics
+  width: calc(100% - #{$panelWidth} - 25px)
+  border: none
+  
+  div.graph
+    height: 200px
+    width: 100%
+    border: none
+    margin-left: auto
+    margin-right: auto
+    margin-bottom: 10px
+

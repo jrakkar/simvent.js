@@ -1,0 +1,44 @@
+table {
+  margin-left: none;
+  margin-right: auto;
+  border-collapse: collapse;
+  border: 1px solid black; }
+
+td, th {
+  padding-left: 5px;
+  padding-right: 5px;
+  text-align: left;
+  border-bottom: 1px solid black; }
+
+th {
+  border-top: 1px solid black;
+  background-color: silver; }
+
+#panel {
+  float: right;
+  width: 225px;
+  border: none;
+  padding: 3px; }
+  #panel table {
+    width: 100%;
+    margin-top: 6px; }
+  #panel input {
+    width: 40px; }
+  #panel select {
+    width: 100%; }
+  #panel button {
+    float: right;
+    margin-top: 6px; }
+
+#graphics {
+  width: calc(100% - 225px - 25px);
+  border: none; }
+  #graphics div.graph {
+    height: 200px;
+    width: 100%;
+    border: none;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px; }
+
+/*# sourceMappingURL=fp-demo.css.map */
