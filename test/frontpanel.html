@@ -12,14 +12,19 @@
 	<script src="../src/simvent.js"></script>
 	<script src="../src/dict.js"></script>
 
-	<link rel="stylesheet" href="../css/fp-demo.css" />
-	<link rel="stylesheet" href="../css/controls.css" />
+	<link rel="stylesheet" href="../css/fp-mobile.css" />
+	<link rel="stylesheet" href="../css/icons.css" />
 </head>
 
 <body>
-	<ul class="controls">
-		<li><a onClick='fp.download(fp.data.timeData)' >T</a></li>
-	</ul>
+	<div id="controls">
+		<ul class="right">
+			<li class="panel"><a onclick="fp.togglePanel()" >&#9776;</a></li>
+		</ul>
+		<ul class="">
+			<li><a onClick='fp.download(fp.data.timeData)' >&#8595;</a></li>
+		</ul>
+	</div>
 
 	<div id="panel"> 
 		<table id='fpParamTable'></table>
@@ -30,9 +35,20 @@
 
 	<script src="../src/frontPanel.js" ></script>
 	<script>
-		fp.timeSeries = ["Pao","Flung","Vt", "Vti", "Vte",  "PCO2"];
-		fp.ventModels = ["PVCurve", "PressureAssistor", "PressureControler", "FlowControler", "VDR"];
-		fp.ventModel = "PVCurve";
+		fp.timeSeries = [
+			"Pao",
+			"Flung",
+			"Vt", 
+			"PCO2"
+		];
+		fp.ventModels = [
+			"PVCurve",
+			"PressureAssistor",
+			"PressureControler",
+			"FlowControler",
+			"VDR"
+		];
+		fp.ventModel = "PressureControler";
 		fp.lungModel = "SygLung";
 		fp.init()
 	</script>

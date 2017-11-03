@@ -485,3 +485,7 @@ fp.init = function(){
 		fp.updateModels();
 	});
 };
+
+fp.togglePanel = function(){
+	document.querySelector(fp.paramContainer).classList.toggle('active');
+}
