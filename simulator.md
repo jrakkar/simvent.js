@@ -16,7 +16,7 @@ fp.dygraphConf.titleHeight = 30;
 fp.paramContainer = "#control";
 fp.jparamContainer = "control";
 fp.timeSeries = ["Pao","Flung","Vt", "PCO2"];
-fp.ventModels = ["FlowControler", "PresureControler", "VDR", "PVCurve"];
+fp.ventModels = ["FlowControler", "PressureControler", "PressureAssistor", "VDR", "PVCurve"];
 fp.ventModel = "FlowControler";
 fp.lungModel = "SimpleLung";
 fp.init()
