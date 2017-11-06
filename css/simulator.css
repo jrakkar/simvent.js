@@ -10,6 +10,8 @@ div.graph {
 
 #control {
 	position: fixed;
+	max-height: 100%;
+	overflow: scroll;
 	right: 0px;
 	top: 50%;
 	transform: translate(0%, -50%);
