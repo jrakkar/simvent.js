@@ -6,22 +6,20 @@
 <script src="../src/ventyaml.js" charset="utf-8"></script>
 <script src="../dist/graphsimple.min.js" charset="utf-8"></script>
 <link rel="stylesheet" href="../css/article.css" />
+<h2 id="modeles-de-ventilateurs">Modeles de ventilateurs</h2>
 
-<h1>Mon bel article scientifique</h1>
-Allo, le monde!
-
-<pre class='red vyaml'><code>
-Ventilateur: PressureAssistor
-Poumon: SptLung
-</code></pre>
-
-<pre class='red vyaml'>
-Ventilateur: FlowControler
-Poumon: SimpleLung
-</pre>
+<h3 id="svpressurecontroler">sv.PressureControler</h3>
 
 <pre><code>Ventilator: PressureControler
 </code></pre>
+
+<h3 id="svflowcontroler">sv.FlowControler</h3>
+
+<h3 id="svpressureassistor">sv.PressureAssistor</h3>
+
+<h3 id="svvdr">sv.VDR</h3>
+
+<h3 id="svpvcurve">sv.PVCurve</h3>
 <script>
 gs.defaults["margeG"]=40;
 gs.defaults["margeD"]=2;
@@ -29,13 +27,6 @@ gs.defaults["margeH"]=10;
 gs.defaults["margeB"]=40;
 gs.defaults.padH = .1;
 
-/*
-window.onload = function(){
-	setTimeout(function(){
-	ventyamlEverything("pre");
-	}, 3);
-
-}
-*/
 ventyamlEverything("pre");
 </script>
+</html>
