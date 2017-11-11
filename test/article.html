@@ -6,20 +6,48 @@
 <script src="../src/ventyaml.js" charset="utf-8"></script>
 <script src="../dist/graphsimple.min.js" charset="utf-8"></script>
 <link rel="stylesheet" href="../css/article.css" />
+<script>
+gs.defaults["margeG"]=90;
+</script>
+
 <h2 id="modeles-de-ventilateurs">Modeles de ventilateurs</h2>
 
 <h3 id="svpressurecontroler">sv.PressureControler</h3>
 
-<pre><code>Ventilator: PressureControler
+<pre><code>Ventilateur: PressureControler
 </code></pre>
+
+<p>Générateur de pression (pression constante) déclenché et cyclé par le temps.</p>
 
 <h3 id="svflowcontroler">sv.FlowControler</h3>
 
+<pre><code>Ventilateur: FlowControler
+</code></pre>
+
+<p>Générateur de débit (débit constant) déclenché et cyclé par le temps.</p>
+
 <h3 id="svpressureassistor">sv.PressureAssistor</h3>
+
+<pre><code>Ventilateur: PressureAssistor
+Poumon: SptLung
+</code></pre>
+
+<p>Générateur de pression (pression constante) déclenché et cyclé par le débit.</p>
 
 <h3 id="svvdr">sv.VDR</h3>
 
+<pre><code>Ventilateur: VDR
+Courbe: Pao
+</code></pre>
+
+<p>Ventilateur à haute fréquence percussive biphadique.</p>
+
 <h3 id="svpvcurve">sv.PVCurve</h3>
+
+<pre><code>Ventilateur: PVCurve
+</code></pre>
+
+<p>Manoeuvre pression-volume quasi-statique destinée à mettre en lumière les caractéristiques mécaniques des différents modèles de poumon.</p>
 <script>
 gs.defaults["margeG"]=40;
 gs.defaults["margeD"]=2;

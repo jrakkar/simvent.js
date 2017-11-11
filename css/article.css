@@ -42,3 +42,32 @@ figure.ventyaml.hidden .ventyamlSource, figure.ventyaml.hidden .downloads {
   margin-left: auto;
   margin-right: auto;
   width: 100%; }
+
+body {
+  counter-reset: h2; }
+
+h2 {
+  counter-reset: h3; }
+
+h2::before {
+  counter-increment: h2;
+  content: counter(h2) ". "; }
+
+h3::before {
+  counter-increment: h3;
+  content: counter(h2) "." counter(h3) " "; }
+
+h2, h3 {
+  clear: right; }
+
+figure {
+  float: right;
+  clear: right;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0px;
+  width: 50%;
+  border: 1px dashed gray; }
+
+.gs {
+  height: 250px; }
