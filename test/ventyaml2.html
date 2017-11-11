@@ -1,35 +1,27 @@
 <!DOCTYPE html>
 <meta charset="utf-8"/>
-<script src="../d3.v3.min.js" charset="utf-8"></script>
-<script src="../yaml.min.js" charset="utf-8"></script>
-<script src="../simvent.min.js" charset="utf-8"></script>
-<script src="../ventyaml.js" charset="utf-8"></script>
-<script src="../graphsimple.min.js" charset="utf-8"></script>
-
-<link rel="stylesheet" href="../css/blueOrRed.css" />
-<link rel="stylesheet" href="../css/ventyaml.css" />
-
-<style>
-
-h1 {text-align: center;
-}
-
-</style>
-<div id="container"> </div>
+<script src="../lib/d3.v3.min.js" charset="utf-8"></script>
+<script src="../lib/yaml.min.js" charset="utf-8"></script>
+<script src="../dist/simvent.min.js" charset="utf-8"></script>
+<script src="../src/ventyaml.js" charset="utf-8"></script>
+<script src="../dist/graphsimple.min.js" charset="utf-8"></script>
+<link rel="stylesheet" href="../css/article.css" />
 
 <h1>Mon bel article scientifique</h1>
 Allo, le monde!
 
-<pre class='red vyaml'>
+<pre class='red vyaml'><code>
 Ventilateur: PressureAssistor
 Poumon: SptLung
-</pre>
+</code></pre>
 
 <pre class='red vyaml'>
 Ventilateur: FlowControler
 Poumon: SimpleLung
 </pre>
 
+<pre><code>Ventilator: PressureControler
+</code></pre>
 <script>
 gs.defaults["margeG"]=40;
 gs.defaults["margeD"]=2;

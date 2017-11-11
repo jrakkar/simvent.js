@@ -1,0 +1,73 @@
+.axe {
+  display: none; }
+
+path {
+  stroke: black;
+  fill: none; }
+
+.gridX line, .gridY line {
+  stroke-width: 1px;
+  stroke: silver;
+  stroke-dasharray: 5 5; }
+
+.gridX text {
+  transform: translate(0, 8px); }
+
+.gridY text {
+  transform: translate(-8px, 0); }
+
+pre, .ventyamlSource {
+  box-sizing: border-box;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  transition: all 1s;
+  overflow: scroll;
+  width: 100%;
+  font-weight: bold;
+  line-height: 140%;
+  font-size: 120%; }
+
+figure.ventyaml.hidden .ventyamlSource, figure.ventyaml.hidden .downloads {
+  opacity: 0;
+  border: none;
+  padding: none;
+  height: 0px;
+  overflow: scroll;
+  transition: all 1s; }
+
+.gs {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%; }
+
+body {
+  counter-reset: h2; }
+
+h2 {
+  counter-reset: h3; }
+
+h2::before {
+  counter-increment: h2;
+  content: counter(h2) ". "; }
+
+h3::before {
+  counter-increment: h3;
+  content: counter(h2) "." counter(h3) " "; }
+
+h2, h3 {
+  clear: right; }
+
+figure {
+  float: right;
+  clear: right;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0px;
+  width: 50%;
+  border: 1px dashed gray; }
+
+.gs {
+  height: 250px; }
