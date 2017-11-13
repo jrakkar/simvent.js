@@ -43,8 +43,13 @@ figure.ventyaml.hidden .ventyamlSource, figure.ventyaml.hidden .downloads {
   margin-right: auto;
   width: 100%; }
 
+figure.ventyaml caption {
+  width: 100%;
+  box-sizing: border-box; }
+
 body {
-  counter-reset: h2; }
+  counter-reset: h2;
+  counter-reset: figure; }
 
 h2 {
   counter-reset: h3; }
@@ -57,6 +62,10 @@ h3::before {
   counter-increment: h3;
   content: counter(h2) "." counter(h3) " "; }
 
+caption::before {
+  counter-increment: figure;
+  content: "Figure " counter(figure) ": "; }
+
 h2, h3 {
   clear: right; }
 
@@ -66,8 +75,11 @@ figure {
   margin-left: auto;
   margin-right: auto;
   margin-top: 0px;
-  width: 50%;
-  border: 1px dashed gray; }
+  width: 50%; }
 
 .gs {
   height: 250px; }
+
+caption {
+  font-weight: bold;
+  font-size: small; }

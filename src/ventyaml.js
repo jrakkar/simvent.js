@@ -82,6 +82,7 @@ class ventyaml {
 		this.updateVent();
 		this.run();
 		this.updateGraph();
+		this.updateCaption();
 	}
 
 	updateVent(){
@@ -297,8 +298,18 @@ class ventyaml {
 		}
 	}
 
-	downloadData(){
+	updateCaption(){
+		// Suprimer toute legende existantr
 
+
+
+		// Si ume legende est specifiee dans la source, en creer une
+		
+		if("Legende" in this.json){
+			this.captionElement = document.createElement('caption');
+			this.captionElement.textContent = this.json.Legende;
+			this.container.appendChild(this.captionElement);
+		}
 	}
 }
 
