@@ -1,7 +1,3 @@
-<script>
-gs.defaults["margeG"]=90;
-</script>
-
 ## Modeles de ventilateurs
 
 ### sv.PressureControler
