@@ -21,7 +21,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * All simvent.js class and functions are members of the <em>sv</em> object.
  * @namespace {Object} sv
  */
-sv = {};
+var sv = {};
 
 //****************************
 // Helper fumctions
