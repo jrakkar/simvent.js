@@ -12,4 +12,4 @@ defaults:
    type: "posts"
   values:
    layout: "post"
-exclude: ["test", "lib", "out"]
+exclude: ["test", "lib", "out", "node_modules"]
