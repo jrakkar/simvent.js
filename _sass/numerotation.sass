@@ -1,18 +1,12 @@
 body
-  counter-reset: h2
-  counter-reset: figure
-
+	counter-reset: h2
 h2
-  counter-reset: h3
+	counter-reset: h3
 
 h2::before
-  counter-increment: h2
-  content: counter(h2) ". "
+	counter-increment: h2
+	content: counter(h2) ". "
 
 h3::before
-  counter-increment: h3
-  content: counter(h2)"."counter(h3) " "
-
-caption::before
-  counter-increment: figure
-  content: "Figure " counter(figure) ": "
+	counter-increment: h3
+	content: counter(h2) "." counter(h3) " "
