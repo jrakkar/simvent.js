@@ -11,10 +11,11 @@
 <h3 id="svpressurecontroler">sv.PressureControler</h3>
 
 <pre><code>Ventilateur: PressureControler
-Legende: Courbe Pression-Temps d'une ventilation controee en pression.
 </code></pre>
 
 <p>Générateur de pression (pression constante) déclenché et cyclé par le temps.</p>
+
+<script> new sv.PressureControler().defaultsTable(); </script>
 
 <h3 id="svflowcontroler">sv.FlowControler</h3>
 
@@ -23,13 +24,18 @@ Legende: Courbe Pression-Temps d'une ventilation controee en pression.
 
 <p>Générateur de débit (débit constant) déclenché et cyclé par le temps.</p>
 
+<script> new sv.FlowControler().defaultsTable(); </script>
+
 <h3 id="svpressureassistor">sv.PressureAssistor</h3>
 
 <pre><code>Ventilateur: PressureAssistor
 Poumon: SptLung
+Legende: "Ventilation spontanée avec aide inspiratoire"
 </code></pre>
 
 <p>Générateur de pression (pression constante) déclenché et cyclé par le débit.</p>
+
+<script> new sv.PressureAssistor().defaultsTable(); </script>
 
 <h3 id="svvdr">sv.VDR</h3>
 
@@ -39,12 +45,61 @@ Courbe: Pao
 
 <p>Ventilateur à haute fréquence percussive biphadique.</p>
 
+<script> new sv.VDR().defaultsTable(); </script>
+
 <h3 id="svpvcurve">sv.PVCurve</h3>
 
 <pre><code>Ventilateur: PVCurve
 </code></pre>
 
 <p>Manoeuvre pression-volume quasi-statique destinée à mettre en lumière les caractéristiques mécaniques des différents modèles de poumon.</p>
+
+<script> new sv.PVCurve().defaultsTable(); </script>
+
+<h2 id="modles-de-poumon">Modèles de poumon</h2>
+
+<h3 id="svsimplelung">sv.SimpleLung</h3>
+
+<pre><code>Ventilateur: PVCurve
+Poumon: SimpleLung
+Boucle:
+   x: Palv
+   y: Vabs
+</code></pre>
+
+<p>Modèle simple de poumon avec une compliance linéaire.</p>
+
+<h3 id="svsptlung">sv.SptLung</h3>
+
+<pre><code>Ventilateur: PressureAssistor
+Poumon: SptLung
+Courbes: 
+   - Pmus
+</code></pre>
+
+<p>Modèle de poumon présentant une respiration spontanée et une compliance linéaire.</p>
+
+<h3 id="svsyglung">sv.SygLung</h3>
+
+<pre><code>Ventilateur: PVCurve
+Poumon: SygLung
+Boucle:
+   x: Palv
+   y: Vabs
+</code></pre>
+
+<p>Modèle de poumon avec une courbe pression-volume de forme sygmoïde.</p>
+
+<h3 id="svrlung">sv.RLUNG</h3>
+
+<pre><code>Ventilateur: PVCurve
+Poumon: RLung
+Boucle:
+   x: Palv
+   y: Vabs
+</code></pre>
+
+<p>Modèle de poumon <em>recrutable</em>. Sa courbe presion-volume a une forme sygmoïde et présente une hystérèse.</p>
 <script>
 gs.defaults["margeG"]=75;
 gs.defaults["margeD"]=2;
