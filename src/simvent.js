@@ -9,7 +9,7 @@
  * All simvent.js class and functions are members of the <em>sv</em> object.
  * @namespace {Object} sv
  */
-sv = {}
+var sv = {}
 
 //****************************
 // Helper fumctions
@@ -73,12 +73,12 @@ sv.sygX = function(y, ymin, ymax, xid, kid){
 
 sv.avg = function(dataset, data, Nroll){
 
-	for(i = 0; i < dataset.length - (Nroll -1); i ++){
+	for(var i = 0; i < dataset.length - (Nroll -1); i ++){
 
 		var curent = i;
 		var avged = dataset[curent][data];
 
-		for(i2 = curent + 1; i2 < (curent + Nroll) ; i2 ++){
+		for(var i2 = curent + 1; i2 < (curent + Nroll) ; i2 ++){
 			avged += dataset[i2][data];
 		}
 
@@ -107,7 +107,7 @@ sv.defaultsTable = function(obj){
 
 	t.appendChild(rLine);
 
-	for(id in obj){
+	for(var id in obj){
 		var param = obj[id];
 		if(param.calculated != true){
 			var rLine = document.createElement("tr");
@@ -607,7 +607,7 @@ sv.Ventilator = class Ventilator{
 
 		if(this.rAvg >= 2){
 
-			for (index in this.dataToFilter){
+			for (var index in this.dataToFilter){
 				sv.avg(this.timeData, this.dataToFilter[index], this.rAvg);
 			}
 		}
