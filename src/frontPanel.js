@@ -309,14 +309,16 @@ fp.initDyGraph = function(){
 // **********************************
 
 fp.updateTSParam = function(){
-
 	console.log(this.checked);
 }
+
 fp.mkTsSelect = function(){
-	var params =sv.log(fp.lung, fp.ventilator);
-	delete params.time;
 	var keys = [];
-	for(key in params){keys.push(key)};
+	var params = sv.log(fp.lung, fp.ventilator);
+	delete params.time;
+
+	for(var key in params){keys.push(key)};
+
 	keys = keys.sort(function (a, b) {
     return a.toLowerCase().localeCompare(b.toLowerCase());
 });
@@ -456,6 +458,16 @@ fp.ventChange = function(){
 	fp.init();
 }
 
+fp.initShadow = function(){
+	// If shadow does not already exist
+	if (true) {
+		var shadowDiv = document.createElement("div");
+		shadowDiv.className = "fpShadow";
+		shadowDiv.onclick = function(){alert("Allo !")};
+		document.body.appendChild(shadowDiv);
+	}
+}
+
 fp.init = function(){
 	if(typeof fp.ventilator == "undefined"){fp.ventilator = new sv[fp.ventModel]();}
 	if(typeof fp.lung == "undefined"){fp.lung = new sv[fp.lungModel]();}
@@ -470,6 +482,7 @@ fp.init = function(){
 
 	$(fp.paramContainer).append('<button id="ventiler" value="ventiler" onClick="maj()">Ventiler</button>');
 
+	fp.initShadow();
 	fp.graphics = [];
 	fp.initDyGraph()
 	maj();
@@ -488,4 +501,14 @@ fp.init = function(){
 
 fp.togglePanel = function(){
 	document.querySelector(fp.paramContainer).classList.toggle('active');
+}
+
+fp.panelActivate = function(){
+	document.querySelector(fp.paramContainer).classList.add('active');
+	document.querySelector("fpShadow").classList.remove('hidden');
+}
+
+fp.panelDesactivate = function(){
+	document.querySelector(fp.paramContainer).classList.remove('active');
+	document.querySelector("fpShadow").classList.add('hidden');
 }
