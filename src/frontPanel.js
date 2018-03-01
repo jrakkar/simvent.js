@@ -1,6 +1,6 @@
 // Creation of the front panel object
 
-fp = {};
+var fp = {};
 
 // *****************************
 // Configurations
@@ -463,9 +463,14 @@ fp.initShadow = function(){
 	if (true) {
 		var shadowDiv = document.createElement("div");
 		shadowDiv.className = "fpShadow";
-		shadowDiv.onclick = function(){alert("Allo !")};
+		shadowDiv.onclick = fp.panelDesactivate;
 		document.body.appendChild(shadowDiv);
 	}
+}
+
+fp.hideShadow = function(){
+	var shadowDiv = document.querySelector(".fpShadow");
+	shadowDiv.classList.add("visible");
 }
 
 fp.init = function(){
@@ -473,6 +478,7 @@ fp.init = function(){
 	if(typeof fp.lung == "undefined"){fp.lung = new sv[fp.lungModel]();}
 
 	$(fp.paramContainer).children().remove();
+	
 	fp.ventMenu();
 	fp.lungMenu();
 
@@ -500,15 +506,17 @@ fp.init = function(){
 };
 
 fp.togglePanel = function(){
-	document.querySelector(fp.paramContainer).classList.toggle('active');
+	document.querySelector(fp.paramContainer).classList.toggle('hidden');
 }
 
 fp.panelActivate = function(){
-	document.querySelector(fp.paramContainer).classList.add('active');
-	document.querySelector("fpShadow").classList.remove('hidden');
+	document.querySelector(fp.paramContainer).scrollTop = 0;
+	document.querySelector(fp.paramContainer).classList.add('visible');
+	document.querySelector(".fpShadow").classList.add('visible');
 }
 
 fp.panelDesactivate = function(){
-	document.querySelector(fp.paramContainer).classList.remove('active');
-	document.querySelector("fpShadow").classList.add('hidden');
+	console.log("panelDesactivate");
+	document.querySelector(fp.paramContainer).classList.remove('visible');
+	document.querySelector(".fpShadow").classList.remove('visible');
 }
