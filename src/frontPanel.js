@@ -177,17 +177,15 @@ fp.iSelect = function(){
 
 fp.paramTable = function(object, paramSet, container, label){
 	if(typeof object[paramSet] != "undefined"){
-
-		$(label).detach();
-		if(document.getElementById('fpParamTable') == null){
-			$(container).append("<table id=\"fpParamTable\"></table>");
+		//$(label).detach();
+		if(document.getElementById('#'+ label) == null){
+			$(container).append("<table id=\""+label+"\"></table>");
 		}
-		//var table = $("#" + label) ; 
-		var table = $("#fpParamTable") ; 
-		if(typeof label != "undefined"){table.append("<tr><th colspan='3' class='fp-tableSection'>"+label+"</th></tr>");}
+		var table = $("#" + label) ; 
+		//var table = $("#fpParamTable") ; 
+//		if(typeof label != "undefined"){table.append("<tr><th colspan='3' class='fpPanelTitle'>"+label+"</th></tr>");}
 
 		for(id in object[paramSet]){
-
 			var param = object[paramSet][id];
 			//var abrev = id; // abrev will eventualy be set to a translated value
 			var abrev = fp.translate1(id, "short");
@@ -386,7 +384,6 @@ fp.initProgress = function(){
 	fp.pBarr.value = 0;
 	fp.pDiv.appendChild(fp.pBarr);
 	document.body.appendChild(fp.pDiv);
-
 };
 
 fp.stopProgress = function(){
@@ -479,14 +476,36 @@ fp.init = function(){
 
 	$(fp.paramContainer).children().remove();
 	
+	
+	var title = document.createElement("h2");
+	title.textContent = "Ventilateur";
+	title.className = "fpPanelTitle";
+	document.querySelector("#panel").appendChild(title);
+
 	fp.ventMenu();
+	fp.paramTable(fp.ventilator, "ventParams", fp.paramContainer, "Ventilateur"); 
+
+	var title = document.createElement("h2");
+	title.textContent = "Poumon";
+	title.className = "fpPanelTitle";
+	document.querySelector("#panel").appendChild(title);
+
 	fp.lungMenu();
+	fp.paramTable(fp.lung, "mechParams", fp.paramContainer, "Poumon"); 
 
-	fp.paramTable(fp.ventilator, "ventParams", fp.paramContainer, fp.translate1("Parameters", "long")); 
-	fp.paramTable(fp.ventilator, 'simParams', fp.paramContainer, fp.translate1("Simulator", "long")); 
-	fp.paramTable(fp.lung, "mechParams", fp.paramContainer, fp.translate1("Lung", "long")); 
+	var title = document.createElement("h2");
+	title.textContent = "Simulation";
+	title.className = "fpPanelTitle";
+	document.querySelector("#panel").appendChild(title);
 
-	$(fp.paramContainer).append('<button id="ventiler" value="ventiler" onClick="maj()">Ventiler</button>');
+	fp.paramTable(fp.ventilator, 'simParams', fp.paramContainer, "Simulation"); 
+
+	//
+	//fp.paramTable(fp.ventilator, "ventParams", fp.paramContainer, fp.translate1("Parameters", "long")); 
+	//fp.paramTable(fp.ventilator, 'simParams', fp.paramContainer, fp.translate1("Simulator", "long")); 
+	//fp.paramTable(fp.lung, "mechParams", fp.paramContainer, fp.translate1("Lung", "long")); 
+
+	$(fp.paramContainer).append('<button id="ventiler" value="ventiler" onClick="maj()">&#x25b6; Ventiler</button>');
 
 	fp.initShadow();
 	fp.graphics = [];
