@@ -39,14 +39,19 @@ a {
   display: block; }
 
 #graphics {
-  width: 100%;
-  padding-top: 40px; }
+  padding-top: 3em;
+  margin-right: 30px; }
   #graphics div.graph {
     width: 100%;
-    height: 180px; }
+    height: 180px;
+    border: 0px dashed #cccccc;
+    padding-right: 100px; }
 
 .dygraph-title {
-  font-size: small; }
+  font-size: small;
+  margin-top: 20px;
+  text-align: center;
+  padding-left: 15px; }
 
 #controls {
   position: fixed;
@@ -54,35 +59,50 @@ a {
   text-align: right;
   margin: 0px;
   margin-bottom: 20px;
-  background-color: white;
   z-index: 40;
-  padding-top: 10px;
-  padding-bottom: 10px; }
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: white;
+  box-shadow: 0px 0px 0px 0px silver; }
   #controls ul {
     margin: 0px;
     padding-right: 15px;
     list-style-type: none; }
 
 .fpPanelTitle {
-  background-color: gray;
+  background-color: #4d4d4d;
+  color: white;
   font-size: medium;
-  padding-left: 5px;
+  padding-left: 6px;
   padding-top: 5px;
   padding-bottom: 5px;
-  text-align: left; }
+  text-align: left;
+  font-weight: 500;
+  letter-spacing: 1px; }
 
-#panel select, #panel button {
-  display: block;
-  margin-top: 5px;
-  margin-bottom: 5px; }
-#panel select {
-  width: 100%; }
-#panel table {
-  white-space: nowrap; }
-#panel button {
-  margin-top: 10px;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto; }
+#panel {
+  padding: 2px; }
+  #panel select, #panel button {
+    display: block;
+    margin-top: 3px;
+    margin-bottom: 5px; }
+  #panel select {
+    width: 100%; }
+  #panel table {
+    white-space: nowrap;
+    margin-left: 5px;
+    margin-right: 5px; }
+  #panel button {
+    margin-top: 10px;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto; }
+
+#fp-controls img {
+  height: 1.5em;
+  opacity: 0.7; }
+
+#fp-controls img:hover {
+  opacity: 1; }
 
 /*# sourceMappingURL=fp-scratch.css.map */

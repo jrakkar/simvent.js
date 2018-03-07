@@ -20,14 +20,18 @@ fp.dygraphConf = {
 	animatedZooms:true,
 	//drawYGrid:true,
 	interactionModel:{},
+	titleHeight: 50,
+	rightGap: 100,
 	axes:{
 		x:{
 			pixelsPerLabel:30,
-			drawGrid: false
+			drawGrid: false,
+			axisLabelWidth: 10
 		  },
 		y:{
 			pixelsPerLabel:15,
-			drawGrid: true
+			drawGrid: true,
+			axisLabelWidth: 35
 		  }
 	},
 	valueFormatter:function(v){return Math.round(1000 * v)/1000}

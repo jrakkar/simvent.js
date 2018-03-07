@@ -40,15 +40,20 @@ a
   display: block
 
 #graphics
-  width: 100%
-  padding-top: 40px
+  padding-top: 3em
+  margin-right: 30px
 
   div.graph
     width: 100%
     height: 180px
+    border: 0px dashed hsl(0, 0%, 80%)
+    padding-right: 100px
 
 .dygraph-title
   font-size: small
+  margin-top: 20px
+  text-align: center
+  padding-left: 15px
 
 #controls
   position: fixed
@@ -56,10 +61,11 @@ a
   text-align: right
   margin: 0px
   margin-bottom: 20px
-  background-color: white
   z-index: 40
-  padding-top: 10px
-  padding-bottom: 10px
+  padding-top: 5px
+  padding-bottom: 5px
+  background-color: white
+  box-shadow: 0px 0px 0px 0px silver
 
   ul
     margin: 0px
@@ -67,17 +73,22 @@ a
     list-style-type: none
 
 .fpPanelTitle
-  background-color: gray
+  background-color: hsl(0, 0%, 30%)
+  color: white
   font-size: medium
-  padding-left: 5px
+  padding-left: 6px
   padding-top: 5px
   padding-bottom: 5px
   text-align: left
+  font-weight: 500
+  letter-spacing: 1px
 
 #panel
+  padding: 2px
+
   select, button
     display: block
-    margin-top: 5px
+    margin-top: 3px
     margin-bottom: 5px
 
   select
@@ -85,9 +96,18 @@ a
   
   table
     white-space: nowrap
+    margin-left: 5px
+    margin-right: 5px
   
   button
     margin-top: 10px
     text-align: center
     margin-left: auto
     margin-right: auto
+
+#fp-controls img
+  height: 1.5em
+  opacity: 0.7
+
+#fp-controls img:hover
+  opacity: 1
