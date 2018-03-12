@@ -475,7 +475,7 @@ fp.hideShadow = function(){
 	shadowDiv.classList.add("visible");
 }
 
-fp.initControls = funtcion(){
+fp.initControls = function(){
 	var cDiv = document.querySelector("#fpControls");
 	var panelCtl = document.createElement("a");
 }
