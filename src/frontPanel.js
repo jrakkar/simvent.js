@@ -25,6 +25,7 @@ fp.dygraphConf = {
 	axes:{
 		x:{
 			pixelsPerLabel:30,
+	//var container = document.getElementById(fp.jparamContainer);
 			drawGrid: false,
 			axisLabelWidth: 10
 		  },
@@ -38,7 +39,6 @@ fp.dygraphConf = {
 };
 
 fp.paramContainer = "#panel";
-fp.jparamContainer = "panel";
 
 fp.lungModels = [
 	"SimpleLung",
@@ -282,6 +282,7 @@ fp.initDyGraph = function(){
 		var idgraph = "#graph" + id;
 		if (typeof dict[id] != "undefined"){
 			var label = fp.translate1(fp.timeSeries[index], "long");
+	//var container = document.getElementById(fp.jparamContainer);
 		}
 		else { label = id}
 
@@ -412,7 +413,7 @@ function maj() {
 }
 
 fp.lungMenu = function(){
-	var container = document.getElementById(fp.jparamContainer);
+	var container = document.querySelector(fp.paramContainer);
 	var select = document.createElement("select");
 	select.id = "lungSelect";
 	select.onchange = fp.lungChange;
@@ -428,7 +429,7 @@ fp.lungMenu = function(){
 }
 
 fp.ventMenu = function(){
-	var container = document.getElementById(fp.jparamContainer);
+	var container = document.querySelector(fp.paramContainer);
 	var select = document.createElement("select");
 	select.id = "ventSelect";
 	select.onchange = fp.ventChange;
@@ -474,6 +475,10 @@ fp.hideShadow = function(){
 	shadowDiv.classList.add("visible");
 }
 
+fp.initControls = funtcion(){
+	var cDiv = document.querySelector("#fpControls");
+	var panelCtl = document.createElement("a");
+}
 fp.init = function(){
 	if(typeof fp.ventilator == "undefined"){fp.ventilator = new sv[fp.ventModel]();}
 	if(typeof fp.lung == "undefined"){fp.lung = new sv[fp.lungModel]();}
