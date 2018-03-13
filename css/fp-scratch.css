@@ -1,3 +1,22 @@
+#pDiv {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 10px;
+  padding-left: 10px;
+  z-index: 300;
+  box-shadow: 0px 0px 20px 0px gray; }
+  #pDiv progress {
+    display: block;
+    width: 100%; }
+
 body {
   font-family: sans-serif;
   overflow-x: hidden;
@@ -38,10 +57,10 @@ a {
 .fpShadow.visible {
   display: block; }
 
-#graphics {
+#fpGraphics {
   padding-top: 3em;
   margin-right: 30px; }
-  #graphics div.graph {
+  #fpGraphics div.graph {
     width: 100%;
     height: 180px;
     border: 0px dashed #cccccc;
@@ -62,11 +81,14 @@ a {
   z-index: 40;
   padding-top: 5px;
   padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
   background-color: white;
   box-shadow: 0px 0px 0px 0px silver; }
-  #controls ul {
+  #controls #fpControls {
+    float: right;
     margin: 0px;
-    padding-right: 15px;
+    margin-right: 15px;
     list-style-type: none; }
 
 .fpPanelTitle {
