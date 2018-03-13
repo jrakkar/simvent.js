@@ -39,6 +39,7 @@ fp.dygraphConf = {
 };
 
 fp.paramContainer = "#panel";
+fp.waveformContainerID = "#fpGraphics";
 
 fp.lungModels = [
 	"SimpleLung",
@@ -291,7 +292,7 @@ fp.initDyGraph = function(){
 		conf.title = label;
 		conf.labels = ["Time", id];
 
-		$("#graphics").append("<div class='graph' id='graph" + id + "'></div>");
+		$(fp.waveformContainerID).append("<div class='graph' id='graph" + id + "'></div>");
 		var  div = document.getElementById("graph" + id);
 
 		fp.graphics.push(new Dygraph(div, [[0,0]], fp.dygraphConf));
@@ -477,12 +478,20 @@ fp.hideShadow = function(){
 
 fp.initControls = function(){
 	var cDiv = document.querySelector("#fpControls");
-	var panelCtl = document.createElement("a");
+	cDiv.textContent = null;
+	var cImg = document.createElement("img");
+	cImg.src = "../Icones/sliders.svg";
+	var pCtl = document.createElement("a");
+	pCtl.appendChild(cImg);
+	pCtl.onclick = fp.panelActivate;
+	cDiv.appendChild(pCtl);
 }
+
 fp.init = function(){
 	if(typeof fp.ventilator == "undefined"){fp.ventilator = new sv[fp.ventModel]();}
 	if(typeof fp.lung == "undefined"){fp.lung = new sv[fp.lungModel]();}
 
+	fp.initControls();
 	$(fp.paramContainer).children().remove();
 	
 	
@@ -525,9 +534,11 @@ fp.init = function(){
 	$("#panel input").keypress(function(event){
 		if (event.which == 13){ $("#ventiler").click(); }
 	});
+
 	$("input").change(function(){
 		fp.updateModels();
 	});
+
 	$("input").keyup(function(){
 		fp.updateModels();
 	});
