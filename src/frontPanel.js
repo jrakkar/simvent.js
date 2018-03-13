@@ -383,6 +383,7 @@ fp.progressBar = function(){
 }
 
 fp.initProgress = function(){
+	document.querySelector(".fpShadow").classList.add('visible');
 	fp.pDiv = document.createElement("div");
 	fp.pDiv.id = "pDiv";
 	fp.pDiv.textContent = "Updating graphics...";
@@ -394,6 +395,7 @@ fp.initProgress = function(){
 
 fp.stopProgress = function(){
 	setTimeout(function(){
+		fp.hideShadow();
 		document.body.removeChild(fp.pDiv);
 	},100);
 };
@@ -402,6 +404,7 @@ fp.stopProgress = function(){
 /*******************************************/
 
 function maj() {
+	fp.panelDesactivate();
 	fp.initProgress();
 	setTimeout(function(){
 		fp.updateModels();
@@ -466,14 +469,16 @@ fp.initShadow = function(){
 	if (true) {
 		var shadowDiv = document.createElement("div");
 		shadowDiv.className = "fpShadow";
-		shadowDiv.onclick = fp.panelDesactivate;
+		shadowDiv.onclick = function(){
+			fp.panelDesactivate();
+			fp.hideShadow();
+		}
 		document.body.appendChild(shadowDiv);
 	}
 }
 
 fp.hideShadow = function(){
-	var shadowDiv = document.querySelector(".fpShadow");
-	shadowDiv.classList.add("visible");
+	document.querySelector(".fpShadow").classList.remove('visible');
 }
 
 fp.initControls = function(){
@@ -557,5 +562,5 @@ fp.panelActivate = function(){
 fp.panelDesactivate = function(){
 	console.log("panelDesactivate");
 	document.querySelector(fp.paramContainer).classList.remove('visible');
-	document.querySelector(".fpShadow").classList.remove('visible');
+	//document.querySelector(".fpShadow").classList.remove('visible');
 }

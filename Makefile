@@ -1,3 +1,5 @@
+VPATH = css _sass src lib dist
+
 .PHONY: nothing css js
 
 nothing:
@@ -11,14 +13,14 @@ js: dist/simvent.min.js dist/graphsimple.min.js dist/ventyaml.min.js
 # CSS things
 # ----------
 
-css/fp-demo.css: _sass/fp-demo.sass _sass/table.sass _sass/fp-progress.sass _sass/controls.sass _sass/fp-shadow.sass _sass/fp-panel.sass
-	sass _sass/fp-demo.sass css/fp-demo.css
-
-css/fp-mobile.css: _sass/fp-mobile.sass _sass/table.sass _sass/fp-progress.sass _sass/controls.sass _sass/fp-panel.sass
+fp-demo.css: _sass/fp-demo.sass _sass/table.sass _sass/fp-progress.sass _sass/controls.sass _sass/fp-shadow.sass _sass/fp-panel.sass
 	sass _sass/fp-mobile.sass css/fp-mobile.css
 
-css/fp-scratch.css: _sass/fp-scratch.sass
-	sass $< $@
+fp-mobile.css: _sass/fp-mobile.sass _sass/table.sass _sass/fp-progress.sass _sass/controls.sass _sass/fp-panel.sass
+	sass $< css/$@
+
+fp-scratch.css: _sass/fp-scratch.sass
+	sass $< css/$@
 
 # ------------
 # Random tests
