@@ -87,9 +87,9 @@ sv.avg = function(dataset, data, Nroll){
 }
 
 sv.defaultsTable = function(obj){
-	var b = document.getElementsByTagName("body")[0];
-	var t = document.createElement("table");
-	b.appendChild(t);
+	var target = document.scripts[document.scripts.length -1 ].parentNode;
+	var table = document.createElement("table");
+	target.appendChild(table);
 
 	var rLine = document.createElement("tr");
 
@@ -105,7 +105,7 @@ sv.defaultsTable = function(obj){
 	c2.textContent = "Unit";
 	rLine.appendChild(c2);
 
-	t.appendChild(rLine);
+	table.appendChild(rLine);
 
 	for(var id in obj){
 		var param = obj[id];
@@ -124,7 +124,7 @@ sv.defaultsTable = function(obj){
 			c2.textContent = param.unit;
 			rLine.appendChild(c2);
 
-			t.appendChild(rLine);
+			table.appendChild(rLine);
 		}
 	}
 };
