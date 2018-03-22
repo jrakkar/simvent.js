@@ -12,7 +12,7 @@
 	<script src="../dist/frontPanel-legacy.js" ></script>
 	<script src="../src/simvent.js"></script>
 	<script src="../src/dict.js"></script>
-	<script src="../dist/frontPanel.min.js" ></script>
+	<script src="../src/frontPanel.js" ></script>
 
 	<link rel="stylesheet" href="../css/fp-scratch.css" />
 </head>
@@ -35,23 +35,6 @@
 
 	<div id="fpGraphics"> </div>
 
-	<script>
-		fp.timeSeries = [
-			"Pao",
-			"Flung",
-			"Vt", 
-			"PCO2"
-		];
-		fp.ventModels = [
-			"PVCurve",
-			"PressureAssistor",
-			"PressureControler",
-			"FlowControler",
-			"VDR"
-		];
-		fp.ventModel = "PressureControler";
-		fp.lungModel = "SimpleLung";
-		fp.init()
-	</script>
+	<script> fp.init() </script>
 </body>
 </html>

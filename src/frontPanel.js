@@ -51,12 +51,14 @@ fp.lungModels = [
 fp.lungModel = "SimpleLung";
 
 fp.ventModels = [
-	"PressureAssistor",
+	"FlowControler",
 	"PressureControler",
+	"PressureAssistor",
 	"VDR",
-	"PVCurve",
-	"FlowControler"
-	]
+	"PVCurve"
+	];
+
+fp.ventModel = "PressureControler";
 
 fp.progressDelay = 50;
 
@@ -242,7 +244,7 @@ fp.timeSeries = [
 	"Pao",
 	//"Fop",
 	"Flung",
-	"Palv",
+	//"Palv",
 	"Vt",
 	"PCO2"
 	];
