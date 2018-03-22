@@ -65,7 +65,7 @@ fp.languages = {
 	short: navigator.language.substr(0,2),
 	fallback: "en"
 	};
-for (language in fp.languages){
+for (var language in fp.languages){
 	console.log(language + ": " + fp.languages[language]);
 }
 // **********************************
@@ -96,25 +96,25 @@ fp.translate1 = function(toTranslate, length){
 
 fp.updateModels = function(){
 
-	for(i in fp.ventilator.ventParams){
+	for(var i in fp.ventilator.ventParams){
 		if(fp.ventilator.ventParams[i].calculated != true){
 			fp.ventilator[i] = parseFloat($("#input" + i).val());
 		}
 	}
 
 	fp.ventilator.updateCalcParams();
-	for(i in fp.ventilator.ventParams){
+	for(var i in fp.ventilator.ventParams){
 		if(fp.ventilator.ventParams[i].calculated == true){
 			document.getElementById("data"+i).textContent = ""+ Math.round(10 * fp.ventilator[i])/10;
 		}
 	}
 
-	for(i in fp.ventilator.simParams){
+	for(var i in fp.ventilator.simParams){
 		fp.ventilator[i] = parseFloat($("#input" + i).val());
 	}
 
 	fp.lung = new sv[fp.lungModel]();
-	for(i in fp.lung.mechParams){
+	for(var i in fp.lung.mechParams){
 		fp.lung[i] = parseFloat($("#input" + i).val());
 	}
 }
@@ -190,7 +190,7 @@ fp.paramTable = function(object, paramSet, container, label){
 		//var table = $("#fpParamTable") ; 
 //		if(typeof label != "undefined"){table.append("<tr><th colspan='3' class='fpPanelTitle'>"+label+"</th></tr>");}
 
-		for(id in object[paramSet]){
+		for(var id in object[paramSet]){
 			var param = object[paramSet][id];
 			//var abrev = id; // abrev will eventualy be set to a translated value
 			var abrev = fp.translate1(id, "short");
@@ -277,7 +277,7 @@ fp.timeSeries2 = [
 
 fp.initDyGraph = function(){
 	$(".graph").detach();
-	for (index in fp.timeSeries){
+	for (var index in fp.timeSeries){
 
 		var id = fp.timeSeries[index];
 		var idgraph = "#graph" + id;
@@ -423,7 +423,7 @@ fp.lungMenu = function(){
 	select.onchange = fp.lungChange;
 	container.appendChild(select);
 
-	for (i in fp.lungModels){
+	for (var i in fp.lungModels){
 		var option = document.createElement("option");
 		option.value = fp.lungModels[i];
 		option.textContent = fp.lungModels[i];
@@ -439,7 +439,7 @@ fp.ventMenu = function(){
 	select.onchange = fp.ventChange;
 	container.appendChild(select);
 
-	for (i in fp.ventModels){
+	for (var i in fp.ventModels){
 		var option = document.createElement("option");
 		option.value = fp.ventModels[i];
 		option.textContent = fp.ventModels[i];
