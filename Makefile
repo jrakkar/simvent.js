@@ -39,6 +39,7 @@ ventyaml-legacy.js: ventyaml.js
 
 frontPanel-legacy.js: frontPanel.js
 	$(LEGACYFY)$(@F) $<
+	sleep 4
 
 graphsimple-legacy.js: graphsimple.js
 	$(LEGACYFY)$(@F) $<
@@ -56,8 +57,5 @@ ventyaml.min.js: dist/ventyaml-legacy.js lib/yaml.min.js
 graphsimple.min.js: dist/graphsimple-legacy.js \lib/d3.v3.min.js
 	uglifyjs -mc -o dist/$(@F) $?
 
-frontPanel.min.js: frontPanel-legacy.js \
-	jquery.min.js \
-	dygraph-combined.js \
-	synchronizer.js
+frontPanel.min.js: frontPanel-legacy.js jquery.min.js dygraph-combined.js synchronizer.js
 	uglifyjs -mc -o dist/$(@F) $?
