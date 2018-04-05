@@ -46,6 +46,8 @@ gs.graph = class {
 								var newSvg = document.createElement("svg");
 								newSvg.className = "gs";
 								newSvg.id = "svg" + svgNum;
+								newSvg.style.width = "600px";
+								newSvg.style.height = "600px";
 								scriptParent.appendChild(newSvg);
 								this.idsvg = newSvg.id;
 					 }
@@ -63,7 +65,9 @@ gs.graph = class {
 					 }
 
 					 this.svg = d3.select(this.idsvg)
-								.classed("gs", true);
+								.classed("gs", true)
+					 			.style("width", "600px")
+					 			.style("height", "600px");
 
 					 if('class' in this){
 								this.svg.classed(this.class, true);
@@ -86,10 +90,12 @@ gs.graph = class {
 					 this.plages = [];
 					 this.curAnim = 0;
 
-					 this.width = this.svg.style("width");
+					 //this.width = this.svg.style("width");
+					 this.width = newSvg.style.width;
 					 this.width = this.width.substr(0, this.width.length-2);
 
-					 this.height = this.svg.style("height");
+					 //this.height = this.svg.style("height");
+					 this.height = newSvg.style.height;
 					 this.height = this.height.substr(0, this.height.length-2);
 
 					 this.defs = this.svg.append("defs");
@@ -628,3 +634,4 @@ gs.addGraph = function(target, data, fx, fy, conf){
 	*/
 		  return gs.quickGraph("#" + newSVGid, data, fx, fy, conf);
 }
+
