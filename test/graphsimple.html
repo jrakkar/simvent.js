@@ -53,7 +53,8 @@ var dat1 = vent.ventilate(lung1).timeData;
 function fx(d){return d.time;}
 function fy(d){return d.Flung;}
 
-var plot = new gs.graph("#svg1");
+//var plot = new gs.graph("#svg1");
+var plot = new gs.graph();
 plot.setscale(dat1,fx,fy);
 plot.tracer(dat1,fx,fy);
 for (var i = 2; i<9; i++){
