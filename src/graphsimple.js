@@ -40,16 +40,8 @@ gs.stat = function(iddiv, respd){
 gs.graph = class {
 		  constructor(idsvg, conf){
 
-					 if(typeof idsvg == "undefined"){
-								var scriptParent = document.scripts[document.scripts.length - 1].parentNode;
-								var svgNum = document.querySelectorAll("svg").length + 1;
-								var newSvg = document.createElement("svg");
-								newSvg.className = "gs";
-								newSvg.id = "svg" + svgNum;
-								newSvg.style.width = "600px";
-								newSvg.style.height = "600px";
-								scriptParent.appendChild(newSvg);
-								this.idsvg = newSvg.id;
+					 if(idsvg == null){
+								this.idsvg = "#" + gs.newSvg();
 					 }
 					 else{
 								this.idsvg = idsvg;
@@ -65,9 +57,7 @@ gs.graph = class {
 					 }
 
 					 this.svg = d3.select(this.idsvg)
-								.classed("gs", true)
-					 			.style("width", "600px")
-					 			.style("height", "600px");
+								.classed("gs", true);
 
 					 if('class' in this){
 								this.svg.classed(this.class, true);
@@ -90,12 +80,14 @@ gs.graph = class {
 					 this.plages = [];
 					 this.curAnim = 0;
 
-					 //this.width = this.svg.style("width");
-					 this.width = newSvg.style.width;
+					 console.log(this.idsvg);
+					 console.log(this.svg);
+					 this.width = this.svg.style("width");
+					 //this.width = newSvg.style.width;
 					 this.width = this.width.substr(0, this.width.length-2);
 
-					 //this.height = this.svg.style("height");
-					 this.height = newSvg.style.height;
+					 this.height = this.svg.style("height");
+					 //this.height = newSvg.style.height;
 					 this.height = this.height.substr(0, this.height.length-2);
 
 					 this.defs = this.svg.append("defs");
@@ -144,6 +136,7 @@ gs.graph = class {
 		  }
 
 		  setscale (d, fx, fy){
+					 console.log(fy);
 					 this.ymin = Math.min(d3.min(d, fy),0);
 					 this.ymax = d3.max(d, fy);
 					 this.xmin = d3.min(d, fx);
@@ -162,6 +155,8 @@ gs.graph = class {
 					 if(this.padH != 0){
 								this.ymax += this.padH * (this.ymax - this.ymin);
 					 }
+					 console.log("this.width: " +this.width);
+					 console.log("this.height: " +this.height);
 					 this.echellex = d3.scale.linear()
 								.domain([this.xmin, this.xmax])
 								.range([this.margeG + this.padG, this.width - (this.margeD + this.padD)]);
@@ -611,12 +606,6 @@ gs.quickGraph = function(div, data, fx, fy, conf){
 					 .tracer(data, fx, fy);
 }
 
-gs.randomHue = function(saturation, lightnes){
-		  var hue = Math.random() * 360;
-		  var color = "hsl( " + hue + ", " + saturation + "%, " + lightnes + "% )";
-		  return color;
-}
-
 gs.addGraph = function(target, data, fx, fy, conf){
 		  var numSVG = document.getElementsByTagName("svg").length + 1; 
 		  var newSVGid = target + "SVG" + numSVG;
@@ -627,11 +616,30 @@ gs.addGraph = function(target, data, fx, fy, conf){
 		  if (typeof conf != "undefined" && 'class' in conf){
 					 newsvg.classed(conf.class, true);
 		  }
-		  /*
-	else {
-		newsvg.attr("class", "gs");
-	}
-	*/
 		  return gs.quickGraph("#" + newSVGid, data, fx, fy, conf);
 }
 
+gs.newSvg = function(){
+		  var scriptParent = document.scripts[document.scripts.length - 1].parentNode;
+		  var numSVG = document.getElementsByTagName("svg").length + 1; 
+		  var newSVGid = "svg" + numSVG;
+		  var newsvg = d3.select(scriptParent)
+					 .append("svg")
+					 .attr("id", newSVGid);
+		  return newSVGid;
+}
+
+gs.newDiv = function(){
+		  var scriptParent = document.scripts[document.scripts.length - 1].parentNode;
+		  var divNum = document.querySelectorAll("div").length + 1;
+		  var newDiv = document.createElement("div");
+		  newDiv.id = "div" + divNum;
+		  scriptParent.appendChild(newDiv);
+		  return newDiv.id;
+}
+
+gs.randomHue = function(saturation, lightnes){
+		  var hue = Math.random() * 360;
+		  var color = "hsl( " + hue + ", " + saturation + "%, " + lightnes + "% )";
+		  return color;
+}
