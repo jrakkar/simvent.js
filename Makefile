@@ -55,7 +55,7 @@ ventyaml.min.js: dist/ventyaml-legacy.js lib/yaml.min.js
 	uglifyjs -mc -o dist/$(@F) $?
 
 graphsimple.min.js: graphsimple-legacy.js d3.v3.min.js
-	uglifyjs -mc -o dist/$(@F) dist/graphsimple-legacy.js lib/d3.v3.min.js
+	uglifyjs -mc -o dist/$(@F) lib/d3.v3.min.js dist/graphsimple-legacy.js
 
 frontPanel.min.js: frontPanel-legacy.js jquery.min.js dygraph-combined.js synchronizer.js
 	uglifyjs -mc -o dist/$(@F) $?
