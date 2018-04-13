@@ -488,6 +488,7 @@ fp.initControls = function(){
 	cDiv.textContent = null;
 	var cImg = document.createElement("img");
 	cImg.src = "https://progrt.github.io/simvent.js/Icones/sliders.svg";
+	cImg.alt = "Paramètres";
 	var pCtl = document.createElement("a");
 	pCtl.appendChild(cImg);
 	pCtl.onclick = fp.panelActivate;
