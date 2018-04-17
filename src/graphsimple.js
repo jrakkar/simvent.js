@@ -61,7 +61,6 @@ gs.graph = class {
 
 					 if('class' in this){
 								this.svg.classed(this.class, true);
-								console.log(this.class);
 					 }
 					 this.gridGroup = this.svg.append("g")
 								.attr("id", "gridGroup");
@@ -80,8 +79,6 @@ gs.graph = class {
 					 this.plages = [];
 					 this.curAnim = 0;
 
-					 console.log(this.idsvg);
-					 console.log(this.svg);
 					 this.width = this.svg.style("width");
 					 //this.width = newSvg.style.width;
 					 this.width = this.width.substr(0, this.width.length-2);
@@ -136,7 +133,6 @@ gs.graph = class {
 		  }
 
 		  setscale (d, fx, fy){
-					 console.log(fy);
 					 this.ymin = Math.min(d3.min(d, fy),0);
 					 this.ymax = d3.max(d, fy);
 					 this.xmin = d3.min(d, fx);
@@ -155,8 +151,6 @@ gs.graph = class {
 					 if(this.padH != 0){
 								this.ymax += this.padH * (this.ymax - this.ymin);
 					 }
-					 console.log("this.width: " +this.width);
-					 console.log("this.height: " +this.height);
 					 this.echellex = d3.scale.linear()
 								.domain([this.xmin, this.xmax])
 								.range([this.margeG + this.padG, this.width - (this.margeD + this.padD)]);
@@ -201,6 +195,10 @@ gs.graph = class {
 
 					 if(!("iridX"in this)){
 								this.drawGridX();
+					 }
+
+					 if(!("ligneZeroX" in this)){
+								this.tracerZeroX();
 					 }
 
 					 if(!('waveformGroup' in this)){
@@ -281,32 +279,23 @@ gs.graph = class {
 		  }
 
 		  tracerZeroX (){
-					 console.log("tracerZeroX");
-					 this.ligneZeroX = this.svg.append("line")
+					 this.ligneZeroX = this.gridGroup.append("line")
 								.attr("x1", this.margeG)
-					 //	.attr("x1", 0)
 								.attr("x2", this.width - this.margeD)
-					 //.attr("x2", 200)
 								.attr("y1", this.echelley(0))
 								.attr("y2", this.echelley(0))
 								.attr("class", "ligneZero");
 		  }
 
 		  axes (){
-					 //if(this.hasOwnProperty("axex")){console.log("Axe X déja présent");}
-					 //else{
 					 this.axex = this.svg.append("line")
 								.attr("x1", this.margeG)
 								.attr("x2", this.width - this.margeD)
-					 //.attr("y1", this.height - this.margeB)
-					 //.attr("y2", this.height - this.margeB)
 								.attr("y1", this.echelley(0))
 								.attr("y2", this.echelley(0))
 								.attr("class", "axe");
 
 					 this.axey = this.svg.append("line")
-					 //.attr("x1", this.margeG)
-					 //.attr("x2", this.margeG)
 								.attr("x1", this.echellex(0))
 								.attr("x2", this.echellex(0))
 								.attr("y1", this.height - this.margeB)
@@ -314,7 +303,6 @@ gs.graph = class {
 								.attr("class", "axe");
 
 					 d3.selectAll(".axe").attr("style", "marker-end: url(#flechep);");
-					 //}
 		  }
 
 		  zoomX (xmin, xmax) {
