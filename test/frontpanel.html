@@ -35,6 +35,24 @@
 
 	<div id="fpGraphics"> </div>
 
-	<script> fp.init() </script>
+	<script>
+		fp.timeSeries = [
+			"Pao",
+			"Flung",
+			"Vt", 
+			"PCO2"
+		];
+		fp.ventModels = [
+				  "IPV",
+			"PVCurve",
+			"PressureAssistor",
+			"PressureControler",
+			"FlowControler",
+			"VDR"
+		];
+		fp.ventModel = "IPV";
+		fp.lungModel = "SimpleLung";
+		fp.init()
+	</script>
 </body>
 </html>

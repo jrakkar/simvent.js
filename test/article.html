@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <meta charset="utf-8"/>
+<script src="../dist/simvent.min.js" charset="utf-8"></script>
 <script src="../lib/d3.v3.min.js" charset="utf-8"></script>
 <script src="../lib/yaml.min.js" charset="utf-8"></script>
-<script src="../dist/simvent.min.js" charset="utf-8"></script>
 <script src="../src/ventyaml.js" charset="utf-8"></script>
 <script src="../src/graphsimple.js" charset="utf-8"></script>
 <link rel="stylesheet" href="../css/article.css" />
@@ -69,16 +69,6 @@ Boucle:
 
 <p>Modèle simple de poumon avec une compliance linéaire.</p>
 
-<h3 id="svsptlung">sv.SptLung</h3>
-
-<pre><code>Ventilateur: PressureAssistor
-Poumon: SptLung
-Courbes: 
-   - Pmus
-</code></pre>
-
-<p>Modèle de poumon présentant une respiration spontanée et une compliance linéaire.</p>
-
 <h3 id="svsyglung">sv.SygLung</h3>
 
 <pre><code>Ventilateur: PVCurve
@@ -100,6 +90,16 @@ Boucle:
 </code></pre>
 
 <p>Modèle de poumon <em>recrutable</em>. Sa courbe presion-volume a une forme sygmoïde et présente une hystérèse.</p>
+
+<h3 id="svsptlung">sv.SptLung</h3>
+
+<pre><code>Ventilateur: PressureAssistor
+Poumon: SptLung
+Courbes: 
+   - Pmus
+</code></pre>
+
+<p>Modèle de poumon présentant une respiration spontanée et une compliance linéaire.</p>
 <script>
 gs.defaults["margeG"]=75;
 gs.defaults["margeD"]=2;

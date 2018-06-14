@@ -51,7 +51,9 @@ fp.lungModels = ["SimpleLung", "SptLung", "SygLung", "RLung"];
 
 fp.lungModel = "SimpleLung";
 
-fp.ventModels = ["PressureAssistor", "PressureControler", "VDR", "PVCurve", "FlowControler"];
+fp.ventModels = ["FlowControler", "PressureControler", "PressureAssistor", "VDR", "PVCurve"];
+
+fp.ventModel = "PressureControler";
 
 fp.progressDelay = 50;
 
@@ -217,7 +219,9 @@ fp.graphics = [];
 
 fp.timeSeries = ["Pao",
 //"Fop",
-"Flung", "Palv", "Vt", "PCO2"];
+"Flung",
+//"Palv",
+"Vt", "PCO2"];
 
 fp.timeSeries2 = [{
 	id: "Pao",
@@ -442,7 +446,8 @@ fp.initControls = function () {
 	var cDiv = document.querySelector("#fpControls");
 	cDiv.textContent = null;
 	var cImg = document.createElement("img");
-	cImg.src = "../Icones/sliders.svg";
+	cImg.src = "https://progrt.github.io/simvent.js/Icones/sliders.svg";
+	cImg.alt = "Paramètres";
 	var pCtl = document.createElement("a");
 	pCtl.appendChild(cImg);
 	pCtl.onclick = fp.panelActivate;

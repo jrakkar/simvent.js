@@ -1,4 +1,4 @@
-VPATH = css _sass src lib dist
+VPATH = css _sass src lib dist test
 LEGACYFY = babel --presets es2015 -o dist/
 MINIFY = 
 
@@ -48,14 +48,14 @@ graphsimple-legacy.js: graphsimple.js
 # Packaging
 # --------------
 
-simvent.min.js: dist/simvent-legacy.js
-	uglifyjs -mc -o dist/$(@F) $?
+simvent.min.js: simvent-legacy.js
+	uglifyjs -mc -o dist/$(@F) $<
 
 ventyaml.min.js: dist/ventyaml-legacy.js lib/yaml.min.js
 	uglifyjs -mc -o dist/$(@F) $?
 
-graphsimple.min.js: dist/graphsimple-legacy.js \lib/d3.v3.min.js
-	uglifyjs -mc -o dist/$(@F) $?
+graphsimple.min.js: graphsimple-legacy.js d3.v3.min.js
+	uglifyjs -mc -o dist/$(@F) lib/d3.v3.min.js dist/graphsimple-legacy.js
 
 frontPanel.min.js: frontPanel-legacy.js jquery.min.js dygraph-combined.js synchronizer.js
 	uglifyjs -mc -o dist/$(@F) $?
