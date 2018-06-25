@@ -166,7 +166,7 @@ fp.download = function(objArray)
     var link = document.createElement('a');
     link.download = 'simvent.dat';
     link.href = 'data:text/csv;charset=utf-8,' + escape(str);
-    document.body.appendChild(link);
+    document.body.appendSimChild(link);
     setTimeout(function(){
     link.click();
     document.body.removeChild(link);
@@ -529,12 +529,20 @@ fp.init = function(){
 
 		  fp.paramTable(fp.ventilator, 'simParams', fp.paramContainer, "Simulation"); 
 
-		  //
-		  //fp.paramTable(fp.ventilator, "ventParams", fp.paramContainer, fp.translate1("Parameters", "long")); 
-		  //fp.paramTable(fp.ventilator, 'simParams', fp.paramContainer, fp.translate1("Simulator", "long")); 
-		  //fp.paramTable(fp.lung, "mechParams", fp.paramContainer, fp.translate1("Lung", "long")); 
-
 		  $(fp.paramContainer).append('<button id="ventiler" value="ventiler" onClick="maj()">&#x25b6; Ventiler</button>');
+
+		  var title = document.createElement("h2");
+		  title.textContent = "Téléchargements";
+		  title.className = "fpPanelTitle";
+		  title.id = "fpH2PanelDownload";
+		  document.querySelector("#panel").appendChild(title);
+
+		  var link  = document.createElement("a");
+		  link.text = "simvent_timedata.dat";
+		  link.onclick = function(){
+					 fp.download(fp.timeData);
+		  };
+		  document.querySelector("#panel").appendChild(link);
 
 		  fp.initShadow();
 		  fp.graphics = [];
