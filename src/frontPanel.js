@@ -67,9 +67,9 @@ fp.languages = {
 	short: navigator.language.substr(0,2),
 	fallback: "en"
 	};
-for (var language in fp.languages){
-	console.log(language + ": " + fp.languages[language]);
-}
+//for (var language in fp.languages){
+//	console.log(language + ": " + fp.languages[language]);
+//}
 // **********************************
 // Translation of the user interface
 // **********************************
@@ -104,7 +104,7 @@ fp.updateModels = function(){
 		}
 	}
 
-	fp.ventilator.updateCalcParams();
+	//fp.ventilator.updateCalcParams();
 	for(var i in fp.ventilator.ventParams){
 		if(fp.ventilator.ventParams[i].calculated == true){
 			document.getElementById("data"+i).textContent = ""+ Math.round(10 * fp.ventilator[i])/10;
@@ -166,7 +166,7 @@ fp.download = function(objArray)
     var link = document.createElement('a');
     link.download = 'simvent.dat';
     link.href = 'data:text/csv;charset=utf-8,' + escape(str);
-    document.body.appendSimChild(link);
+    document.body.appendChild(link);
     setTimeout(function(){
     link.click();
     document.body.removeChild(link);
@@ -299,14 +299,16 @@ fp.initDyGraph = function(){
 
 		fp.graphics.push(new Dygraph(div, [[0,0]], fp.dygraphConf));
 	}
-	fp.sync = Dygraph.synchronize(
-		fp.graphics,
-		{
-			selection: true,
-			zoom: true,
-			range: false
-		}
-	);
+	if(fp.graphics.length > 1){
+			  fp.sync = Dygraph.synchronize(
+						 fp.graphics,
+						 {
+									selection: true,
+									zoom: true,
+									range: false
+						 }
+			  );
+	}
 
 }
 
@@ -314,34 +316,77 @@ fp.initDyGraph = function(){
 // Paneau de sélection des graphiques
 // **********************************
 
-fp.updateTSParam = function(){
-	console.log(this.checked);
+fp.updateTsSelect = function(){
+		  fp.TsSelectDesactivate();
+		  fp.timeSeries = [];
+		  var params = document.querySelectorAll(".TsSelect");
+		  for(var i = 0; i < params.length; i ++){
+					 p = params[i];
+					 if(p.checked == true){
+								fp.timeSeries.push(p.id);
+					 }
+		  }
+		  fp.graphics = [];
+		  fp.initDyGraph();
+		  fp.initProgress();
+		  fp.plotDygraph(0);
 }
 
 fp.mkTsSelect = function(){
-	var keys = [];
-	var params = sv.log(fp.lung, fp.ventilator);
-	delete params.time;
 
-	for(var key in params){keys.push(key)};
+		  if(document.querySelectorAll("#fpTselect").length > 0){
+					 var Tselect = document.querySelector("#fpTselect");
+					 TsSelect.parentNode.removeChild(TsSelect);
+		  }
 
-	keys = keys.sort(function (a, b) {
-    return a.toLowerCase().localeCompare(b.toLowerCase());
-});
-	for(var i in keys){
-		var para = document.createElement("span");
-		var checkbox = document.createElement("input");
-		checkbox.type = "checkbox";
-		checkbox.onChange = fp.updateTSParam;
-		if(fp.timeSeries.includes(keys[i])){
-			checkbox.checked = true;
-		}
-		para.appendChild(checkbox);
-		var node = document.createTextNode(" " + keys[i]);
-		para.appendChild(node);
-		document.body.appendChild(para);
-		
-	}
+		  var keys = [];
+		  var params = sv.log(fp.lung, fp.ventilator);
+		  delete params.time;
+
+		  for(var key in params){keys.push(key)};
+
+		  keys = keys.sort(
+					 function (a, b) {
+								return a.toLowerCase().localeCompare(b.toLowerCase());
+					 }
+		  );
+
+		  var div = document.createElement("div");
+		  div.id = "fpTselect";
+		  document.body.appendChild(div);
+
+		  var divList = document.createElement("div");
+		  divList.id = "fpTselectList";
+		  div.appendChild(divList);
+
+
+		  for(var i in keys){
+					 var para = document.createElement("label");
+					 para.for = keys[i];
+					 var checkbox = document.createElement("input");
+					 checkbox.type = "checkbox";
+					 checkbox.className = 'TsSelect';
+					 checkbox.id = keys[i];
+
+					 if(fp.timeSeries.includes(keys[i])){
+								checkbox.checked = true;
+					 }
+
+					 para.appendChild(checkbox);
+					 var text = document.createTextNode(" " + keys[i]);
+					 para.appendChild(text);
+					 divList.appendChild(para);
+		  }
+
+		  var divButtons = document.createElement("div");
+		  divButtons.id = "fpTselectButtons";
+		  div.appendChild(divButtons);
+
+		  var valider  = document.createElement("button");
+		  var text = document.createTextNode("Valider");
+		  valider.appendChild(text);
+		  valider.onclick = fp.updateTsSelect;
+		  divButtons.appendChild(valider);
 }
 
 // *****************************
@@ -350,9 +395,7 @@ fp.mkTsSelect = function(){
 
 fp.plotDygraph = function(index){
 
-		var param = fp.timeSeries[index];
-		var id = param;
-		//var label = fp.translate(dict[id].long);
+		var id = fp.timeSeries[index];
 
 		function f1(d, i, a){ return [ d["time"], d[id] ]; }
 		
@@ -367,10 +410,7 @@ fp.plotDygraph = function(index){
 				fp.plotDygraph(index)
 			}, 10);
 		}
-		else{
-			//fp.stopProgress();
-			setTimeout(function(){fp.stopProgress();},50);
-		}
+		else{setTimeout(function(){fp.stopProgress();},50);}
 		fp.graphics[0].resetZoom();
 }
 
@@ -486,13 +526,25 @@ fp.hideShadow = function(){
 fp.initControls = function(){
 	var cDiv = document.querySelector("#fpControls");
 	cDiv.textContent = null;
+
 	var cImg = document.createElement("img");
-	cImg.src = "https://progrt.github.io/simvent.js/Icones/sliders.svg";
+	//cImg.src = "https://progrt.github.io/simvent.js/Icones/Courbes.svg";
+	cImg.src = "../Icones/Courbes.svg";
+	cImg.alt = "Courbes";
+	var pCtl = document.createElement("a");
+	pCtl.appendChild(cImg);
+	pCtl.onclick = fp.TsSelectActivate;
+	cDiv.appendChild(pCtl);
+
+	var cImg = document.createElement("img");
+	//cImg.src = "https://progrt.github.io/simvent.js/Icones/sliders.svg";
+	cImg.src = "../Icones/sliders.svg";
 	cImg.alt = "Paramètres";
 	var pCtl = document.createElement("a");
 	pCtl.appendChild(cImg);
 	pCtl.onclick = fp.panelActivate;
 	cDiv.appendChild(pCtl);
+
 }
 
 fp.init = function(){
@@ -500,6 +552,7 @@ fp.init = function(){
 		  if(typeof fp.lung == "undefined"){fp.lung = new sv[fp.lungModel]();}
 
 		  fp.initControls();
+
 		  $(fp.paramContainer).children().remove();
 
 
@@ -561,10 +614,19 @@ fp.init = function(){
 		  $("input").keyup(function(){
 					 fp.updateModels();
 		  });
+
+		  fp.mkTsSelect();
 };
 
-fp.togglePanel = function(){
-	document.querySelector(fp.paramContainer).classList.toggle('hidden');
+fp.TsSelectActivate = function(){
+	document.querySelector("#fpTselect").scrollTop = 0;
+	document.querySelector("#fpTselect").classList.add('visible');
+	//document.querySelector(".fpShadow").classList.add('visible');
+}
+
+fp.TsSelectDesactivate = function(){
+	document.querySelector("#fpTselect").classList.remove('visible');
+	//document.querySelector(".fpShadow").classList.remove('visible');
 }
 
 fp.panelActivate = function(){
@@ -574,7 +636,6 @@ fp.panelActivate = function(){
 }
 
 fp.panelDesactivate = function(){
-	console.log("panelDesactivate");
 	document.querySelector(fp.paramContainer).classList.remove('visible');
 	//document.querySelector(".fpShadow").classList.remove('visible');
 }

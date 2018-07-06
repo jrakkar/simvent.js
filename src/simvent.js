@@ -48,10 +48,7 @@ sv.log = function(lung, vent){
 		Pao    : vent.Pao,
 		Fip    : vent.Fip,
 		Fop    : vent.Fop,
-		stateP : vent.stateP,
-		Pcirc  : vent.Pcirc,
-		Fmax   : vent.Fmax,
-		Fstop  : vent.Fstop
+		stateP : vent.stateP
 	};
 }
 
