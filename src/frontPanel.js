@@ -529,8 +529,8 @@ fp.initControls = function(){
 	cDiv.textContent = null;
 
 	var cImg = document.createElement("img");
-	//cImg.src = "https://progrt.github.io/simvent.js/Icones/Courbes.svg";
-	cImg.src = "../Icones/Courbes.svg";
+	cImg.src = "https://progrt.github.io/simvent.js/Icones/Courbes.svg";
+	//cImg.src = "../Icones/Courbes.svg";
 	cImg.alt = "Courbes";
 	var pCtl = document.createElement("a");
 	pCtl.appendChild(cImg);
@@ -538,8 +538,8 @@ fp.initControls = function(){
 	cDiv.appendChild(pCtl);
 
 	var cImg = document.createElement("img");
-	//cImg.src = "https://progrt.github.io/simvent.js/Icones/sliders.svg";
-	cImg.src = "../Icones/sliders.svg";
+	cImg.src = "https://progrt.github.io/simvent.js/Icones/sliders.svg";
+	//cImg.src = "../Icones/sliders.svg";
 	cImg.alt = "Paramètres";
 	var pCtl = document.createElement("a");
 	pCtl.appendChild(cImg);
