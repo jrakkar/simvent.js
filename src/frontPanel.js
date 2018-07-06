@@ -55,6 +55,7 @@ fp.ventModels = [
 	"PressureControler",
 	"PressureAssistor",
 	"VDR",
+		  "IPV",
 	"PVCurve"
 	];
 

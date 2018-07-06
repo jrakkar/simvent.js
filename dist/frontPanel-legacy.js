@@ -51,7 +51,7 @@ fp.lungModels = ["SimpleLung", "SptLung", "SygLung", "RLung"];
 
 fp.lungModel = "SimpleLung";
 
-fp.ventModels = ["FlowControler", "PressureControler", "PressureAssistor", "VDR", "PVCurve"];
+fp.ventModels = ["FlowControler", "PressureControler", "PressureAssistor", "VDR", "IPV", "PVCurve"];
 
 fp.ventModel = "PressureControler";
 
