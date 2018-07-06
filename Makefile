@@ -39,7 +39,6 @@ ventyaml-legacy.js: ventyaml.js
 
 frontPanel-legacy.js: frontPanel.js
 	$(LEGACYFY)$(@F) $<
-	sleep 4
 
 graphsimple-legacy.js: graphsimple.js
 	$(LEGACYFY)$(@F) $<

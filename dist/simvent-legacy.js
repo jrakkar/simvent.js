@@ -64,10 +64,7 @@ sv.log = function (lung, vent) {
 		Pao: vent.Pao,
 		Fip: vent.Fip,
 		Fop: vent.Fop,
-		stateP: vent.stateP,
-		Pcirc: vent.Pcirc,
-		Fmax: vent.Fmax,
-		Fstop: vent.Fstop
+		stateP: vent.stateP
 	};
 };
 
@@ -987,13 +984,13 @@ sv.Phasitron.Fop = function (Fip, Pao) {
  * @extends sv.Ventilator
  */
 
-sv.VDR = function (_sv$Ventilator4) {
-	_inherits(VDR, _sv$Ventilator4);
+sv.IPV = function (_sv$Ventilator4) {
+	_inherits(IPV, _sv$Ventilator4);
 
-	function VDR() {
-		_classCallCheck(this, VDR);
+	function IPV() {
+		_classCallCheck(this, IPV);
 
-		var _this8 = _possibleConstructorReturn(this, (VDR.__proto__ || Object.getPrototypeOf(VDR)).call(this));
+		var _this8 = _possibleConstructorReturn(this, (IPV.__proto__ || Object.getPrototypeOf(IPV)).call(this));
 
 		_this8.Tramp = 0.005;
 		_this8.Rexp = 1; // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
@@ -1009,36 +1006,29 @@ sv.VDR = function (_sv$Ventilator4) {
 			lowPass: {}
 		};
 
-		_this8.Tic = 2; // Convective inspiratory time
-		_this8.Tec = 2; // Convective expiratory time
 		_this8.Fperc = 500;
 		_this8.Rit = 0.5; //Ratio of inspiratory time over total time (percussion)
-		_this8.Fipl = 0.18; // 	
-		_this8.Fiph = 1.8; // 
-		_this8.CPR = 0;
+		//this.Fipl= 0.18; // 	
+		//this.Fiph= 1.8; // 
+		//this.CPR = 0;
+		_this8.Fipc = 0.18;
 
 		_this8.Fop = 0; //Phasitron output flow
 		_this8.Fip = 0; //Phasitron output flow
 		_this8.Pao = 0; //Presure at the ariway openning (phasitron output)
-		_this8.CycleC = 0;
 
 		_this8.ventParams = {
-			Tic: { unit: "s" },
-			Tec: { unit: "s" },
-			Fconv: { unit: "s", calculated: true },
 			Fperc: { unit: "/min" },
 			Fhz: { unit: "hz", calculated: true },
 			Rit: {},
-			Fiph: { unit: "l/s" },
-			Fipl: { unit: "l/s" },
-			CPR: {}
+			Fipc: { unit: "l/s" }
 		};
 
 		_this8.dataToFilter = ["Pao", "Flung"];
 		return _this8;
 	}
 
-	_createClass(VDR, [{
+	_createClass(IPV, [{
 		key: "percussiveExpiration",
 		value: function percussiveExpiration(lung, Rexp) {
 			// Must be executed in a scope where the timeData container is defined
@@ -1071,12 +1061,6 @@ sv.VDR = function (_sv$Ventilator4) {
 			while (this.time < tStopPerc) {
 
 				this.Fip = inFlow;
-				/*
-    if(this.time % this.Tcc > this.Tec){
-    	this.Fip = this.Fiph;
-    }
-    else{this.Fip = this.Fipl;}
-    */
 				this.Pao = this.Fop * lung.Raw + lung.Palv;
 				this.Fop = sv.Phasitron.Fop(this.Fip, this.Pao);
 				lung.appliquer_debit(this.Fop, this.Tsampl);
@@ -1086,9 +1070,87 @@ sv.VDR = function (_sv$Ventilator4) {
 			}
 		}
 	}, {
+		key: "ventilationCycle",
+		value: function ventilationCycle(lung) {
+			this.percussiveInspiration(lung, this.Fipc);
+			this.percussiveExpiration(lung, this.Rexp);
+		}
+	}, {
+		key: "Fhz",
+		get: function get() {
+			return this.Fperc / 60;
+		}
+	}, {
+		key: "Tip",
+		get: function get() {
+			return 60 / this.Fperc * this.Rit;
+		}
+	}, {
+		key: "Tep",
+		get: function get() {
+			return 60 / this.Fperc - this.Tip;
+		}
+	}]);
+
+	return IPV;
+}(sv.Ventilator);
+
+sv.VDR = function (_sv$IPV) {
+	_inherits(VDR, _sv$IPV);
+
+	function VDR() {
+		_classCallCheck(this, VDR);
+
+		var _this9 = _possibleConstructorReturn(this, (VDR.__proto__ || Object.getPrototypeOf(VDR)).call(this));
+
+		_this9.Tramp = 0.005;
+		_this9.Rexp = 1; // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
+		_this9.rAvg = 2;
+		_this9.lowPass = 3;
+
+		_this9.simParams = {
+			Tvent: { unit: "s" },
+			Tsampl: { unit: "s" },
+			Tramp: { unit: "s" },
+			Rexp: { unit: "cmH₂O/l/s" },
+			rAvg: {},
+			lowPass: {}
+		};
+
+		_this9.Tic = 2; // Convective inspiratory time
+		_this9.Tec = 2; // Convective expiratory time
+		_this9.Fperc = 500;
+		_this9.Rit = 0.5; //Ratio of inspiratory time over total time (percussion)
+		_this9.Fipl = 0.18; // 	
+		_this9.Fiph = 1.8; // 
+		_this9.CPR = 0;
+
+		_this9.Fop = 0; //Phasitron output flow
+		_this9.Fip = 0; //Phasitron output flow
+		_this9.Pao = 0; //Presure at the ariway openning (phasitron output)
+		_this9.CycleC = 0;
+
+		_this9.ventParams = {
+			Tic: { unit: "s" },
+			Tec: { unit: "s" },
+			Fconv: { unit: "s", calculated: true },
+			Fperc: { unit: "/min" },
+			Fhz: { unit: "hz", calculated: true },
+			Rit: {},
+			Fiph: { unit: "l/s" },
+			Fipl: { unit: "l/s" },
+			CPR: {}
+		};
+
+		_this9.dataToFilter = ["Pao", "Flung"];
+		return _this9;
+	}
+
+	_createClass(VDR, [{
 		key: "convectiveInspiration",
+		// Duration of the convection cycle
+
 		value: function convectiveInspiration(lung) {
-			//var tStopConv = this.time + this.Tic;
 			var tStopConv = this.Tcc * Math.ceil(this.time / this.Tcc);
 			var tCPR = this.time + 0.8;
 			this.CycleC = 1;
@@ -1111,7 +1173,6 @@ sv.VDR = function (_sv$Ventilator4) {
 	}, {
 		key: "convectiveExpiration",
 		value: function convectiveExpiration(lung) {
-			//var tStopConv = this.time + this.Tec;
 			var tStopConv = this.Tcc * Math.floor(this.time / this.Tcc) + this.Tec;
 			this.CycleC = 0;
 			while (this.time < tStopConv && this.time < this.simulationStop) {
@@ -1127,11 +1188,6 @@ sv.VDR = function (_sv$Ventilator4) {
 			this.convectiveInspiration(lung);
 		}
 	}, {
-		key: "Fhz",
-		get: function get() {
-			return this.Fperc / 60;
-		}
-	}, {
 		key: "Fconv",
 		get: function get() {
 			return 60 / (this.Tic + this.Tec);
@@ -1141,20 +1197,10 @@ sv.VDR = function (_sv$Ventilator4) {
 		get: function get() {
 			return this.Tic + this.Tec;
 		}
-	}, {
-		key: "Tip",
-		get: function get() {
-			return 60 / this.Fperc * this.Rit;
-		}
-	}, {
-		key: "Tep",
-		get: function get() {
-			return 60 / this.Fperc - this.Tip;
-		}
 	}]);
 
 	return VDR;
-}(sv.Ventilator);
+}(sv.IPV);
 
 /**
  * Time trigered, flow controled, time cycled ventilator.
@@ -1167,14 +1213,14 @@ sv.FlowControler = function (_sv$Ventilator5) {
 	function FlowControler() {
 		_classCallCheck(this, FlowControler);
 
-		var _this9 = _possibleConstructorReturn(this, (FlowControler.__proto__ || Object.getPrototypeOf(FlowControler)).call(this));
+		var _this10 = _possibleConstructorReturn(this, (FlowControler.__proto__ || Object.getPrototypeOf(FlowControler)).call(this));
 
-		_this9.Vt = 0.5;
-		_this9.PEEP = 5.0;
-		_this9.Ti = 1;
-		_this9.Fconv = 12;
+		_this10.Vt = 0.5;
+		_this10.PEEP = 5.0;
+		_this10.Ti = 1;
+		_this10.Fconv = 12;
 
-		_this9.ventParams = {
+		_this10.ventParams = {
 			Vt: { unit: "l" },
 			PEEP: { unit: "cmH₂O" },
 			Fconv: { unit: "/min." },
@@ -1182,50 +1228,10 @@ sv.FlowControler = function (_sv$Ventilator5) {
 			Te: { calculated: true, unit: "sec." },
 			Tcycle: { calculated: true, unit: "sec." }
 		};
-		return _this9;
+		return _this10;
 	}
 
 	_createClass(FlowControler, [{
-		key: "Aventilate",
-		value: function Aventilate(lung) {
-
-			var timeData = [];
-			var convData = [];
-
-			for (this.time = 0; this.time < this.Tvent;) {
-				var tdeb = this.time;
-
-				while (this.time < tdeb + this.Ti) {
-					lung.appliquer_debit(this.Flow, this.Tsampl);
-					this.Pao = lung.Palv + this.Flow * lung.Raw;
-					timeData.push(sv.log(lung, this));
-					this.time += this.Tsampl;
-				}
-
-				this.Pao = this.PEEP;
-				while (this.time < tdeb + 60 / this.Fconv) {
-					lung.appliquer_pression(this.Pao, this.Tsampl);
-					timeData.push(sv.log(lung, this));
-					this.time += this.Tsampl;
-				}
-
-				var pmeco2 = (760 - 47) * lung.veco2 / lung.vce;
-
-				convData.push({
-					pmeco2: pmeco2,
-					petco2: lung.pco2,
-					pAco2: lung.PACO2,
-					fowler: lung.Vem / lung.vce,
-					bohr: (lung.PACO2 - pmeco2) / lung.PACO2
-				});
-			}
-
-			return {
-				timeData: timeData,
-				convData: convData
-			};
-		}
-	}, {
 		key: "ventilationCycle",
 		value: function ventilationCycle(lung) {
 

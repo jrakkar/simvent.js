@@ -11,9 +11,11 @@ var ventyaml = function () {
 		_classCallCheck(this, ventyaml);
 
 		this.clsList = sourceNode.classList;
-		for (var cls in sourceNode.classList.keys()) {
-			console.log(cls);
-		}
+		/***
+  for(var cls in sourceNode.classList.keys()){
+  	console.log(cls);
+  }
+  ***/
 
 		if (!YAML) {
 			throw "ventyaml: YAML library not loaded.";
