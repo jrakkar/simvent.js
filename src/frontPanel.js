@@ -1,6 +1,11 @@
 // Creation of the front panel object
 
 var fp = {};
+fp.savedScenarios = [];
+
+if("savedScenarios" in localStorage){
+		  fp.savedScenarios = JSON.parse(localStorage.savedScenarios);
+}
 
 // *****************************
 // Configurations
@@ -336,7 +341,7 @@ fp.updateTsSelect = function(){
 fp.mkTsSelect = function(){
 
 		  if(document.querySelectorAll("#fpTselect").length > 0){
-					 var Tselect = document.querySelector("#fpTselect");
+					 var TsSelect = document.querySelector("#fpTselect");
 					 TsSelect.parentNode.removeChild(TsSelect);
 		  }
 
@@ -450,12 +455,24 @@ function maj() {
 	fp.panelDesactivate();
 	fp.initProgress();
 	setTimeout(function(){
-		fp.updateModels();
-		fp.ventilate()
-		fp.xmin = null;
-		fp.ymin = null;
-		fp.plotDygraph(0)
-		//fp.plotDygraph1()
+			  fp.updateModels();
+			  var scenario = fp.getScenario();
+			  fp.savedScenarios.unshift(scenario);
+			  fp.savedScenarios = fp.savedScenarios.slice(0,3);
+			  var list = document.querySelector("#fpScenarioList");
+					 var li = document.createElement("li");
+					 var a = document.createElement("a");
+					 var text = document.createTextNode(scenario.label);
+					 a.appendChild(text);
+					 a.onclick = fp.loadThisScenario;
+					 li.appendChild(a);
+					 list.insertBefore(li, list.childNodes[0]);
+			  localStorage.savedScenarios = JSON.stringify(fp.savedScenarios);
+			  fp.ventilate()
+			  fp.xmin = null;
+			  fp.ymin = null;
+			  fp.plotDygraph(0)
+			  //fp.plotDygraph1()
 	}, 50);
 }
 
@@ -585,6 +602,7 @@ fp.init = function(){
 
 		  $(fp.paramContainer).append('<button id="ventiler" value="ventiler" onClick="maj()">&#x25b6; Ventiler</button>');
 
+
 		  var title = document.createElement("h2");
 		  title.textContent = "Téléchargements";
 		  title.className = "fpPanelTitle";
@@ -602,10 +620,25 @@ fp.init = function(){
 		  };
 		  document.querySelector("#fpDownloadDiv").appendChild(link);
 
+		  var title = document.createElement("h2");
+		  title.textContent = "Historique";
+		  title.className = "fpPanelTitle";
+		  title.id = "fpH2PanelHistory";
+		  document.querySelector("#panel").appendChild(title);
+
+		  fp.mkScenarioList();
+
 		  fp.initShadow();
 		  fp.graphics = [];
 		  fp.initDyGraph()
-		  maj();
+		  fp.initProgress();
+		  setTimeout(function(){
+					 fp.updateModels();
+					 fp.ventilate()
+					 fp.xmin = null;
+					 fp.ymin = null;
+					 fp.plotDygraph(0)
+		  }, 50);
 
 		  // Gestion des racourcis clavier
 		  $("#panel input").keypress(function(event){
@@ -644,3 +677,86 @@ fp.panelDesactivate = function(){
 	document.querySelector(fp.paramContainer).classList.remove('visible');
 	//document.querySelector(".fpShadow").classList.remove('visible');
 }
+
+fp.getScenario = function(){
+		  var scenario = {}
+		  scenario.ventParams = {};
+		  scenario.mechParams = {};
+
+		  var d = new Date();
+		  scenario.year = d.getFullYear();
+		  scenario.month = ("0" + (d.getMonth() + 1)).slice(-2);
+		  scenario.day = ("0" + (d.getDate())).slice(-2);
+		  scenario.hours = ("0" + (d.getHours())).slice(-2);
+		  scenario.minutes = ("0" + (d.getMinutes())).slice(-2);
+		  scenario.seconds = ("0" + (d.getSeconds())).slice(-2);
+
+		  scenario.label = scenario.year + "-" + scenario.month +"-" + scenario.day + "_" + scenario.hours + scenario.minutes + scenario.seconds;
+		  scenario.ventModel = fp.ventModel;
+		  scenario.lungModel = fp.lungModel;
+
+		  for(var id in fp.ventilator.ventParams){
+					 //fp.ventParams[id] = fp.ventilator[id]
+					 scenario.ventParams[id] = fp.ventilator[id]
+		  }
+
+		  for(var id in fp.ventilator.simParams){
+					 //fp.ventParams[id] = fp.ventilator[id]
+					 scenario.ventParams[id] = fp.ventilator[id]
+		  }
+
+		  for(var id in fp.lung.mechParams){
+					 //fp.mechParams[id] = fp.lung[id]
+					 scenario.mechParams[id] = fp.lung[id]
+		  }
+
+		  return scenario;
+}
+
+fp.mkScenarioList = function(){
+		  var list = document.createElement("ul");
+		  list.id = "fpScenarioList";
+
+		  for(var id in fp.savedScenarios){
+					 var id = id;
+					 console.log("Creating link " + id);
+					 var li = document.createElement("li");
+					 var a = document.createElement("a");
+					 a.dataset.ident = id;
+					 a.onclick = fp.loadThisScenario;
+					 var text = document.createTextNode(fp.savedScenarios[id].label);
+					 a.appendChild(text);
+					 li.appendChild(a);
+					 list.appendChild(li);
+		  }
+
+		  document.querySelector("#panel").appendChild(list);
+}
+
+fp.loadScenario = function(id){
+		  //console.log("Loading scenario " + id);
+		  var scenario = fp.savedScenarios[id];
+
+		  fp.ventModel = scenario.ventModel;
+		  fp.lungModel = scenario.lungModel;
+
+		  fp.ventilator = new sv[fp.ventModel];
+
+		  for(var id in fp.ventilator.ventParams){
+					 fp.ventilator[id] = scenario.ventParams[id];
+		  }
+
+		  for(var id in fp.ventilator.simParams){
+					 fp.ventilator[id] = scenario.ventParams[id];
+		  }
+
+		  for(var id in fp.lung.mechParams){
+					 fp.lung[id] = scenario.mechParams[id];
+		  }
+
+		  fp.init();
+}
+fp.loadThisScenario = function(){
+		  console.log("Loading scenario " + this.dataset.ident);
+		  fp.loadScenario(this.dataset.ident);
+};
