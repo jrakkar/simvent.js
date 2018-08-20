@@ -4,22 +4,13 @@
 <script src="../lib/d3.v3.min.js" charset="utf-8"></script>
 <script src="../src/graphsimple.js" charset="utf-8"></script>
 <script src="../src/simvent.js" charset="utf-8"></script>
+<script src="../src/animation.js" charset="utf-8"></script>
 <!--script src="../frontpaneljs/dict.js" charset="utf-8"></script-->
 <link rel="stylesheet" type="text/css" href="../css/gs-grid-clear-rainbow.css" charset="utf-8"/>
 <!--link rel="stylesheet" type="text/css" href="../../graphsimple.js/css/test-layout.css" charset="utf-8"/-->
 
 <style>
-body {
-	box-sizing: border-box;
-	padding: none;
-	margin-top: none;
-}
-html {
-	box-sizing: border-box;
-	height: 100%;
-	padding-top: none;
-	margin: none;
-}
+
 svg {
 		  border: none;
 		  display: block;
@@ -30,156 +21,22 @@ svg {
 		  margin-top: 30px;
 		  margin-bottom: 30px;
 }
+
 text {
 		  font-size: 12pt;
 }
-div {
-		  border: 1px dashed blue;
-		  width: 80vw;
-		  height: 50vh;
-}
-.gs .controlsGroup {
-	opacity: .1;
-	font-size: 36pt;
-}
+
 </style>
+
 <body>
+
 		  <script>
-class graph {
-		  constructor(dataName, ymin, ymax, xScale, target){
-					 this.dataName = dataName;
-
-					 this.echellex = xScale;
-/*
-					 this.echelley = d3.scale.linear()
-								.domain([ymin, ymax])
-								.range([200, 0]);
-*/
-					 this.svg = target.append('svg');
-					 this.path = this.svg.append('path');
-
-					 this.id = this.svg.append('text')
-					 .attr('x', 5)
-					 .attr('y', 25)
-					 .attr('text-anchor', 'start')
-					 .text(dataName);
-		  }
-
-		  setLf(){
-					 this.lf = d3.svg.line()
-								.x(d => this.echellex(d.time - this.tStart))
-								.y(d => this.echelley(d[this.dataName]))
-								.interpolate("linear");
-		  }
-		  serYscale(ymin, ymax){
-					 if(typeof ymin != undefined && typeof ymax != undefined){
-					 }
-					 else{
-					 }
-		  }
-}
-					 class simulator {
-								constructor(){
-										  this.target = d3.select(document.body);
-
-										  this.datasets = [
-													 {name: 'Pao', ymin: 0, ymax: 60},
-													 {name: 'Flung', ymin: -5, ymax: 5},
-													 {name: 'PCO2', ymin: 0, ymax: 60}
-										  ];
-
-										  this.timePerScreen = 12;
-										  this.graphData = [];
-										  this.data = [];
-										  this.graphData = [];
-										  this.graphStack = [];
-										  this.tStart = 0;
-
-										  this.lung = new sv.SimpleLung();
-										  this.vent = new sv.VDR();	
-										  this.vent.Tsampl = 0.006;
-										  this.vent.Tvent = 60 / this.vent.Fconv;
-										  this.pointsPerScreen = this.timePerScreen / this.vent.Tsampl;
-
-										  this.xScale = d3.scale.linear()
-													 .domain([0, this.timePerScreen])
-													 .range([0, 800]);
-
-										  for(var id in this.datasets){
-													 var ds = this.datasets[id];
-													 var gr = new graph(ds.name, ds.ymin, ds.ymax, this.xScale, this.target);
-													 gr.tStart = 0;
-													 this.graphStack.push(gr);
-										  }
-								}
-
-								setYscale(graph){
-										  if(this.graphData.length > 0){
-													 for(graph of this.graphStack){
-																var ymin = d3.min(this.graphData, d => d[graph.dataName]);
-																var ymax = d3.max(this.graphData, d => d[graph.dataName]);
-																graph.echelley = d3.scale.linear()
-																		  .domain([ymin, ymax])
-																		  .range([200, 0]);
-																graph.setLf();
-													 }
-										  }
-										  else{
-													 for(graph of this.graphStack){
-																var ymin = d3.min(this.data, d => d[graph.dataName]);
-																var ymax = d3.max(this.data, d => d[graph.dataName]);
-																graph.echelley = d3.scale.linear()
-																		  .domain([ymin, ymax])
-																		  .range([200, 0]);
-																graph.setLf();
-													 }
-										  }
-								}
-
-								ventLoop(){
-										  //console.log((this.data.length * this.vent.Tsampl) + 'secondes en réserve');
-										  if(this.data.length <= 1/this.vent.Tsampl){
-													 var newDat = this.vent.ventilate(this.lung).timeData;
-													 this.data = this.data.concat(newDat);
-										  }
-								}
-
-								graphLoop(){
-										  if(this.data.length == 0){ throw 'Stoped; no more data to plot.'}
-
-										  if(this.graphData.length >= this.pointsPerScreen){
-													 this.tStart = this.data[0].time;
-													 for(graph of this.graphStack){graph.tStart = this.data[0].time}
-													 this.graphData = [];
-										  }
-
-										  this.graphData.push(this.data.shift());
-										  for(var id in this.graphStack){
-													 var gr = this.graphStack[id];
-													 var coord = gr.lf(this.graphData);
-													 gr.path.attr('d', coord);
-										  }
-								}
-
-								start(){
-										  this.ventLoop();
-										  this.setYscale();
-										  this.ventInt = setInterval(()=>this.ventLoop(), 500);
-										  this.graphInt = setInterval(()=>this.graphLoop(), this.vent.Tsampl * 1000);
-								}
-
-								stop(){
-										  clearInterval(this.ventInt);
-										  clearInterval(this.graphInt);
-								}
-					 }
-
-
-// Let's run this...
 
 var sim = new simulator();
 sim.start();
+
+//setTimeout(() => sim.stop(), 4000);
+
 		  </script>
-<script>
-</script>
+
 </body>
