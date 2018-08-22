@@ -12,18 +12,18 @@
 <style>
 
 svg {
-		  border: none;
 		  display: block;
-		  width: 800px;
-		  height: 200px;
+		  width: 50vw;
+		  height: 30vh;
 		  margin-left: auto;
 		  margin-right: auto;
-		  margin-top: 30px;
-		  margin-bottom: 30px;
+		  margin-top: 5px;
+		  margin-bottom: 5px;
+		  font-size: .8em;
 }
 
-text {
-		  font-size: 12pt;
+.tick line {
+		  stroke: gray;
 }
 
 </style>
@@ -34,9 +34,7 @@ text {
 
 var sim = new simulator();
 sim.start();
-
-//setTimeout(() => sim.stop(), 4000);
-
+onresize = ()=>sim.redraw();
 		  </script>
 
 </body>

@@ -1,24 +1,59 @@
 class graph {
-		  constructor(dataName, ymin, ymax, xScale, target){
+		  constructor(dataName, timePerScreen, target){
+					 this.timePerScreen = timePerScreen;
 					 this.dataName = dataName;
 
-					 this.echellex = xScale;
 					 this.svg = target.append('svg');
 					 this.path = this.svg.append('path');
 					 this.coord = '';
 
-					 this.id = this.svg.append('text')
-					 .attr('x', 5)
-					 .attr('y', 25)
-					 .attr('text-anchor', 'start')
-					 .text(dataName);
+					 /*
+					 this.margeB = this.svg.style('font-size').slice(0,-2) * 2;
+					 this.height = this.svg.style('height').slice(0, -2);
+					 */
+
+					 this.setXscale();	
+					 this.drawID();
 		  }
 
-		  setLf(){
-					 this.lf = d3.svg.line()
-								.x(d => this.echellex(d.time - this.tStart))
-								.y(d => this.echelley(d[this.dataName]))
-								.interpolate("linear");
+		  setXscale(){
+					 this.margeG = this.svg.style('font-size').slice(0,-2) * 2.0;
+					 this.margeD = this.svg.style('font-size').slice(0,-2) * .8;
+					 this.width = this.svg.style('width').slice(0, -2);
+
+					 this.echellex = d3.scale.linear()
+								.domain([0, this.timePerScreen])
+								.range([this.margeG, this.width - this.margeD]);
+		  }
+
+		  setYscale(dataSet){
+					 var dsMin = d3.min(dataSet, d => d[this.dataName]);
+					 var dsMax = d3.max(dataSet, d => d[this.dataName]);
+
+					 var ymin = Math.min(0,dsMin);
+					 var ymax = Math.max(dsMax , - dsMin);
+
+					 if(ymax > 10){ymax = Math.ceil(ymax/5)*5}
+					 if(ymax < 10){ymax = Math.ceil(ymax)}
+					 if(ymin < 0 && ymin > -10){ymin = Math.floor(ymin)}
+					 if(ymin < -10){ymin = Math.floor(ymin/5)*5}
+
+					 this.margeB = this.svg.style('font-size').slice(0,-2) * 2;
+					 this.margeH = this.svg.style('font-size').slice(0,-2) * 1;
+					 this.height = this.svg.style('height').slice(0, -2);
+
+					 this.echelley = d3.scale.linear()
+								.domain([ymin, ymax])
+								.range([this.height - this.margeB, this.margeH]);
+		  }
+
+		  drawID(){
+					 this.id = this.svg.append('text')
+								.attr('x', this.margeG + 5)
+								.attr('y', 18)
+								.attr('text-anchor', 'start')
+								.text(this.dataName)
+					 ;
 		  }
 
 		  setNLf(){
@@ -38,6 +73,59 @@ class graph {
 					 }
 		  }
 
+		  drawGradY (){
+
+					 if(this.gradYGroup){this.gradYGroup.remove()}
+					 this.gradY = d3.svg.axis()
+								.ticks(4)
+								.tickSize(5)
+								.orient("left")
+								.scale(this.echelley);
+
+					 this.gradYGroup = this.svg.append("g")
+								.attr("class", "gradY")
+								.attr("transform", "translate(" + this.margeG + ", 0)")
+								.call(this.gradY)
+					 ;
+
+					 return this;
+		  }
+
+		  drawGradX (){
+
+					 if(this.gradXGroup){this.gradXGroup.remove()}
+					 this.gradX = d3.svg.axis()
+								.scale(this.echellex)
+								.orient('bottom')
+								//.ticks(2)
+					 			.tickValues(d3.range(2,this.timePerScreen, 2))
+					 ;
+
+					 this.gradXGroup = this.svg.append("g")
+								.attr("class", "gradX")
+								.attr("transform", "translate(0, " + this.echelley(0) + ")")
+								.call(this.gradX)
+					 ;
+
+		  }
+
+		replot(data){
+				  var lf = d3.svg.line()
+								.x((d)=> this.echellex(d['time']-this.tStart))
+								.y((d)=> this.echelley(d[this.dataName]))
+								.interpolate("linear");
+				  this.coord = lf(data);
+				  this.path.attr('d', this.coord);
+		}
+
+		redraw(scalingData, plotData){
+				  this.setXscale();
+				  this.setYscale(scalingData);
+				  this.drawGradX();
+				  this.drawGradY();
+				  this.replot(plotData);
+		}
+
 }
 
 class simulator {
@@ -45,9 +133,9 @@ class simulator {
 					 this.target = d3.select(document.body);
 
 					 this.datasets = [
-								{name: 'Pao', ymin: 0, ymax: 60},
-								{name: 'Flung', ymin: -5, ymax: 5},
-								{name: 'PCO2', ymin: 0, ymax: 60}
+								{name: 'Pao'},
+								{name: 'Flung'},
+								{name: 'PCO2'}
 					 ];
 
 					 this.timePerScreen = 12;
@@ -58,62 +146,45 @@ class simulator {
 					 this.tStart = 0;
 
 					 this.lung = new sv.SimpleLung();
-					 this.vent = new sv.VDR();	
-					 this.vent.Tsampl = 0.006;
-					 this.vent.Tvent = 60 / this.vent.Fconv;
-					 this.pointsPerScreen = this.timePerScreen / this.vent.Tsampl;
+					 this.vent = new sv.FlowControler();	
 
-					 this.xScale = d3.scale.linear()
-								.domain([0, this.timePerScreen])
-								.range([0, 800]);
+					 this.ventUpdate();
 
-					 for(var id in this.datasets){
-								var ds = this.datasets[id];
-								var gr = new graph(ds.name, ds.ymin, ds.ymax, this.xScale, this.target);
+					 for(var ds of this.datasets){
+								var gr = new graph(ds.name, this.timePerScreen, this.target);
 								gr.tStart = 0;
 								this.graphStack.push(gr);
 					 }
 		  }
 
-		  setYscale(graph){
-					 if(this.graphData.length > 0){
-								for(graph of this.graphStack){
-										  var ymin = d3.min(this.graphData, d => d[graph.dataName]);
-										  var ymax = d3.max(this.graphData, d => d[graph.dataName]);
-										  graph.echelley = d3.scale.linear()
-													 .domain([ymin, ymax])
-													 .range([200, 0]);
-										  //graph.setLf();
-										  graph.setNLf();
-								}
-					 }
-					 else{
-								for(graph of this.graphStack){
-										  var ymin = d3.min(this.data, d => d[graph.dataName]);
-										  var ymax = d3.max(this.data, d => d[graph.dataName]);
-										  graph.echelley = d3.scale.linear()
-													 .domain([ymin, ymax])
-													 .range([200, 0]);
-										  //graph.setLf();
-										  graph.setNLf();
-								}
+		  ventUpdate(){
+					 this.vent.Tvent = 120 / this.vent.Fconv;
+					 this.vent.Tsampl = 0.006;
+					 this.pointsPerScreen = this.timePerScreen / this.vent.Tsampl;
+		  }
+
+		  setYscale(){
+					 /*
+					 if(this.graphData.length > 0){ var dataSet = this.graphData; }
+					 else{ var dataSet = this.data; }
+					 */
+					 var dataSet = this.data.concat(this.graphData);
+
+					 for(graph of this.graphStack){
+								graph.setYscale(dataSet);
+								graph.drawGradY();
+								graph.drawGradX();
+								graph.setNLf();
 					 }
 		  }
 
-		  lf(){
-					//Unused function for the moment
-					 var l = this.graphData.length;
-					 var point = d[l -1];
-					 if(l == 0){
-								console.log('NLF: no data to plot');
+		  redraw(){
+					 //this.stop();
+					 var scalingData = this.data.concat(this.graphData);
+
+					 for(var graph of this.graphStack){
+								graph.redraw(scalingData, this.graphData);
 					 }
-					 else if (l == 1){
-								this.coord = this.coord + 'M' + this.echellex(point.time - this.tStart) + ',' + this.echelley(point[this.dataName]);
-					 }
-					 else {
-								this.coord = this.coord + 'L' + this.echellex(point.time - this.tStart) + ',' + this.echelley(point[this.dataName]);
-					 }
-					 return this.coord;
 		  }
 		  ventLoop(){
 					 //console.log((this.data.length * this.vent.Tsampl) + 'secondes en réserve');
@@ -127,6 +198,7 @@ class simulator {
 					 if(this.data.length == 0){ throw 'Stoped; no more data to plot.'}
 
 					 if(this.graphData.length >= this.pointsPerScreen){
+								this.setYscale();
 								this.tStart = this.data[0].time;
 								for(graph of this.graphStack){
 										  graph.tStart = this.tStart;
@@ -145,6 +217,10 @@ class simulator {
 		  start(){
 					 this.ventLoop();
 					 this.setYscale();
+					 this.startLoops();
+		  }
+
+		  startLoops(){
 					 this.ventInt = setInterval(()=>this.ventLoop(), 500);
 					 this.graphInt = setInterval(()=>this.graphLoop(), this.vent.Tsampl * 1000);
 		  }
