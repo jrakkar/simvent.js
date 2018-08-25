@@ -104,7 +104,7 @@ fp.updateModels = function(){
 		}
 	}
 
-	fp.ventilator.updateCalcParams();
+	//fp.ventilator.updateCalcParams();
 	for(var i in fp.ventilator.ventParams){
 		if(fp.ventilator.ventParams[i].calculated == true){
 			document.getElementById("data"+i).textContent = ""+ Math.round(10 * fp.ventilator[i])/10;

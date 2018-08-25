@@ -7,11 +7,6 @@ class graph {
 					 this.path = this.svg.append('path');
 					 this.coord = '';
 
-					 /*
-					 this.margeB = this.svg.style('font-size').slice(0,-2) * 2;
-					 this.height = this.svg.style('height').slice(0, -2);
-					 */
-
 					 this.setXscale();	
 					 this.drawID();
 		  }
@@ -156,6 +151,130 @@ class simulator {
 								this.graphStack.push(gr);
 					 }
 		  }
+
+		  panelTitle(content){
+					 if(!this.panelDiv){throw 'sim class: non panelDiv'}
+					 var title = document.createElement("h2");
+					 title.textContent = content;
+					 title.className = "fpPanelTitle";
+					 this.panelDiv.appendChild(title);
+		  }
+
+		  initPanel(){
+
+					 this.panelDiv = document.createElement('div');
+					 this.panelDiv.id = 'fpPanel';
+					 document.body.appendChild(this.panelDiv);
+
+					 this.panelTitle('Ventilateur');
+
+					 //this.ventMenu();
+					 this.paramTable(this.vent, "ventParams", this.paramContainer, "Ventilateur"); 
+
+					 /*
+					 fp.panelTitle('Poumon');
+					 this.lungMenu();
+					 this.paramTable(this.lung, "mechParams", this.paramContainer, "Poumon"); 
+
+					 fp.panelTitle('Simulation');
+					 this.paramTable(this.ventilator, 'simParams', this.paramContainer, "Simulation"); 
+
+
+					 $(this.paramContainer).append('<button id="ventiler" value="ventiler" onClick="maj()">&#x25b6; Ventiler</button>');
+
+					 // Gestion des racourcis clavier
+					 $("#panel input").keypress(function(event){
+								if (event.which == 13){ $("#ventiler").click(); }
+					 });
+
+					 $("input").change(function(){
+								this.updateModels();
+					 });
+
+					 $("input").keyup(function(){
+								this.updateModels();
+					 });
+					 */
+		  }
+
+		  paramTable(object, paramSet, container, label){
+					 if(typeof object[paramSet] == "undefined"){throw object.name + '[' + paramSet + '] does not exist'}
+					 var table = document.createElement('table');
+					 this.panelDiv.appendChild(table);
+
+					 for(var id in object[paramSet]){
+								var param = object[paramSet][id];
+								//var abrev = fp.translate1(id, "short");
+								var abrev = id;
+
+								if (typeof param.unit != "undefined"){var unit = param.unit;}
+								else {var unit = "";}
+
+								var tr = document.createElement('tr');
+								table.appendChild(tr);
+
+								// Parameter name cell
+
+								var td = document.createElement('td');
+								//td.title = fp.translate1(id, "long");
+								td.title = id;
+								td.textContent = abrev + ' :';
+								tr.appendChild(td);
+
+								/*
+								var td = $("<td></td>")
+										  .attr("title", fp.translate1(id, "long"))
+										  .html(abrev + " :")
+										  .appendTo(tr);
+										  */
+
+								// input or value cell
+								
+								var td = document.createElement('td');
+								td.className = 'data';
+								//td.title = fp.translate1(id, "long");
+
+								if (param.calculated == true){
+										  var value = Math.round(10 * this.vent[id])/10;
+										  var dataSpan = document.createElement('span');
+										  dataSpan.id = 'data' + id;
+										  dataSpan.textContent = value;
+										  td.appendChild(dataSpan);
+								}
+								else{
+										  var input = document.createElement('input');
+										  input.id = 'input' + id;
+										  input.value = object[id];
+										  //input.size = 3;
+										  input.type = 'number';
+										  //input step = param.step
+										  //input.onFocus = 'this.select()'
+										  td.appendChild(input);
+
+										  /*
+													 .attr("id", 'input' + id)
+													 .attr("value", object[id])
+													 .attr("size", '3')
+													 .attr("type", 'number')
+													 .attr("step", param.step)
+													 .attr("onFocus", 'this.select()')
+													 .appendTo(td);
+													 */
+								}
+								tr.appendChild(td);
+
+								// Parameter unit cell
+
+								var td = document.createElement('td');
+								td.className = 'unit';
+								td.textContent = unit;
+								tr.appendChild(td);
+
+								// Push the row to the table
+
+								table.appendChild(tr);
+					 }
+		  } 
 
 		  ventUpdate(){
 					 this.vent.Tvent = 120 / this.vent.Fconv;

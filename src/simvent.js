@@ -1087,6 +1087,7 @@ sv.ventilators = [
 	sv.FlowControler,
 	sv.PressureAssistor,
 	sv.VDR,
+	sv.IPV,
 	sv.PVCurve
 ];
 
