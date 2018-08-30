@@ -2,39 +2,34 @@
 <meta charset="utf-8"/>
 
 <script src="../lib/d3.v3.min.js" charset="utf-8"></script>
-<script src="../src/graphsimple.js" charset="utf-8"></script>
 <script src="../src/simvent.js" charset="utf-8"></script>
 <script src="../src/animation.js" charset="utf-8"></script>
-<!--script src="../frontpaneljs/dict.js" charset="utf-8"></script-->
-<link rel="stylesheet" type="text/css" href="../css/gs-grid-clear-rainbow.css" charset="utf-8"/>
-<!--link rel="stylesheet" type="text/css" href="../../graphsimple.js/css/test-layout.css" charset="utf-8"/-->
+<script src="../src/swipe.js" charset="utf-8"></script>
 
-<style>
-
-svg {
-		  display: block;
-		  width: 50vw;
-		  height: 30vh;
-		  margin-left: auto;
-		  margin-right: auto;
-		  margin-top: 5px;
-		  margin-bottom: 5px;
-		  font-size: .8em;
-}
-
-.tick line {
-		  stroke: gray;
-}
-
-</style>
+<link rel="stylesheet" type="text/css" href="../css/gs-scratch.css" charset="utf-8"/>
+<link rel="stylesheet" type="text/css" href="../css/fp-scratch.css" charset="utf-8"/>
 
 <body>
 
 		  <script>
 
 var sim = new simulator();
+sim.ventUpdate();
+sim.initPanel();
 sim.start();
+//setTimeout(()=>sim.stop(),4000);
 onresize = ()=>sim.redraw();
+
+function swipeLeftHandler(){
+		  document.querySelector('#fpPanel').classList.remove('hidden');
+}
+
+function swipeRightHandler(){
+		  document.querySelector('#fpPanel').classList.add('hidden');
+}
+
+window.addEventListener('swiperight', swipeRightHandler, false);
+window.addEventListener('swipeleft', swipeLeftHandler, false);
 		  </script>
 
 </body>

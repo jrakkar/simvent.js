@@ -4,7 +4,9 @@ class graph {
 					 this.dataName = dataName;
 
 					 this.svg = target.append('svg');
+					 this.svg.attr('class', 'gs');
 					 this.path = this.svg.append('path');
+					 this.path.attr('class', 'gsPlotLine');
 					 this.coord = '';
 
 					 this.setXscale();	
@@ -12,7 +14,7 @@ class graph {
 		  }
 
 		  setXscale(){
-					 this.margeG = this.svg.style('font-size').slice(0,-2) * 2.0;
+					 this.margeG = this.svg.style('font-size').slice(0,-2) * 2.1;
 					 this.margeD = this.svg.style('font-size').slice(0,-2) * .8;
 					 this.width = this.svg.style('width').slice(0, -2);
 
@@ -160,29 +162,90 @@ class simulator {
 					 this.panelDiv.appendChild(title);
 		  }
 
+		  lungMenu(){
+					 var select = document.createElement("select");
+					 select.id = "lungSelect";
+					 select.onchange = this.lungChange;
+					 this.panelDiv.appendChild(select);
+
+					 for (var lung of sv.lungs){
+								var lungName = lung.name;
+								var option = document.createElement("option");
+								option.value = lungName;
+								option.textContent = lungName;
+								select.appendChild(option);
+					 }
+					 select.selectedIndex = sv.lungs.indexOf(sv[this.lung.constructor.name]);
+		  }
+
+		  ventMenu(){
+					 this.ventSelect = document.createElement("select");
+					 this.ventSelect.id = "ventSelect";
+					 this.ventSelect.onchange = ()=>this.ventChange();
+					 this.panelDiv.appendChild(this.ventSelect);
+
+					 for (var vent of sv.ventilators){
+								var ventName = vent.name;
+								var option = document.createElement("option");
+								option.value = ventName;
+								option.textContent = ventName;
+								this.ventSelect.appendChild(option);
+					 }
+					 this.ventSelect.selectedIndex = sv.ventilators.indexOf(sv[this.vent.constructor.name]);
+		  }
+
+		  ventChange(){
+					 this.nextVent = new sv.ventilators[this.ventSelect.selectedIndex];
+					 this.nextVent.time = this.vent.time;
+					 this.vent = this.nextVent;
+					 this.ventUpdate();
+					 this.fillParamTable(this.vent, 'ventParams', this.ventTable);
+		  }
+
+		  lungChange(){}
+
 		  initPanel(){
 
 					 this.panelDiv = document.createElement('div');
 					 this.panelDiv.id = 'fpPanel';
+					 this.panelDiv.classList.add('hidden');
 					 document.body.appendChild(this.panelDiv);
 
 					 this.panelTitle('Ventilateur');
 
-					 //this.ventMenu();
-					 this.paramTable(this.vent, "ventParams", this.paramContainer, "Ventilateur"); 
+					 this.ventMenu();
+					 this.ventTable = document.createElement('table');
+					 this.panelDiv.appendChild(this.ventTable);
+					 this.fillParamTable(this.vent, 'ventParams', this.ventTable);
+
+					 this.panelTitle('Poumon');
+					 this.lungMenu();
+					 this.lungTable = document.createElement('table');
+					 this.panelDiv.appendChild(this.lungTable);
+					 this.fillParamTable(this.lung, 'mechParams', this.lungTable);
+/*
+					 this.panelTitle('Monitorage');
+					 var text = document.createTextNode('Temps en réserve: ');
+					 this.panelDiv.append(text);
+					 this.spanDataMon = document.createElement('span');
+					 this.panelDiv.append(this.spanDataMon);
+					 var text = document.createTextNode('s');
+					 this.panelDiv.append(text);
+					 */
 
 					 /*
-					 fp.panelTitle('Poumon');
-					 this.lungMenu();
-					 this.paramTable(this.lung, "mechParams", this.paramContainer, "Poumon"); 
-
-					 fp.panelTitle('Simulation');
+					 this.panelTitle('Simulation');
 					 this.paramTable(this.ventilator, 'simParams', this.paramContainer, "Simulation"); 
 
-
-					 $(this.paramContainer).append('<button id="ventiler" value="ventiler" onClick="maj()">&#x25b6; Ventiler</button>');
+*/
+					 this.buttonValidate = document.createElement('button');
+					 this.buttonValidate.textContent = 'Valider';
+					 this.buttonValidate.onclick = ()=>this.validate();
+					 this.buttonValidate.disabled = true;
+					 this.panelDiv.appendChild(this.buttonValidate);
 
 					 // Gestion des racourcis clavier
+					 /*
 					 $("#panel input").keypress(function(event){
 								if (event.which == 13){ $("#ventiler").click(); }
 					 });
@@ -197,10 +260,10 @@ class simulator {
 					 */
 		  }
 
-		  paramTable(object, paramSet, container, label){
+		  fillParamTable(object, paramSet, table){
 					 if(typeof object[paramSet] == "undefined"){throw object.name + '[' + paramSet + '] does not exist'}
-					 var table = document.createElement('table');
-					 this.panelDiv.appendChild(table);
+
+					 while(table.hasChildNodes()){table.removeChild(table.firstChild)}
 
 					 for(var id in object[paramSet]){
 								var param = object[paramSet][id];
@@ -244,22 +307,20 @@ class simulator {
 								else{
 										  var input = document.createElement('input');
 										  input.id = 'input' + id;
+										  input.name = id;
 										  input.value = object[id];
-										  //input.size = 3;
 										  input.type = 'number';
-										  //input step = param.step
-										  //input.onFocus = 'this.select()'
+										  input.step = param.step
+										  input.onfocus = function(){this.select()};
+										  input.onchange = (evt)=>{
+													 object[evt.target.name] = parseFloat(evt.target.value);
+													 this.ventUpdate();
+													 this.buttonValidate.disabled = false;
+												};
+										  input.onkeyup = (evt)=>{
+													 this.buttonValidate.disabled = false;
+												};
 										  td.appendChild(input);
-
-										  /*
-													 .attr("id", 'input' + id)
-													 .attr("value", object[id])
-													 .attr("size", '3')
-													 .attr("type", 'number')
-													 .attr("step", param.step)
-													 .attr("onFocus", 'this.select()')
-													 .appendTo(td);
-													 */
 								}
 								tr.appendChild(td);
 
@@ -277,16 +338,12 @@ class simulator {
 		  } 
 
 		  ventUpdate(){
-					 this.vent.Tvent = 120 / this.vent.Fconv;
-					 this.vent.Tsampl = 0.006;
+					 this.vent.Tvent = 60 / this.vent.Fconv;
+					 this.vent.Tsampl = 0.01;
 					 this.pointsPerScreen = this.timePerScreen / this.vent.Tsampl;
 		  }
 
 		  setYscale(){
-					 /*
-					 if(this.graphData.length > 0){ var dataSet = this.graphData; }
-					 else{ var dataSet = this.data; }
-					 */
 					 var dataSet = this.data.concat(this.graphData);
 
 					 for(graph of this.graphStack){
@@ -298,7 +355,6 @@ class simulator {
 		  }
 
 		  redraw(){
-					 //this.stop();
 					 var scalingData = this.data.concat(this.graphData);
 
 					 for(var graph of this.graphStack){
@@ -306,13 +362,21 @@ class simulator {
 					 }
 		  }
 		  ventLoop(){
-					 //console.log((this.data.length * this.vent.Tsampl) + 'secondes en réserve');
+					 //this.spanDataMon.textContent = Math.round(this.data.length * this.vent.Tsampl * 10 )/10;
 					 if(this.data.length <= 1/this.vent.Tsampl){
-								var newDat = this.vent.ventilate(this.lung).timeData;
-								this.data = this.data.concat(newDat);
+								this.ventilate();
 					 }
 		  }
 
+		  ventilate(){
+								var newDat = this.vent.ventilate(this.lung).timeData;
+								this.data = this.data.concat(newDat);
+		  }
+
+		  validate(){
+					 document.activeElement.blur();
+					 this.buttonValidate.disabled = true;
+		  }
 		  graphLoop(){
 					 if(this.data.length == 0){ throw 'Stoped; no more data to plot.'}
 

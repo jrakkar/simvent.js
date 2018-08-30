@@ -997,10 +997,10 @@ sv.FlowControler = class FlowControler extends sv.Ventilator{
 		this.Vt = 0.5;
 		this.PEEP = 5.0;
 		this.Ti = 1;
-		this.Fconv = 12;
+		this.Fconv = 18;
 
 		this.ventParams = {
-			Vt:{unit: "l"},
+										Vt:{unit: "l", step:0.01},
 			PEEP:{unit: "cmH₂O"},
 			Fconv:{unit:"/min."},
 			Ti:{unit: "cmH₂O"},
@@ -1012,45 +1012,6 @@ sv.FlowControler = class FlowControler extends sv.Ventilator{
 	get Tcycle(){return 60 / this.Fconv;}
 	get Te(){return (60 / this.Fconv) - this.Ti;}
 	get Flow(){return this.Vt / this.Ti;}
-	
-	Aventilate (lung){
-
-		var timeData = [];
-		var convData = [];
-
-		for (this.time = 0; this.time < this.Tvent; ){
-			var tdeb = this.time;
-
-			while(this.time < (tdeb + this.Ti)){
-				lung.appliquer_debit(this.Flow, this.Tsampl)
-				this.Pao = lung.Palv + (this.Flow * lung.Raw);
-				timeData.push(sv.log(lung, this));
-				this.time += this.Tsampl;	
-			}
-
-			this.Pao = this.PEEP
-			while(this.time < (tdeb + (60/this.Fconv))){
-				lung.appliquer_pression(this.Pao, this.Tsampl)
-				timeData.push(sv.log(lung, this));
-				this.time += this.Tsampl;	
-			}
-
-			var pmeco2 = ((760-47) * lung.veco2/lung.vce);
-
-			convData.push({
-				pmeco2:pmeco2,
-				petco2:lung.pco2,
-				pAco2: lung.PACO2,
-				fowler: lung.Vem/lung.vce,
-				bohr: (lung.PACO2 - pmeco2)/lung.PACO2,
-			});
-		}
-
-		return {
-			timeData: timeData,
-			convData:convData
-		};
-	}
 
 	ventilationCycle(lung){
 
@@ -1087,7 +1048,6 @@ sv.ventilators = [
 	sv.FlowControler,
 	sv.PressureAssistor,
 	sv.VDR,
-	sv.IPV,
 	sv.PVCurve
 ];
 
