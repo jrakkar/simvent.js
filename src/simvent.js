@@ -1038,10 +1038,10 @@ sv.FlowControler = class FlowControler extends sv.Ventilator{
 		this.Vt = 0.5;
 		this.PEEP = 5.0;
 		this.Ti = 1;
-		this.Fconv = 12;
+		this.Fconv = 18;
 
 		this.ventParams = {
-			Vt:{unit: "l"},
+										Vt:{unit: "l", step:0.01},
 			PEEP:{unit: "cmH₂O"},
 			Fconv:{unit:"/min."},
 			Ti:{unit: "cmH₂O"},
@@ -1053,7 +1053,7 @@ sv.FlowControler = class FlowControler extends sv.Ventilator{
 	get Tcycle(){return 60 / this.Fconv;}
 	get Te(){return (60 / this.Fconv) - this.Ti;}
 	get Flow(){return this.Vt / this.Ti;}
-	
+
 	ventilationCycle(lung){
 
 			for(var tStop=this.time+this.Ti; this.time<tStop && this.time<=this.simulationStop;this.time += this.Tsampl){

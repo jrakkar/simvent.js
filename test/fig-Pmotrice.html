@@ -8,45 +8,48 @@
 -->
 <script src="../src/graphsimple.js" charset="utf-8"></script>
 <script src="../src/simvent.js" charset="utf-8"></script>
-<!--script src="../frontpaneljs/dict.js" charset="utf-8"></script-->
 
-<link rel="stylesheet" href="../css/gs-grid-clear-rainbow.css"/>
+<!--link rel="stylesheet" href="../css/gs-grid-clear-rainbow.css"/-->
+<link rel="stylesheet" href="../css/fig-Pmotrice.css"/>
 <link rel="stylesheet" href="../css/gs-annotate.css"/>
-
 <style>
 body {
-	box-sizing: border-box;
-	height: 100%;
-	padding: none;
-	margin-top: none;
+		  font-family: sans-serif;
+		  box-sizing: border-box;
+		  height: 100%;
+		  padding: none;
+		  margin-top: none;
 }
 html {
-	box-sizing: border-box;
-	height: 100%;
-	padding-top: none;
-	margin: none;
+		  box-sizing: border-box;
+		  height: 100%;
+		  padding-top: none;
+		  margin: none;
 }
 .gs {
-	width: 100%;
-	height: 100%;
+		  width: 80%;
+		  height: 80%;
 }
 </style>
 <body>
+		  
 	<svg id="svg1"></svg>
 	<script>
-gs.defaults["margeG"]=90;
-gs.defaults["margeD"]=150;
+gs.defaults["margeG"]=140;
+gs.defaults["margeD"]=10;
 gs.defaults["margeH"]=10;
 gs.defaults["margeB"]=60;
 gs.defaults.padH=.05;
-gs.defaults.padB=.1;
+//gs.defaults.padD=.05;
 gs.defaults.padPlage=12;
+gs.defaults.annotateOnRight = false;
 
 var lung1 = new sv.SimpleLung();
 
 var vent = new sv.VDR();	
 
 var dat1 = vent.ventilate(lung1).timeData;
+dat1 = dat1.filter((d)=>d.time<10 && d.time >5);
 
 function fx(d){return d.time;}
 function fy(d){return d.Pao;}
@@ -55,10 +58,12 @@ function fy2(d){return d.Palv;}
 var plot = new gs.graph("#svg1");
 plot.setscale(dat1,fx,fy);
 plot.tracer(dat1,fx,fy);
-//plot.tracer(dat1,fx,fy2);
-plot.pointy(19, 'Moyenne insp.');
-plot.pointy(6, 'Moyenne exp.');
-plot.plagey(6,19, 'P. motrice');
+plot.tracer(dat1,fx,fy2);
+plot.pointy(19, 'P insp. moy.');
+plot.pointy(6, 'P exp. moy.');
+var vectX = 5.8;
+plot.vecteur(vectX,6,vectX,19);
+plot.etiquette(5.4, 13, 'P motrice');
 
 	</script>
 </body>

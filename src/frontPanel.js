@@ -499,13 +499,14 @@ fp.ventMenu = function(){
 	select.onchange = fp.ventChange;
 	container.appendChild(select);
 
-	for (var i in fp.ventModels){
-		var option = document.createElement("option");
-		option.value = fp.ventModels[i];
-		option.textContent = fp.ventModels[i];
-		select.appendChild(option);
+	for (var vent of sv.ventilators){
+			  var ventName = vent.vame
+			  var option = document.createElement("option");
+			  option.value = ventName;
+			  option.textContent = ventName;
+			  select.appendChild(option);
 	}
-	select.selectedIndex = fp.ventModels.indexOf(fp.ventModel);
+	//select.selectedIndex = fp.ventModels.indexOf(fp.ventModel);
 }
 
 fp.lungChange = function(){
