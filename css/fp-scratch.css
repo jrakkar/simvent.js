@@ -1,0 +1,115 @@
+#fpPanel {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  height: 100%;
+  overflow-x: hidden; }
+
+svg {
+  display: block;
+  height: 30vh;
+  margin-left: none;
+  margin-right: auto;
+  margin-top: 5px;
+  margin-bottom: 5px; }
+
+@media (max-width: 800px) {
+  svg {
+    width: 100%; }
+
+  #fpPanel.hidden {
+    right: -100%; } }
+@media (min-width: 800px) {
+  svg {
+    width: calc(100vw - 275px); } }
+@media (min-width: 1300px) {
+  svg {
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto; } }
+#fpControls {
+  float: right;
+  margin: 0px;
+  list-style-type: none; }
+  #fpControls a {
+    margin-left: 10px; }
+
+.fpPanelTitle {
+  background-color: #4d4d4d;
+  color: white;
+  font-size: medium;
+  padding-left: 6px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  text-align: left;
+  font-weight: 500;
+  letter-spacing: 1px; }
+
+.fpPanelTitle:before {
+  vertical-align: middle;
+  margin-right: 0.3em;
+  display: inline-block;
+  transform: scale(0.8); }
+
+#fpH2PanelVent:before {
+  content: url("/simvent.js/Icones/souflet-blanc.svg"); }
+
+#fpH2PanelLung:before {
+  content: url("/simvent.js/Icones/poumons-blanc.svg"); }
+
+#fpH2PanelSim:before {
+  content: url("/simvent.js/Icones/configuration-blanc.svg"); }
+
+#fpH2PanelDownload:before {
+  content: url("/simvent.js/Icones/telecharger-blanc.svg"); }
+
+#fpPanel {
+  font-family: sans-serif;
+  padding: 2px;
+  transition: 0.5s;
+  background-color: white;
+  box-shadow: 0px 0px 10px 2px black; }
+  #fpPanel select, #fpPanel button {
+    display: block;
+    margin-top: 3px;
+    margin-bottom: 5px; }
+  #fpPanel select {
+    width: 100%; }
+  #fpPanel table {
+    margin-left: 5px;
+    margin-right: 5px;
+    border: none;
+    width: 100%;
+    border-collapse: collapse; }
+    #fpPanel table tr, #fpPanel table td {
+      height: 2em;
+      border-bottom: 1px solid silver; }
+    #fpPanel table td:not(:last-child) {
+      white-space: nowrap; }
+  #fpPanel button {
+    margin-top: 25px;
+    margin-bottom: 25px;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto; }
+  #fpPanel input {
+    width: 50px; }
+
+#panel.visible {
+  right: 0px; }
+
+#fpDownloadDiv a:before {
+  vertical-align: middle;
+  margin-right: 0.2em;
+  display: inline-block;
+  transform: scale(0.6);
+  content: url("/simvent.js/Icones/telecharger.svg"); }
+
+#fp-controls img {
+  height: 1.5em;
+  opacity: 0.7; }
+
+#fp-controls img:hover {
+  opacity: 1; }
+
+/*# sourceMappingURL=fp-scratch.css.map */
