@@ -18,6 +18,9 @@ js: dist/simvent.min.js dist/graphsimple.min.js dist/ventyaml.min.js
 fp-scratch.css: fp-scratch.sass
 	sass $< css/$(@)
 
+gs-scratch.css: gs-scratch.sass
+	sass $< css/$(@)
+
 gs-annotate.css: gs-annotate.sass
 	sass $< css/$(@)
 
