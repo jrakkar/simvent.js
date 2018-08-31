@@ -589,6 +589,7 @@ sv.Ventilator = class Ventilator{
 		for ( this.simulationStop = this.time + this.Tvent; this.time <= this.simulationStop; ){
 			this.ventilationCycle(lung);
 		}
+
 		if(this.lowPass > 1){
 
 			for (var index in this.dataToFilter){
