@@ -163,19 +163,19 @@ class simulator {
 		  }
 
 		  lungMenu(){
-					 var select = document.createElement("select");
-					 select.id = "lungSelect";
-					 select.onchange = this.lungChange;
-					 this.panelDiv.appendChild(select);
+					 this.lungSelect = document.createElement("select");
+					 this.lungSelect.id = "lungSelect";
+					 this.lungSelect.onchange = ()=>this.lungChange();
+					 this.panelDiv.appendChild(this.lungSelect);
 
 					 for (var lung of sv.lungs){
 								var lungName = lung.name;
 								var option = document.createElement("option");
 								option.value = lungName;
 								option.textContent = lungName;
-								select.appendChild(option);
+								this.lungSelect.appendChild(option);
 					 }
-					 select.selectedIndex = sv.lungs.indexOf(sv[this.lung.constructor.name]);
+					 this.lungSelect.selectedIndex = sv.lungs.indexOf(sv[this.lung.constructor.name]);
 		  }
 
 		  ventMenu(){
@@ -202,7 +202,10 @@ class simulator {
 					 this.fillParamTable(this.vent, 'ventParams', this.ventTable);
 		  }
 
-		  lungChange(){}
+		  lungChange(){
+					 this.lung = new sv.lungs[this.lungSelect.selectedIndex];
+					 this.fillParamTable(this.lung, 'mechParams', this.lungTable);
+		  }
 
 		  initPanel(){
 
