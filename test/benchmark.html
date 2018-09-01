@@ -23,6 +23,10 @@ td, th {
   padding-right: 5px;
   text-align: left;
   border-bottom: 1px solid black; }
+
+td:not(:first-child){
+		  text-align: center;
+}
 	</style>
 </head>
 
@@ -49,7 +53,7 @@ function chrono(vent, lung, target){
 	c1.textContent = lung.name;
 	c2.textContent = r.length;
 	c3.textContent = duration;
-	c4.textContent = r.length /duration;
+	c4.textContent = Math.round(r.length /duration);
 
 
 	rLine.appendChild(c1);

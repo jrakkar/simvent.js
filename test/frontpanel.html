@@ -9,10 +9,9 @@
 	<script src="../lib/jquery.min.js"></script>
 	<script src="../lib/dygraph-combined.js"></script>
 	<script src="../lib/synchronizer.js"></script>
-	<script src="../dist/frontPanel-legacy.js" ></script>
 	<script src="../src/simvent.js"></script>
 	<script src="../src/dict.js"></script>
-	<script src="../dist/frontPanel.min.js" ></script>
+	<script src="../src/frontPanel.js" ></script>
 
 	<link rel="stylesheet" href="../css/fp-scratch.css" />
 </head>
@@ -43,13 +42,14 @@
 			"PCO2"
 		];
 		fp.ventModels = [
+				  "IPV",
 			"PVCurve",
 			"PressureAssistor",
 			"PressureControler",
 			"FlowControler",
 			"VDR"
 		];
-		fp.ventModel = "PressureControler";
+		fp.ventModel = "IPV";
 		fp.lungModel = "SimpleLung";
 		fp.init()
 	</script>

@@ -63,6 +63,8 @@ gs.graph = class {
 
 					 this.vectGroup = this.svg.append("g")
 								.attr("id", "vectGroup");
+					 this.annotationsGroup = this.svg.append("g")
+								.attr("id", "annotationsGroup");
 
 					 this.controlsGroup = this.svg.append("g")
 								.attr("class", "controlsGroup");
@@ -74,11 +76,9 @@ gs.graph = class {
 					 this.curAnim = 0;
 
 					 this.width = this.svg.style("width");
-					 //this.width = newSvg.style.width;
 					 this.width = this.width.substr(0, this.width.length-2);
 
 					 this.height = this.svg.style("height");
-					 //this.height = newSvg.style.height;
 					 this.height = this.height.substr(0, this.height.length-2);
 
 					 this.defs = this.svg.append("defs");
@@ -109,6 +109,17 @@ gs.graph = class {
 								.attr("id", "flecheg")
 								.attr("refY", "10")
 								.attr("refX", "7")
+								.attr("markerWidth", "21")
+								.attr("markerHeight", "18")
+								.attr("orient", "auto")
+								.attr("markerUnits", "userSpaceOnUse")
+								.append("path")
+								.attr("d", "M3,5 L9,10 L3,15");
+
+					 this.defs.append("marker")
+								.attr("id", "flechev")
+								.attr("refY", "10")
+								.attr("refX", "10")
 								.attr("markerWidth", "21")
 								.attr("markerHeight", "18")
 								.attr("orient", "auto")
@@ -173,7 +184,7 @@ gs.graph = class {
 								this.drawGridY();
 					 }
 
-					 if(!("iridX"in this)){
+					 if(!("gridX"in this)){
 								this.drawGridX();
 					 }
 
@@ -297,40 +308,40 @@ gs.graph = class {
 								.attr("d", this.lf(this.donnees));
 		  }
 
-		  vecteur (args){
+		  vecteur ( x1, y1, x2, y2, options){
 					 var pad = this.padPlage;
-					 var vect = {};
+					 var vecteur = {};
 
-					 vect.ligne = this.vectGroup.append("line")
-								.attr("x1", this.echellex(min) + pad)
-								.attr("x2", this.echellex(max) - pad)
-								.attr("y1", this.height - this.margeB*.5)
-								.attr("y2", this.height - this.margeB*.5)
-								.attr("class", "help")
-								.attr("style", "marker-start: url(#fleches);marker-end: url(#flechep);");
+					 vecteur.ligne = this.annotationsGroup.append("line")
+								.attr("x1", this.echellex(x1)/* + pad*/)
+								.attr("x2", this.echellex(x2) /*- pad*/)
+								.attr("y1", this.echelley(y1))
+								.attr("y2", this.echelley(y2))
+								.attr("class", "vecteur")
+								.attr("style", "marker-end: url(#flechev);");
 
-					 vect.rect = this.vectGroup.append("rect")
-								.attr('y', this.margeH)
-								.attr('x', this.echellex(min))
-								.attr('width', this.echellex(max)- this.echellex(min))
-								.attr('height', this.height - this.margeH - this.margeB);
-
-					 vect.texte = this.svg.append("text")
-								.attr("class", "help")
-								.attr("x", this.echellex(min + (max - min)/2))
-								.attr("y", this.height - this.margeB * .3)
-								.attr("text-anchor", "middle")
-								.text(id)
-								.attr("opacity", 0);
-
-					 vect.texte.transition().duration(this.durAnim).attr("opacity",1);
-
-					 this.vects.push(vect);
+					 //this.annotations.push(vecteur);
 
 					 return this;
 
 		  }
 
+		  etiquette ( x, y, texte, options){
+					 var pad = this.padPlage;
+					 var etiquette = {};
+
+					 etiquette.texte = this.annotationsGroup.append("text")
+								.attr("class", "etiquette")
+								.attr("x", this.echellex(x))
+								.attr("y", this.echelley(y))
+								.attr("text-anchor", "middle")
+								.text(texte);
+
+					 //this.annotations.push(etiquette);
+
+					 return this;
+
+		  }
 		  plagex (min, max, id){
 					 var pad = this.padPlage;
 					 var plage = {};
@@ -503,6 +514,9 @@ gs.graph = class {
 
 								texte.attr("x", this.width - this.margeD/2);
 					 } 
+					 else{
+								texte.attr("x", this.margeG/2);
+					 }
 
 					 this.anotations.push(texte);
 					 return this;

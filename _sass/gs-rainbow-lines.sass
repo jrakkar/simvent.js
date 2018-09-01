@@ -4,9 +4,9 @@ path.surface
 
 #waveformGroup path
   display: visible
-  stroke-width: 1.5px
+  stroke-width: 2.5px
   fill: none
 
 @for $i from 1 through 8
   #waveformGroup path:nth-child(#{$i})
-    stroke: hsl(225 - (45 * ($i - 1)), 40%, 50%)
+    stroke: hsl(260 - (180 * ($i - 1)), 50%, 50%)

@@ -48,10 +48,7 @@ sv.log = function(lung, vent){
 		Pao    : vent.Pao,
 		Fip    : vent.Fip,
 		Fop    : vent.Fop,
-		stateP : vent.stateP,
-		Pcirc  : vent.Pcirc,
-		Fmax   : vent.Fmax,
-		Fstop  : vent.Fstop
+		stateP : vent.stateP
 	};
 }
 
@@ -592,6 +589,7 @@ sv.Ventilator = class Ventilator{
 		for ( this.simulationStop = this.time + this.Tvent; this.time <= this.simulationStop; ){
 			this.ventilationCycle(lung);
 		}
+
 		if(this.lowPass > 1){
 
 			for (var index in this.dataToFilter){
@@ -842,7 +840,102 @@ sv.Phasitron.Fop = function(Fip, Pao){
  * @extends sv.Ventilator
  */
 
-sv.VDR = class VDR extends sv.Ventilator{
+
+sv.IPV = class IPV extends sv.Ventilator{
+
+	constructor(){
+		super();
+
+		this.Tramp= 0.005;
+		this.Rexp= 1; // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
+		this.rAvg= 2;
+		this.lowPass= 3;
+
+		this.simParams = {
+			Tvent: {unit: "s"},
+			Tsampl: {unit: "s"},
+			Tramp: {unit: "s"},
+			Rexp: {unit: "cmH₂O/l/s"},
+			rAvg: {},
+			lowPass: {}
+		};
+
+		this.Fperc= 500;
+		this.Rit= 0.5; //Ratio of inspiratory time over total time (percussion)
+		//this.Fipl= 0.18; // 	
+		//this.Fiph= 1.8; // 
+		//this.CPR = 0;
+		this.Fipc=0.18;
+
+		this.Fop=0; //Phasitron output flow
+		this.Fip=0; //Phasitron output flow
+		this.Pao=0;//Presure at the ariway openning (phasitron output)
+
+		this.ventParams = {
+			Fperc: {unit: "/min"},
+			Fhz: {unit: "hz", calculated: true},
+			Rit: {},
+			Fipc: {unit: "l/s"}
+		};
+
+		this.dataToFilter= [
+				"Pao",
+				"Flung"
+			];
+	}
+
+	get Fhz (){ return this.Fperc / 60; }
+	get Tip(){return (60/this.Fperc)*this.Rit;}
+	get Tep(){return (60/this.Fperc)-this.Tip;}
+
+	percussiveExpiration (lung, Rexp){
+		// Must be executed in a scope where the timeData container is defined
+		lung.flow = 0;
+		this.Fip = 0;
+		this.Fop = 0;
+		this.stateP = 0;
+		lung.Vtep = 0;
+
+		var tStopPerc = this.time + this.Tep;
+		while (this.time < tStopPerc){
+			this.Pao = - lung.flow * Rexp;
+			
+			var flow = (this.Pao - lung.Palv)/lung.Raw;
+			lung.appliquer_debit(flow, this.Tsampl);
+			this.timeData.push(sv.log(lung, this));
+			this.time += this.Tsampl;
+		}
+	}
+
+	percussiveInspiration (lung, inFlow){
+		// Must be executed in a scope where the timeData container is defined
+		this.stateP = 1;
+		lung.Vtip = 0;
+		this.Fip = inFlow
+		var tStartInsp = this.time;
+		var tStopPerc = this.time + this.Tip;
+
+		while (this.time < tStopPerc){
+
+			this.Fip = inFlow;
+			this.Pao = (this.Fop * lung.Raw) + lung.Palv;
+			this.Fop = sv.Phasitron.Fop(this.Fip, this.Pao);
+			lung.appliquer_debit(this.Fop, this.Tsampl);
+			
+			this.timeData.push(sv.log(lung, this));
+			this.time += this.Tsampl;
+		}
+	}
+		
+	ventilationCycle(lung){
+			  this.percussiveInspiration(lung, this.Fipc);
+			  this.percussiveExpiration(lung, this.Rexp);
+	}
+
+
+};
+
+sv.VDR = class VDR extends sv.IPV{
 
 	constructor(){
 		super();
@@ -892,57 +985,10 @@ sv.VDR = class VDR extends sv.Ventilator{
 			];
 	}
 
-	get Fhz (){ return this.Fperc / 60; }
 	get Fconv (){ return 60 / (this.Tic + this.Tec); }
-	get Tcc (){ return this.Tic + this.Tec; }
-
-	percussiveExpiration (lung, Rexp){
-		// Must be executed in a scope where the timeData container is defined
-		lung.flow = 0;
-		this.Fip = 0;
-		this.Fop = 0;
-		this.stateP = 0;
-		lung.Vtep = 0;
-
-		var tStopPerc = this.time + this.Tep;
-		while (this.time < tStopPerc){
-			this.Pao = - lung.flow * Rexp;
-			
-			var flow = (this.Pao - lung.Palv)/lung.Raw;
-			lung.appliquer_debit(flow, this.Tsampl);
-			this.timeData.push(sv.log(lung, this));
-			this.time += this.Tsampl;
-		}
-	}
-
-	percussiveInspiration (lung, inFlow){
-		// Must be executed in a scope where the timeData container is defined
-		this.stateP = 1;
-		lung.Vtip = 0;
-		this.Fip = inFlow
-		var tStartInsp = this.time;
-		var tStopPerc = this.time + this.Tip;
-
-		while (this.time < tStopPerc){
-
-			this.Fip = inFlow;
-			/*
-			if(this.time % this.Tcc > this.Tec){
-				this.Fip = this.Fiph;
-			}
-			else{this.Fip = this.Fipl;}
-			*/
-			this.Pao = (this.Fop * lung.Raw) + lung.Palv;
-			this.Fop = sv.Phasitron.Fop(this.Fip, this.Pao);
-			lung.appliquer_debit(this.Fop, this.Tsampl);
-			
-			this.timeData.push(sv.log(lung, this));
-			this.time += this.Tsampl;
-		}
-	}
+	get Tcc (){ return this.Tic + this.Tec; } // Duration of the convection cycle
 
 	convectiveInspiration (lung){
-		//var tStopConv = this.time + this.Tic;
 		var tStopConv = this.Tcc * Math.ceil(this.time/this.Tcc);
 		var tCPR = this.time + 0.8;
 		this.CycleC=1;
@@ -964,7 +1010,6 @@ sv.VDR = class VDR extends sv.Ventilator{
 	}
 
 	convectiveExpiration (lung){
-		//var tStopConv = this.time + this.Tec;
 		var tStopConv = this.Tcc * Math.floor(this.time/this.Tcc)+ this.Tec;
 		this.CycleC=0;
 		while (this.time < tStopConv && this.time < this.simulationStop){
@@ -974,9 +1019,6 @@ sv.VDR = class VDR extends sv.Ventilator{
 		}
 	}
 
-	get Tip(){return (60/this.Fperc)*this.Rit;}
-	get Tep(){return (60/this.Fperc)-this.Tip;}
-		
 	ventilationCycle(lung){
 			this.convectiveExpiration(lung);
 			this.convectiveInspiration(lung);
@@ -997,10 +1039,10 @@ sv.FlowControler = class FlowControler extends sv.Ventilator{
 		this.Vt = 0.5;
 		this.PEEP = 5.0;
 		this.Ti = 1;
-		this.Fconv = 12;
+		this.Fconv = 18;
 
 		this.ventParams = {
-			Vt:{unit: "l"},
+										Vt:{unit: "l", step:0.01},
 			PEEP:{unit: "cmH₂O"},
 			Fconv:{unit:"/min."},
 			Ti:{unit: "cmH₂O"},
@@ -1012,45 +1054,6 @@ sv.FlowControler = class FlowControler extends sv.Ventilator{
 	get Tcycle(){return 60 / this.Fconv;}
 	get Te(){return (60 / this.Fconv) - this.Ti;}
 	get Flow(){return this.Vt / this.Ti;}
-	
-	Aventilate (lung){
-
-		var timeData = [];
-		var convData = [];
-
-		for (this.time = 0; this.time < this.Tvent; ){
-			var tdeb = this.time;
-
-			while(this.time < (tdeb + this.Ti)){
-				lung.appliquer_debit(this.Flow, this.Tsampl)
-				this.Pao = lung.Palv + (this.Flow * lung.Raw);
-				timeData.push(sv.log(lung, this));
-				this.time += this.Tsampl;	
-			}
-
-			this.Pao = this.PEEP
-			while(this.time < (tdeb + (60/this.Fconv))){
-				lung.appliquer_pression(this.Pao, this.Tsampl)
-				timeData.push(sv.log(lung, this));
-				this.time += this.Tsampl;	
-			}
-
-			var pmeco2 = ((760-47) * lung.veco2/lung.vce);
-
-			convData.push({
-				pmeco2:pmeco2,
-				petco2:lung.pco2,
-				pAco2: lung.PACO2,
-				fowler: lung.Vem/lung.vce,
-				bohr: (lung.PACO2 - pmeco2)/lung.PACO2,
-			});
-		}
-
-		return {
-			timeData: timeData,
-			convData:convData
-		};
-	}
 
 	ventilationCycle(lung){
 

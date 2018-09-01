@@ -1,6 +1,6 @@
-- [ ] Ajouter des icones aux pages
-  - [ ] Menu
-  - [ ] frontPanel (sections du paneau des paramètres)
-  - [ ] Barre de menu
+- [X] Ajouter des icones aux pages
+  - [X] Menu
+  - [X] frontPanel (sections du paneau des paramètres)
+  - [X] Barre de menu
 - [ ] Transformer les figures du dossier *test* en *posts*
-- [ ] Faire un liste des *posts* avec leur contenu  
+- [X] Faire un liste des *posts* avec leur contenu  

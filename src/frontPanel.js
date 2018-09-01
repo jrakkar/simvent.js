@@ -104,7 +104,7 @@ fp.updateModels = function(){
 		}
 	}
 
-	fp.ventilator.updateCalcParams();
+	//fp.ventilator.updateCalcParams();
 	for(var i in fp.ventilator.ventParams){
 		if(fp.ventilator.ventParams[i].calculated == true){
 			document.getElementById("data"+i).textContent = ""+ Math.round(10 * fp.ventilator[i])/10;
@@ -441,13 +441,14 @@ fp.ventMenu = function(){
 	select.onchange = fp.ventChange;
 	container.appendChild(select);
 
-	for (var i in fp.ventModels){
-		var option = document.createElement("option");
-		option.value = fp.ventModels[i];
-		option.textContent = fp.ventModels[i];
-		select.appendChild(option);
+	for (var vent of fp.ventModels){
+			  var ventName = vent;
+			  var option = document.createElement("option");
+			  option.value = ventName;
+			  option.textContent = ventName;
+			  select.appendChild(option);
 	}
-	select.selectedIndex = fp.ventModels.indexOf(fp.ventModel);
+	//select.selectedIndex = fp.ventModels.indexOf(fp.ventModel);
 }
 
 fp.lungChange = function(){
@@ -488,7 +489,6 @@ fp.initControls = function(){
 	cDiv.textContent = null;
 	var cImg = document.createElement("img");
 	cImg.src = "https://progrt.github.io/simvent.js/Icones/sliders.svg";
-	cImg.alt = "Paramètres";
 	var pCtl = document.createElement("a");
 	pCtl.appendChild(cImg);
 	pCtl.onclick = fp.panelActivate;
@@ -496,63 +496,60 @@ fp.initControls = function(){
 }
 
 fp.init = function(){
-		  if(typeof fp.ventilator == "undefined"){fp.ventilator = new sv[fp.ventModel]();}
-		  if(typeof fp.lung == "undefined"){fp.lung = new sv[fp.lungModel]();}
+	if(typeof fp.ventilator == "undefined"){fp.ventilator = new sv[fp.ventModel]();}
+	if(typeof fp.lung == "undefined"){fp.lung = new sv[fp.lungModel]();}
 
-		  fp.initControls();
-		  $(fp.paramContainer).children().remove();
+	fp.initControls();
+	$(fp.paramContainer).children().remove();
+	
+	
+	var title = document.createElement("h2");
+	title.textContent = "Ventilateur";
+	title.className = "fpPanelTitle";
+	document.querySelector("#panel").appendChild(title);
 
+	fp.ventMenu();
+	fp.paramTable(fp.ventilator, "ventParams", fp.paramContainer, "Ventilateur"); 
 
-		  var title = document.createElement("h2");
-		  title.textContent = "Ventilateur";
-		  title.className = "fpPanelTitle";
-		  title.id = "fpH2PanelVent";
-		  document.querySelector("#panel").appendChild(title);
+	var title = document.createElement("h2");
+	title.textContent = "Poumon";
+	title.className = "fpPanelTitle";
+	document.querySelector("#panel").appendChild(title);
 
-		  fp.ventMenu();
-		  fp.paramTable(fp.ventilator, "ventParams", fp.paramContainer, "Ventilateur"); 
+	fp.lungMenu();
+	fp.paramTable(fp.lung, "mechParams", fp.paramContainer, "Poumon"); 
 
-		  var title = document.createElement("h2");
-		  title.textContent = "Poumon";
-		  title.className = "fpPanelTitle";
-		  title.id = "fpH2PanelLung";
-		  document.querySelector("#panel").appendChild(title);
+	var title = document.createElement("h2");
+	title.textContent = "Simulation";
+	title.className = "fpPanelTitle";
+	document.querySelector("#panel").appendChild(title);
 
-		  fp.lungMenu();
-		  fp.paramTable(fp.lung, "mechParams", fp.paramContainer, "Poumon"); 
+	fp.paramTable(fp.ventilator, 'simParams', fp.paramContainer, "Simulation"); 
 
-		  var title = document.createElement("h2");
-		  title.textContent = "Simulation";
-		  title.className = "fpPanelTitle";
-		  title.id = "fpH2PanelSim";
-		  document.querySelector("#panel").appendChild(title);
+	//
+	//fp.paramTable(fp.ventilator, "ventParams", fp.paramContainer, fp.translate1("Parameters", "long")); 
+	//fp.paramTable(fp.ventilator, 'simParams', fp.paramContainer, fp.translate1("Simulator", "long")); 
+	//fp.paramTable(fp.lung, "mechParams", fp.paramContainer, fp.translate1("Lung", "long")); 
 
-		  fp.paramTable(fp.ventilator, 'simParams', fp.paramContainer, "Simulation"); 
+	$(fp.paramContainer).append('<button id="ventiler" value="ventiler" onClick="maj()">&#x25b6; Ventiler</button>');
 
-		  //
-		  //fp.paramTable(fp.ventilator, "ventParams", fp.paramContainer, fp.translate1("Parameters", "long")); 
-		  //fp.paramTable(fp.ventilator, 'simParams', fp.paramContainer, fp.translate1("Simulator", "long")); 
-		  //fp.paramTable(fp.lung, "mechParams", fp.paramContainer, fp.translate1("Lung", "long")); 
+	fp.initShadow();
+	fp.graphics = [];
+	fp.initDyGraph()
+	maj();
+	
+	// Gestion des racourcis clavier
+	$("#panel input").keypress(function(event){
+		if (event.which == 13){ $("#ventiler").click(); }
+	});
 
-		  $(fp.paramContainer).append('<button id="ventiler" value="ventiler" onClick="maj()">&#x25b6; Ventiler</button>');
+	$("input").change(function(){
+		fp.updateModels();
+	});
 
-		  fp.initShadow();
-		  fp.graphics = [];
-		  fp.initDyGraph()
-		  maj();
-
-		  // Gestion des racourcis clavier
-		  $("#panel input").keypress(function(event){
-					 if (event.which == 13){ $("#ventiler").click(); }
-		  });
-
-		  $("input").change(function(){
-					 fp.updateModels();
-		  });
-
-		  $("input").keyup(function(){
-					 fp.updateModels();
-		  });
+	$("input").keyup(function(){
+		fp.updateModels();
+	});
 };
 
 fp.togglePanel = function(){

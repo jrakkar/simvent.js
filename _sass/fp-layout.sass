@@ -1,35 +1,41 @@
-$panelWidth : 225px
+// Rules:
+// - Everything about div layout should be here (width, height, positionning, overflow)
+// - Only rules about div layout should be here (no styling)
 
-#panel
-  float: right
-  width : $panelWidth
-  border: none
-  padding: 3px
-  box-shadow: 10px black
+$breakMedium: 800px
+$breakLarge: 1300px
+$graphWidth: 800px
+$panelWidth: 275px
 
-  table
+#fpPanel
+  position: fixed
+  top: 0px
+  right: 0px
+  height: 100%
+  overflow-x: hidden
+
+
+svg
+  display: block
+  height: 30vh
+  margin-left: none
+  margin-right: auto
+  margin-top: 5px
+  margin-bottom: 5px
+
+@media (max-width: $breakMedium)
+  svg
     width: 100%
-    margin-top: 6px
 
-  input
-    width: 40px
-  
-  select
-    width: 100%
+  #fpPanel.hidden
+    right: -100%
 
-  button
-    float: right
-    margin-top: 6px
+@media (min-width: $breakMedium)
+  svg
+    width: calc(100vw - #{$panelWidth})
 
-#graphics
-  width: calc(100% - #{$panelWidth} - 25px)
-  border: none
-  
-  div.graph
-    height: 200px
-    width: 100%
-    border: none
+@media (min-width: $breakLarge)
+  svg
+    width: $graphWidth
     margin-left: auto
     margin-right: auto
-    margin-bottom: 10px
-
