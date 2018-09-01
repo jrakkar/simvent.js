@@ -27,16 +27,6 @@ gs.animer = function(graph){
 		  }
 };
 
-gs.stat = function(iddiv, respd){
-		  var tableau = "<table style='float:top'>";
-		  tableau += "<tr><td>P<small>A</small>CO₂:</td><td>" + Math.round(10*respd[0].pAco2)/10 +" mmHg</td></tr>";
-		  tableau += "<tr><td>P<small>E</small>CO₂:</td><td>" + Math.round(10*respd[0].pmeco2)/10 +" mmHg</td></tr>";
-		  tableau += '<tr><td>$\\frac{V_{EM}}{Vc}$ (Fowler):</td><td>' + Math.round(1000* respd[0].fowler)/10 +" %</td></tr>";
-		  tableau += '<tr><td>$\\frac{V_{EM}}{Vc}$ (Bohr):</td><td>' + Math.round(1000* respd[0].bohr)/10 +" %</td></tr>";
-		  tableau += "</table>";
-		  $(iddiv).append(tableau);
-};
-
 gs.graph = class {
 		  constructor(idsvg, conf){
 
@@ -71,12 +61,16 @@ gs.graph = class {
 					 this.waveformGroup = this.svg.append("g")
 								.attr("id", "waveformGroup");
 
+					 this.vectGroup = this.svg.append("g")
+								.attr("id", "vectGroup");
+
 					 this.controlsGroup = this.svg.append("g")
 								.attr("class", "controlsGroup");
 
 					 this.animations = [];
 					 this.anotations = [];
 					 this.plages = [];
+					 thic.vects = [];
 					 this.curAnim = 0;
 
 					 this.width = this.svg.style("width");
@@ -125,20 +119,6 @@ gs.graph = class {
 					 if (this.drawControlsSymbols == true){
 								this.controlsGroup.append("text")
 										  .attr("x", this.width - this.margeD - 80)
-										  .attr("y", this.margeH + 80)
-										  .attr("text-anchor", "middle")
-										  .text('T')
-										  .on('click', function(){alert('Allo !')});
-					 }
-		  }
-
-		  setscale (d, fx, fy){
-					 this.ymin = Math.min(d3.min(d, fy),0);
-					 this.ymax = d3.max(d, fy);
-					 this.xmin = d3.min(d, fx);
-					 this.xmax = d3.max(d, fx);
-
-					 if(this.padD != 0){
 								this.xmax += this.padD * (this.xmax - this.xmin);
 					 }
 
@@ -315,6 +295,40 @@ gs.graph = class {
 
 					 this.courbe.transition().duration(this.durAnim)
 								.attr("d", this.lf(this.donnees));
+		  }
+
+		  vecteur (args){
+					 var pad = this.padPlage;
+					 var vect = {};
+
+					 vect.ligne = this.vectGroup.append("line")
+								.attr("x1", this.echellex(min) + pad)
+								.attr("x2", this.echellex(max) - pad)
+								.attr("y1", this.height - this.margeB*.5)
+								.attr("y2", this.height - this.margeB*.5)
+								.attr("class", "help")
+								.attr("style", "marker-start: url(#fleches);marker-end: url(#flechep);");
+
+					 vect.rect = this.vectGroup.append("rect")
+								.attr('y', this.margeH)
+								.attr('x', this.echellex(min))
+								.attr('width', this.echellex(max)- this.echellex(min))
+								.attr('height', this.height - this.margeH - this.margeB);
+
+					 vect.texte = this.svg.append("text")
+								.attr("class", "help")
+								.attr("x", this.echellex(min + (max - min)/2))
+								.attr("y", this.height - this.margeB * .3)
+								.attr("text-anchor", "middle")
+								.text(id)
+								.attr("opacity", 0);
+
+					 vect.texte.transition().duration(this.durAnim).attr("opacity",1);
+
+					 this.vects.push(vect);
+
+					 return this;
+
 		  }
 
 		  plagex (min, max, id){
@@ -619,6 +633,20 @@ gs.newSvg = function(){
 
 gs.newDiv = function(){
 		  var scriptParent = document.scripts[document.scripts.length - 1].parentNode;
+		  var divNum = document.querySelectorAll("div").length + 1;
+		  var newDiv = document.createElement("div");
+		  newDiv.id = "div" + divNum;
+		  scriptParent.appendChild(newDiv);
+		  return newDiv.id;
+}
+
+gs.randomHue = function(saturation, lightnes){
+		  var hue = Math.random() * 360;
+		  var color = "hsl( " + hue + ", " + saturation + "%, " + lightnes + "% )";
+		  return color;
+}
+if(typeof d3 == 'undefined'){
+		  throw 'graphsimple.js: d3 library not loaded.';
 		  var divNum = document.querySelectorAll("div").length + 1;
 		  var newDiv = document.createElement("div");
 		  newDiv.id = "div" + divNum;
