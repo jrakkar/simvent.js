@@ -134,6 +134,15 @@ class simulator {
 								{name: 'Flung'},
 								{name: 'PCO2'}
 					 ];
+					 this.ventList = [
+								'FlowControler',
+								'PressureControler',
+								'VDR'
+					 ];
+					 this.lungList = [
+								'SimpleLung',
+								'SptLung'
+					 ];
 
 					 this.timePerScreen = 12;
 					 this.graphData = [];
@@ -147,11 +156,6 @@ class simulator {
 
 					 this.ventUpdate();
 
-					 for(var ds of this.datasets){
-								var gr = new graph(ds.name, this.timePerScreen, this.target);
-								gr.tStart = 0;
-								this.graphStack.push(gr);
-					 }
 		  }
 
 		  panelTitle(content){
@@ -168,11 +172,10 @@ class simulator {
 					 this.lungSelect.onchange = ()=>this.lungChange();
 					 this.panelDiv.appendChild(this.lungSelect);
 
-					 for (var lung of sv.lungs){
-								var lungName = lung.name;
+					 for (var lung of this.lungList){
 								var option = document.createElement("option");
-								option.value = lungName;
-								option.textContent = lungName;
+								option.value = lung;
+								option.textContent = lung;
 								this.lungSelect.appendChild(option);
 					 }
 					 this.lungSelect.selectedIndex = sv.lungs.indexOf(sv[this.lung.constructor.name]);
@@ -184,18 +187,17 @@ class simulator {
 					 this.ventSelect.onchange = ()=>this.ventChange();
 					 this.panelDiv.appendChild(this.ventSelect);
 
-					 for (var vent of sv.ventilators){
-								var ventName = vent.name;
+					 for (var vent of this.ventList){
 								var option = document.createElement("option");
-								option.value = ventName;
-								option.textContent = ventName;
+								option.value = vent;
+								option.textContent = vent;
 								this.ventSelect.appendChild(option);
 					 }
-					 this.ventSelect.selectedIndex = sv.ventilators.indexOf(sv[this.vent.constructor.name]);
+					 this.ventSelect.selectedIndex = this.ventList.indexOf(this.vent.constructor.name);
 		  }
 
 		  ventChange(){
-					 this.nextVent = new sv.ventilators[this.ventSelect.selectedIndex];
+					 this.nextVent = new sv[this.ventList[this.ventSelect.selectedIndex]]();
 					 this.nextVent.time = this.vent.time;
 					 this.vent = this.nextVent;
 					 this.ventUpdate();
@@ -203,7 +205,7 @@ class simulator {
 		  }
 
 		  lungChange(){
-					 this.lung = new sv.lungs[this.lungSelect.selectedIndex];
+					 this.lung = new sv[this.lungList[this.lungSelect.selectedIndex]]();
 					 this.fillParamTable(this.lung, 'mechParams', this.lungTable);
 		  }
 
@@ -401,6 +403,11 @@ class simulator {
 		  }
 
 		  start(){
+					 for(var ds of this.datasets){
+								var gr = new graph(ds.name, this.timePerScreen, this.target);
+								gr.tStart = 0;
+								this.graphStack.push(gr);
+					 }
 					 this.ventLoop();
 					 this.setYscale();
 					 this.startLoops();

@@ -1,11 +1,9 @@
 class ventyaml {
 	constructor(sourceNode) {
 		this.clsList = sourceNode.classList;
-		/***
 		for(var cls in sourceNode.classList.keys()){
 			console.log(cls);
 		}
-		***/
 
 		if (! YAML){throw "ventyaml: YAML library not loaded."}
 

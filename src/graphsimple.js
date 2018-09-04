@@ -27,6 +27,16 @@ gs.animer = function(graph){
 		  }
 };
 
+gs.stat = function(iddiv, respd){
+		  var tableau = "<table style='float:top'>";
+		  tableau += "<tr><td>P<small>A</small>CO₂:</td><td>" + Math.round(10*respd[0].pAco2)/10 +" mmHg</td></tr>";
+		  tableau += "<tr><td>P<small>E</small>CO₂:</td><td>" + Math.round(10*respd[0].pmeco2)/10 +" mmHg</td></tr>";
+		  tableau += '<tr><td>$\\frac{V_{EM}}{Vc}$ (Fowler):</td><td>' + Math.round(1000* respd[0].fowler)/10 +" %</td></tr>";
+		  tableau += '<tr><td>$\\frac{V_{EM}}{Vc}$ (Bohr):</td><td>' + Math.round(1000* respd[0].bohr)/10 +" %</td></tr>";
+		  tableau += "</table>";
+		  $(iddiv).append(tableau);
+};
+
 gs.graph = class {
 		  constructor(idsvg, conf){
 
@@ -61,24 +71,20 @@ gs.graph = class {
 					 this.waveformGroup = this.svg.append("g")
 								.attr("id", "waveformGroup");
 
-					 this.vectGroup = this.svg.append("g")
-								.attr("id", "vectGroup");
-					 this.annotationsGroup = this.svg.append("g")
-								.attr("id", "annotationsGroup");
-
 					 this.controlsGroup = this.svg.append("g")
 								.attr("class", "controlsGroup");
 
 					 this.animations = [];
 					 this.anotations = [];
 					 this.plages = [];
-					 thic.vects = [];
 					 this.curAnim = 0;
 
 					 this.width = this.svg.style("width");
+					 //this.width = newSvg.style.width;
 					 this.width = this.width.substr(0, this.width.length-2);
 
 					 this.height = this.svg.style("height");
+					 //this.height = newSvg.style.height;
 					 this.height = this.height.substr(0, this.height.length-2);
 
 					 this.defs = this.svg.append("defs");
@@ -116,20 +122,23 @@ gs.graph = class {
 								.append("path")
 								.attr("d", "M3,5 L9,10 L3,15");
 
-					 this.defs.append("marker")
-								.attr("id", "flechev")
-								.attr("refY", "10")
-								.attr("refX", "10")
-								.attr("markerWidth", "21")
-								.attr("markerHeight", "18")
-								.attr("orient", "auto")
-								.attr("markerUnits", "userSpaceOnUse")
-								.append("path")
-								.attr("d", "M3,5 L9,10 L3,15");
-
 					 if (this.drawControlsSymbols == true){
 								this.controlsGroup.append("text")
 										  .attr("x", this.width - this.margeD - 80)
+										  .attr("y", this.margeH + 80)
+										  .attr("text-anchor", "middle")
+										  .text('T')
+										  .on('click', function(){alert('Allo !')});
+					 }
+		  }
+
+		  setscale (d, fx, fy){
+					 this.ymin = Math.min(d3.min(d, fy),0);
+					 this.ymax = d3.max(d, fy);
+					 this.xmin = d3.min(d, fx);
+					 this.xmax = d3.max(d, fx);
+
+					 if(this.padD != 0){
 								this.xmax += this.padD * (this.xmax - this.xmin);
 					 }
 
@@ -184,7 +193,7 @@ gs.graph = class {
 								this.drawGridY();
 					 }
 
-					 if(!("gridX"in this)){
+					 if(!("iridX"in this)){
 								this.drawGridX();
 					 }
 
@@ -219,7 +228,7 @@ gs.graph = class {
 					 this.courbe = this.waveformGroup.append("path")
 								.attr("d", coord)
 								.style("clip-path", "url(" + this.idsvg + "clip)")
-								.classed('dataPath', true);
+								.classed('gsPlotLine', true);
 					 //this.playSimb();
 					 return this;
 		  }
@@ -308,40 +317,6 @@ gs.graph = class {
 								.attr("d", this.lf(this.donnees));
 		  }
 
-		  vecteur ( x1, y1, x2, y2, options){
-					 var pad = this.padPlage;
-					 var vecteur = {};
-
-					 vecteur.ligne = this.annotationsGroup.append("line")
-								.attr("x1", this.echellex(x1)/* + pad*/)
-								.attr("x2", this.echellex(x2) /*- pad*/)
-								.attr("y1", this.echelley(y1))
-								.attr("y2", this.echelley(y2))
-								.attr("class", "vecteur")
-								.attr("style", "marker-end: url(#flechev);");
-
-					 //this.annotations.push(vecteur);
-
-					 return this;
-
-		  }
-
-		  etiquette ( x, y, texte, options){
-					 var pad = this.padPlage;
-					 var etiquette = {};
-
-					 etiquette.texte = this.annotationsGroup.append("text")
-								.attr("class", "etiquette")
-								.attr("x", this.echellex(x))
-								.attr("y", this.echelley(y))
-								.attr("text-anchor", "middle")
-								.text(texte);
-
-					 //this.annotations.push(etiquette);
-
-					 return this;
-
-		  }
 		  plagex (min, max, id){
 					 var pad = this.padPlage;
 					 var plage = {};
@@ -514,9 +489,6 @@ gs.graph = class {
 
 								texte.attr("x", this.width - this.margeD/2);
 					 } 
-					 else{
-								texte.attr("x", this.margeG/2);
-					 }
 
 					 this.anotations.push(texte);
 					 return this;
@@ -647,20 +619,6 @@ gs.newSvg = function(){
 
 gs.newDiv = function(){
 		  var scriptParent = document.scripts[document.scripts.length - 1].parentNode;
-		  var divNum = document.querySelectorAll("div").length + 1;
-		  var newDiv = document.createElement("div");
-		  newDiv.id = "div" + divNum;
-		  scriptParent.appendChild(newDiv);
-		  return newDiv.id;
-}
-
-gs.randomHue = function(saturation, lightnes){
-		  var hue = Math.random() * 360;
-		  var color = "hsl( " + hue + ", " + saturation + "%, " + lightnes + "% )";
-		  return color;
-}
-if(typeof d3 == 'undefined'){
-		  throw 'graphsimple.js: d3 library not loaded.';
 		  var divNum = document.querySelectorAll("div").length + 1;
 		  var newDiv = document.createElement("div");
 		  newDiv.id = "div" + divNum;
