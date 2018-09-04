@@ -587,6 +587,7 @@ sv.Ventilator = class Ventilator{
 		this.timeData = [];
 
 		for ( this.simulationStop = this.time + this.Tvent; this.time <= this.simulationStop; ){
+				  console.log("simvent: starting vent cycle");
 			this.ventilationCycle(lung);
 		}
 
