@@ -55,19 +55,18 @@ class graph {
 
 		  setNLf(){
 					 this.lf = function(d){
-								if(this.debugMode == true){console.log('this.coord: ' + this.coord)}
 								var l = d.length;
 								var point = d[l -1];
 								if(l == 0){
 									console.log('NLF: no data to plot');
 								}
 								else if (l == 1){
-									var string = 'M' + this.echellex(point.time - this.tStart) + ',' + this.echelley(point[this.dataName]);
+									this.coord = this.coord + 'M' + this.echellex(point.time - this.tStart) + ',' + this.echelley(point[this.dataName]);
 								}
 								else {
-									var string = 'L' + this.echellex(point.time - this.tStart) + ',' + this.echelley(point[this.dataName]);
+									this.coord = this.coord + 'L' + this.echellex(point.time - this.tStart) + ',' + this.echelley(point[this.dataName]);
 								}
-								return string;
+								return this.coord;
 					 }
 		  }
 
@@ -128,7 +127,6 @@ class graph {
 
 class simulator {
 		  constructor(){
-					 this.debugMode = false;
 					 this.target = d3.select(document.body);
 
 					 this.datasets = [
@@ -350,15 +348,12 @@ class simulator {
 
 		  ventUpdate(){
 					 if(this.vent.Fconv){this.vent.Tvent = 60 / this.vent.Fconv};
-					 //this.vent.Tsampl = 0.01;
+					 this.vent.Tsampl = 0.01;
 					 this.pointsPerScreen = this.timePerScreen / this.vent.Tsampl;
 		  }
 
 		  setYscale(){
-					 if(this.debugMode == true){console.log('simulator.setYscale()')}
-					 if(this.debugMode == true){console.log('simulator.setYscale()')}
 					 var dataSet = this.data.concat(this.graphData);
-					 if(this.debugMode == true){console.log(dataSet.length + ' data used to set Y scale')}
 
 					 for(graph of this.graphStack){
 								graph.setYscale(dataSet);
@@ -406,18 +401,14 @@ class simulator {
 
 					 this.graphData.push(this.data.shift());
 					 for(var gr of this.graphStack){
-								if(gr.coord == null){gr.coord = ''}
 								var coord = gr.lf(this.graphData);
-								gr.coord = gr.coord + coord;
-								gr.path.attr('d', gr.coord);
+								gr.path.attr('d', coord);
 					 }
 		  }
 
 		  start(){
-					 if(this.debugMode == true){console.log('simulator.start()')}
 					 for(var ds of this.datasets){
 								var gr = new graph(ds.name, this.timePerScreen, this.target);
-								if(this.debugMode == true){gr.debugMode = true}
 								gr.tStart = 0;
 								this.graphStack.push(gr);
 					 }
@@ -429,7 +420,6 @@ class simulator {
 		  startLoops(){
 					 this.ventInt = setInterval(()=>this.ventLoop(), 500);
 					 this.graphInt = setInterval(()=>this.graphLoop(), this.vent.Tsampl * 1000);
-					 if(this.debugMode == true){console.log('animation.js: Loops started')};
 		  }
 
 		  stop(){
