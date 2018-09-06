@@ -55,18 +55,19 @@ class graph {
 
 		  setNLf(){
 					 this.lf = function(d){
+								if(this.debugMode == true){console.log('this.coord: ' + this.coord)}
 								var l = d.length;
 								var point = d[l -1];
 								if(l == 0){
 									console.log('NLF: no data to plot');
 								}
 								else if (l == 1){
-									this.coord = this.coord + 'M' + this.echellex(point.time - this.tStart) + ',' + this.echelley(point[this.dataName]);
+									var string = 'M' + this.echellex(point.time - this.tStart) + ',' + this.echelley(point[this.dataName]);
 								}
 								else {
-									this.coord = this.coord + 'L' + this.echellex(point.time - this.tStart) + ',' + this.echelley(point[this.dataName]);
+									var string = 'L' + this.echellex(point.time - this.tStart) + ',' + this.echelley(point[this.dataName]);
 								}
-								return this.coord;
+								return string;
 					 }
 		  }
 
@@ -127,12 +128,26 @@ class graph {
 
 class simulator {
 		  constructor(){
+					 this.debugMode = false;
 					 this.target = d3.select(document.body);
 
 					 this.datasets = [
 								{name: 'Pao'},
 								{name: 'Flung'},
 								{name: 'PCO2'}
+					 ];
+					 this.ventList = [
+								'FlowControler',
+								'PressureControler',
+								'PressureAssistor',
+								'IPV',
+								'VDR'
+					 ];
+					 this.lungList = [
+								'SimpleLung',
+								'SptLung',
+								'SygLung',
+								'RLung'
 					 ];
 
 					 this.timePerScreen = 12;
@@ -147,11 +162,6 @@ class simulator {
 
 					 this.ventUpdate();
 
-					 for(var ds of this.datasets){
-								var gr = new graph(ds.name, this.timePerScreen, this.target);
-								gr.tStart = 0;
-								this.graphStack.push(gr);
-					 }
 		  }
 
 		  panelTitle(content){
@@ -168,11 +178,10 @@ class simulator {
 					 this.lungSelect.onchange = ()=>this.lungChange();
 					 this.panelDiv.appendChild(this.lungSelect);
 
-					 for (var lung of sv.lungs){
-								var lungName = lung.name;
+					 for (var lung of this.lungList){
 								var option = document.createElement("option");
-								option.value = lungName;
-								option.textContent = lungName;
+								option.value = lung;
+								option.textContent = lung;
 								this.lungSelect.appendChild(option);
 					 }
 					 this.lungSelect.selectedIndex = sv.lungs.indexOf(sv[this.lung.constructor.name]);
@@ -184,18 +193,17 @@ class simulator {
 					 this.ventSelect.onchange = ()=>this.ventChange();
 					 this.panelDiv.appendChild(this.ventSelect);
 
-					 for (var vent of sv.ventilators){
-								var ventName = vent.name;
+					 for (var vent of this.ventList){
 								var option = document.createElement("option");
-								option.value = ventName;
-								option.textContent = ventName;
+								option.value = vent;
+								option.textContent = vent;
 								this.ventSelect.appendChild(option);
 					 }
-					 this.ventSelect.selectedIndex = sv.ventilators.indexOf(sv[this.vent.constructor.name]);
+					 this.ventSelect.selectedIndex = this.ventList.indexOf(this.vent.constructor.name);
 		  }
 
 		  ventChange(){
-					 this.nextVent = new sv.ventilators[this.ventSelect.selectedIndex];
+					 this.nextVent = new sv[this.ventList[this.ventSelect.selectedIndex]]();
 					 this.nextVent.time = this.vent.time;
 					 this.vent = this.nextVent;
 					 this.ventUpdate();
@@ -203,7 +211,7 @@ class simulator {
 		  }
 
 		  lungChange(){
-					 this.lung = new sv.lungs[this.lungSelect.selectedIndex];
+					 this.lung = new sv[this.lungList[this.lungSelect.selectedIndex]]();
 					 this.fillParamTable(this.lung, 'mechParams', this.lungTable);
 		  }
 
@@ -341,13 +349,16 @@ class simulator {
 		  } 
 
 		  ventUpdate(){
-					 this.vent.Tvent = 60 / this.vent.Fconv;
-					 this.vent.Tsampl = 0.01;
+					 if(this.vent.Fconv){this.vent.Tvent = 60 / this.vent.Fconv};
+					 //this.vent.Tsampl = 0.01;
 					 this.pointsPerScreen = this.timePerScreen / this.vent.Tsampl;
 		  }
 
 		  setYscale(){
+					 if(this.debugMode == true){console.log('simulator.setYscale()')}
+					 if(this.debugMode == true){console.log('simulator.setYscale()')}
 					 var dataSet = this.data.concat(this.graphData);
+					 if(this.debugMode == true){console.log(dataSet.length + ' data used to set Y scale')}
 
 					 for(graph of this.graphStack){
 								graph.setYscale(dataSet);
@@ -395,12 +406,21 @@ class simulator {
 
 					 this.graphData.push(this.data.shift());
 					 for(var gr of this.graphStack){
+								if(gr.coord == null){gr.coord = ''}
 								var coord = gr.lf(this.graphData);
-								gr.path.attr('d', coord);
+								gr.coord = gr.coord + coord;
+								gr.path.attr('d', gr.coord);
 					 }
 		  }
 
 		  start(){
+					 if(this.debugMode == true){console.log('simulator.start()')}
+					 for(var ds of this.datasets){
+								var gr = new graph(ds.name, this.timePerScreen, this.target);
+								if(this.debugMode == true){gr.debugMode = true}
+								gr.tStart = 0;
+								this.graphStack.push(gr);
+					 }
 					 this.ventLoop();
 					 this.setYscale();
 					 this.startLoops();
@@ -409,6 +429,7 @@ class simulator {
 		  startLoops(){
 					 this.ventInt = setInterval(()=>this.ventLoop(), 500);
 					 this.graphInt = setInterval(()=>this.graphLoop(), this.vent.Tsampl * 1000);
+					 if(this.debugMode == true){console.log('animation.js: Loops started')};
 		  }
 
 		  stop(){

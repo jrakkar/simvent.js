@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<meta name='viewport' content='width=device-width, user-scalable=no'>
 <meta charset="utf-8"/>
 
 <script src="../lib/d3.v3.min.js" charset="utf-8"></script>
@@ -14,10 +15,13 @@
 		  <script>
 
 var sim = new simulator();
+sim.vent = new sv.VDR();
+sim.debugMode = false;
+sim.vent.Tsampl = 0.02;
 sim.ventUpdate();
 sim.initPanel();
 sim.start();
-//setTimeout(()=>sim.stop(),4000);
+//setTimeout(()=>sim.stop(),10000);
 onresize = ()=>sim.redraw();
 
 function swipeLeftHandler(){
