@@ -591,6 +591,7 @@ sv.Ventilator = class Ventilator{
 			this.ventilationCycle(lung);
 		}
 
+		/*
 		if(this.lowPass > 1){
 
 			for (var index in this.dataToFilter){
@@ -610,6 +611,7 @@ sv.Ventilator = class Ventilator{
 				sv.avg(this.timeData, this.dataToFilter[index], this.rAvg);
 			}
 		}
+		*/
 		return {
 			timeData: this.timeData
 		};
@@ -849,8 +851,11 @@ sv.IPV = class IPV extends sv.Ventilator{
 
 		this.Tramp= 0.005;
 		this.Rexp= 1; // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
-		this.rAvg= 2;
-		this.lowPass= 3;
+		//this.rAvg= 2;
+		//this.lowPass= 3;
+		this.lppe = 3;
+		this.lpip = 2.3;
+		this.lpop = 1.3;
 
 		this.simParams = {
 			Tvent: {unit: "s"},
@@ -879,10 +884,12 @@ sv.IPV = class IPV extends sv.Ventilator{
 			Fipc: {unit: "l/s"}
 		};
 
+			  /*
 		this.dataToFilter= [
 				"Pao",
 				"Flung"
 			];
+			*/
 	}
 
 	get Fhz (){ return this.Fperc / 60; }
@@ -899,8 +906,8 @@ sv.IPV = class IPV extends sv.Ventilator{
 
 		var tStopPerc = this.time + this.Tep;
 		while (this.time < tStopPerc){
-			this.Pao = - lung.flow * Rexp;
-			
+			var Pao = - lung.flow * Rexp;			
+			this.Pao = this.Pao + (Pao - this.Pao)/this.lppe;
 			var flow = (this.Pao - lung.Palv)/lung.Raw;
 			lung.appliquer_debit(flow, this.Tsampl);
 			this.timeData.push(sv.log(lung, this));
@@ -912,15 +919,16 @@ sv.IPV = class IPV extends sv.Ventilator{
 		// Must be executed in a scope where the timeData container is defined
 		this.stateP = 1;
 		lung.Vtip = 0;
-		this.Fip = inFlow
+		//this.Fip = inFlow
 		var tStartInsp = this.time;
 		var tStopPerc = this.time + this.Tip;
 
 		while (this.time < tStopPerc){
 
-			this.Fip = inFlow;
+			//this.Fip = inFlow;
+			this.Fip = this.Fip + (inFlow - this.Fip)/this.lpip;
 			this.Pao = (this.Fop * lung.Raw) + lung.Palv;
-			this.Fop = sv.Phasitron.Fop(this.Fip, this.Pao);
+			this.Fop = this.Fop + (sv.Phasitron.Fop(this.Fip, this.Pao) - this.Fop)/this.lpop;
 			lung.appliquer_debit(this.Fop, this.Tsampl);
 			
 			this.timeData.push(sv.log(lung, this));
@@ -980,10 +988,12 @@ sv.VDR = class VDR extends sv.IPV{
 			CPR: {}
 		};
 
+			  /*
 		this.dataToFilter= [
 				"Pao",
 				"Flung"
 			];
+			*/
 	}
 
 	get Fconv (){ return 60 / (this.Tic + this.Tec); }
