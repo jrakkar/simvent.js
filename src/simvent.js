@@ -853,9 +853,9 @@ sv.IPV = class IPV extends sv.Ventilator{
 		this.Rexp= 1; // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
 		//this.rAvg= 2;
 		//this.lowPass= 3;
-		this.lppe = 3;
-		this.lpip = 2.3;
-		this.lpop = 1.3;
+		this.lppe = 4;
+		this.lpip = 6;
+		this.lpop = 1
 
 		this.simParams = {
 			Tvent: {unit: "s"},
@@ -951,8 +951,8 @@ sv.VDR = class VDR extends sv.IPV{
 
 		this.Tramp= 0.005;
 		this.Rexp= 1; // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
-		this.rAvg= 2;
-		this.lowPass= 3;
+		//this.rAvg= 2;
+		//this.lowPass= 3;
 
 		this.simParams = {
 			Tvent: {unit: "s"},

@@ -22,9 +22,9 @@ html {
 svg.gs {
 		  /*border: 1px solid gray;*/
 		  display: block;
-		  width: 90vw;
+		  width: 70vw;
 		  height: 25vh;
-		  margin-left: auto;
+		  margin-left: none;
 		  margin-right: auto;
 }
 .gs .controlsGroup {
@@ -34,8 +34,29 @@ svg.gs {
 line.help {
 		  stroke: black;
 }
+input {
+		  text-align: right;
+					 width: 50px;
+								margin-left: 20px;
+}
+		  label {
+					 display: flex;
+								justify-content: space-between;
+
+		  }
+		  fieldset {
+					 float: right;
+		  }
 </style>
 <body>
+		  <fieldset>
+					 <legend>Paramètres</legend>
+					 <label>tZoomStart <input id='tZoomStart'/></label>
+					 <label>tZoomEnd <input id='tZoomEnd'/></label>
+					 <label>lpip <input id='lpip'/></label>
+					 <label>lpop <input id='lpop'/></label>
+					 <label>lppe <input id='lppe'/></label>
+		  </fieldset>
 		  <script>
 gs.defaults.padH = .25;
 gs.defaults.margeG = 80;
@@ -46,40 +67,68 @@ gs.defaults.padPlage = 1;
 gs.defaults.yticks = 2;
 gs.defaults.xticks = 20;
 
-var tZoomStart = 10;
-var tZoomStop = 12;
-
-var lung = new sv.SimpleLung();
-
-var vent = new sv.VDR();
-vent.Rit = .5
-vent.dataToFilter = null;
-
-var data = vent.ventilate(lung).timeData;
-var d2 = data.filter(d=>d.time>tZoomStart && d.time < tZoomStop);
-
-fx = function(d){return d.time};
-fy = function(d){return d.Pao};
-
-
-var graph = new gs.graph();
-graph.setscale(data, fx, fy)
-		  .tracer(data, fx, fy)
-		  .setidy('Pao');
-
 var zoomParams = [
 		  'Fip',
 		  'Pao',
 		  'Fop',
 		  'Flung'
-		  ]
+		  ];
 
-var gr = [];
-for (var p of zoomParams){
-		  gr.push(new gs.graph().setscale(d2, fx, function(d){return d[p]}).tracer(d2, fx, function(d){return d[p]}).setidy(p));
+if(localStorage.tZoomStart){var tZoomStart = localStorage.tZoomStart;}
+else{ var tZoomStart = 10;}
+if(localStorage.tZoomEnd){var tZoomEnd = localStorage.tZoomEnd;}
+else{ var tZoomEnd = 10;}
+
+var vent = new sv.VDR();
+if(localStorage.lpip){vent.lpip = localStorage.lpip;}
+if(localStorage.lpop){vent.lpop = localStorage.lpop;}
+if(localStorage.lppe){vent.lppe = localStorage.lppe;}
+
+function go () {
+		  d3.selectAll('svg.gs').remove();
+		  var lung = new sv.SimpleLung();
+
+		  vent.time = 0;
+		  var data = vent.ventilate(lung).timeData;
+		  var d2 = data.filter(d=>d.time>tZoomStart && d.time < tZoomEnd);
+
+		  fx = function(d){return d.time};
+		  fy = function(d){return d.Pao};
+
+
+		  var graph = new gs.graph();
+		  graph.setscale(data, fx, fy)
+					 .tracer(data, fx, fy)
+					 .setidy('Pao');
+		  var gr = [];
+		  for (var p of zoomParams){
+					 gr.push(new gs.graph().setscale(d2, fx, function(d){return d[p]}).tracer(d2, fx, function(d){return d[p]}).setidy(p));
+		  }
 }
 
+document.querySelector('#tZoomStart').addEventListener('keyup', function(){
+		  window.tZoomStart = parseFloat(this.value);
+		  localStorage.tZoomStart = tZoomStart;
+		  go()
+});
+
+document.querySelector('#tZoomEnd').addEventListener('keyup', function(){
+		  window.tZoomEnd = parseFloat(this.value);
+		  localStorage.tZoomEnd = tZoomEnd;
+		  go()
+});
+document.querySelector('#lpip').addEventListener('keyup', function(){
+		  vent.lpip = parseFloat(this.value);
+		  go()
+});
+document.querySelector('#lpop').addEventListener('keyup', function(){
+		  vent.lpop = parseFloat(this.value);
+		  go()
+});
+document.querySelector('#lppe').addEventListener('keyup', function(){
+		  vent.lppe = parseFloat(this.value);
+		  go()
+});
+go();
 		  </script>
-<script>
-</script>
 </body>
