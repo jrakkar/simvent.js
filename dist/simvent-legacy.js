@@ -415,8 +415,8 @@ sv.SptLung = function (_sv$Lung2) {
 		get: function get() {
 			var mTime = this.time % (60.0 / this.Fspt);
 
-			if (mTime < this.Ti && this.Fspt > 0) {
-				return 0.5 * this.Pmax * (1 + Math.sin(2 * Math.PI * (mTime / this.Ti) - Math.PI / 2));
+			if (mTime < 2 * this.Ti && this.Fspt > 0) {
+				return 0.5 * this.Pmax * (1 + Math.sin(2 * Math.PI * (mTime / (2 * this.Ti)) - Math.PI / 2));
 			} else {
 				return 0;
 			}
@@ -516,8 +516,8 @@ sv.RLung = function (_sv$Lung4) {
 		_this4.VmaxExp = _this4.Vmax;
 		_this4.VminInsp = _this4.Vmin;
 		_this4.Vabs = _this4.volume(0);
-		console.log('Palv = ' + _this4.Palv);
-		console.log('Palv = ' + _this4.Palv);
+		//console.log('Palv = ' + this.Palv);
+		//console.log('Palv = ' + this.Palv);
 		_this4.fitInsp();
 		//console.log('Palv = ' + this.Palv);
 		_this4.fitExp();
@@ -525,9 +525,9 @@ sv.RLung = function (_sv$Lung4) {
 		_this4.appliquer_pression(-1, 3);
 		_this4.appliquer_pression(1, 3);
 		_this4.appliquer_pression(-1, 3);
-		console.log('Palv = ' + _this4.Palv);
-		console.log('VminInsp = ' + _this4.VminInsp);
-		console.log('VmaxExp = ' + _this4.VmaxExp);
+		//console.log('Palv = ' + this.Palv);
+		//console.log('VminInsp = ' + this.VminInsp);
+		//console.log('VmaxExp = ' + this.VmaxExp);
 
 		_this4.mechParams = {
 			Vmax: { unit: "l" },
@@ -548,14 +548,14 @@ sv.RLung = function (_sv$Lung4) {
 	}, {
 		key: "fitInsp",
 		value: function fitInsp() {
-			console.log('fitInsp');
+			//console.log('fitInsp');
 			var N = 1 + Math.pow(Math.E, -((this.lastPel - this.PidInsp) / this.Kid));
 			this.VminInsp = (N * this.Vabs - this.Vmax) / (N - 1);
 		}
 	}, {
 		key: "fitExp",
 		value: function fitExp() {
-			console.log('fitExp');
+			//console.log('fitExp');
 			var N = 1 + Math.pow(Math.E, -((this.lastPel - this.PidExp) / this.Kid));
 			this.VmaxExp = this.Vmin + (this.Vabs - this.Vmin) * N;
 		}
@@ -680,27 +680,28 @@ sv.Ventilator = function () {
 			this.timeData = [];
 
 			for (this.simulationStop = this.time + this.Tvent; this.time <= this.simulationStop;) {
+				//console.log("simvent: starting vent cycle");
 				this.ventilationCycle(lung);
 			}
-			if (this.lowPass > 1) {
 
-				for (var index in this.dataToFilter) {
-					var id = this.dataToFilter[index];
-					var smoothed = this.timeData[0][id];
-					for (var jndex = 1, len = this.timeData.length; jndex < len; ++jndex) {
-						var currentValue = this.timeData[jndex][id];
-						smoothed += (currentValue - smoothed) / this.lowPass;
-						this.timeData[jndex][id] = smoothed;
-					}
-				}
-			}
-
-			if (this.rAvg >= 2) {
-
-				for (var index in this.dataToFilter) {
-					sv.avg(this.timeData, this.dataToFilter[index], this.rAvg);
-				}
-			}
+			/*
+   if(this.lowPass > 1){
+   		for (var index in this.dataToFilter){
+   		var id = this.dataToFilter[index];
+   		var smoothed = this.timeData[0][id];
+   		for (var jndex = 1, len = this.timeData.length; jndex<len; ++jndex){
+   			var currentValue = this.timeData[jndex][id];
+   			smoothed += (currentValue - smoothed) / this.lowPass;
+   			this.timeData[jndex][id] = smoothed;
+   		}
+   	}
+   }
+   	if(this.rAvg >= 2){
+   		for (var index in this.dataToFilter){
+   		sv.avg(this.timeData, this.dataToFilter[index], this.rAvg);
+   	}
+   }
+   */
 			return {
 				timeData: this.timeData
 			};
@@ -994,23 +995,19 @@ sv.IPV = function (_sv$Ventilator4) {
 
 		_this8.Tramp = 0.005;
 		_this8.Rexp = 1; // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
-		_this8.rAvg = 2;
-		_this8.lowPass = 3;
+		_this8.lppe = 4;
+		_this8.lpip = 6;
+		_this8.lpop = 1;
 
 		_this8.simParams = {
 			Tvent: { unit: "s" },
 			Tsampl: { unit: "s" },
 			Tramp: { unit: "s" },
-			Rexp: { unit: "cmH₂O/l/s" },
-			rAvg: {},
-			lowPass: {}
+			Rexp: { unit: "cmH₂O/l/s" }
 		};
 
 		_this8.Fperc = 500;
 		_this8.Rit = 0.5; //Ratio of inspiratory time over total time (percussion)
-		//this.Fipl= 0.18; // 	
-		//this.Fiph= 1.8; // 
-		//this.CPR = 0;
 		_this8.Fipc = 0.18;
 
 		_this8.Fop = 0; //Phasitron output flow
@@ -1024,7 +1021,6 @@ sv.IPV = function (_sv$Ventilator4) {
 			Fipc: { unit: "l/s" }
 		};
 
-		_this8.dataToFilter = ["Pao", "Flung"];
 		return _this8;
 	}
 
@@ -1040,8 +1036,8 @@ sv.IPV = function (_sv$Ventilator4) {
 
 			var tStopPerc = this.time + this.Tep;
 			while (this.time < tStopPerc) {
-				this.Pao = -lung.flow * Rexp;
-
+				var Pao = -lung.flow * Rexp;
+				this.Pao = this.Pao + (Pao - this.Pao) / this.lppe;
 				var flow = (this.Pao - lung.Palv) / lung.Raw;
 				lung.appliquer_debit(flow, this.Tsampl);
 				this.timeData.push(sv.log(lung, this));
@@ -1054,15 +1050,14 @@ sv.IPV = function (_sv$Ventilator4) {
 			// Must be executed in a scope where the timeData container is defined
 			this.stateP = 1;
 			lung.Vtip = 0;
-			this.Fip = inFlow;
 			var tStartInsp = this.time;
 			var tStopPerc = this.time + this.Tip;
 
 			while (this.time < tStopPerc) {
 
-				this.Fip = inFlow;
+				this.Fip = this.Fip + (inFlow - this.Fip) / this.lpip;
 				this.Pao = this.Fop * lung.Raw + lung.Palv;
-				this.Fop = sv.Phasitron.Fop(this.Fip, this.Pao);
+				this.Fop = this.Fop + (sv.Phasitron.Fop(this.Fip, this.Pao) - this.Fop) / this.lpop;
 				lung.appliquer_debit(this.Fop, this.Tsampl);
 
 				this.timeData.push(sv.log(lung, this));
@@ -1103,24 +1098,8 @@ sv.VDR = function (_sv$IPV) {
 
 		var _this9 = _possibleConstructorReturn(this, (VDR.__proto__ || Object.getPrototypeOf(VDR)).call(this));
 
-		_this9.Tramp = 0.005;
-		_this9.Rexp = 1; // cmH2O/l/s. To be adjusted based on the visual aspect of the curve.
-		_this9.rAvg = 2;
-		_this9.lowPass = 3;
-
-		_this9.simParams = {
-			Tvent: { unit: "s" },
-			Tsampl: { unit: "s" },
-			Tramp: { unit: "s" },
-			Rexp: { unit: "cmH₂O/l/s" },
-			rAvg: {},
-			lowPass: {}
-		};
-
 		_this9.Tic = 2; // Convective inspiratory time
 		_this9.Tec = 2; // Convective expiratory time
-		_this9.Fperc = 500;
-		_this9.Rit = 0.5; //Ratio of inspiratory time over total time (percussion)
 		_this9.Fipl = 0.18; // 	
 		_this9.Fiph = 1.8; // 
 		_this9.CPR = 0;
@@ -1142,7 +1121,6 @@ sv.VDR = function (_sv$IPV) {
 			CPR: {}
 		};
 
-		_this9.dataToFilter = ["Pao", "Flung"];
 		return _this9;
 	}
 
@@ -1218,10 +1196,10 @@ sv.FlowControler = function (_sv$Ventilator5) {
 		_this10.Vt = 0.5;
 		_this10.PEEP = 5.0;
 		_this10.Ti = 1;
-		_this10.Fconv = 12;
+		_this10.Fconv = 18;
 
 		_this10.ventParams = {
-			Vt: { unit: "l" },
+			Vt: { unit: "l", step: 0.01 },
 			PEEP: { unit: "cmH₂O" },
 			Fconv: { unit: "/min." },
 			Ti: { unit: "cmH₂O" },
