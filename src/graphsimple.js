@@ -16,8 +16,11 @@ gs.defaults = {
 		  idPos: "center",
 		  annotateOnRight: true,
 		  drawControlsSymbols: false,
+		  autoScale: false,
+		  debugMode: false,
 		  durAnim: 1500,
-		  padPlage: 5
+		  padPlage: 5,
+		  nticksY:6
 };
 
 gs.animer = function(graph){
@@ -166,6 +169,11 @@ gs.graph = class {
 					 this.xmin = d3.min(d, fx);
 					 this.xmax = d3.max(d, fx);
 
+					 this.applyPaddings();
+					 return this;
+		  }
+
+		  applyPaddings (){
 					 if(this.padD != 0){
 								this.xmax += this.padD * (this.xmax - this.xmin);
 					 }
@@ -229,10 +237,31 @@ gs.graph = class {
 
 		  }
 
+			Autoscale (){
+					  var lastData = this.donnees[this.donnees.length -1];
+					  if('xmin' in this){
+								if(d3.max(lastData.donnees, lastData.fy) > this.ymax){
+										  this.ymax = d3.max(lastData.donnees, lastData.fy);
+										  if(this.padH != 0){
+													 this.ymax += this.padH * (this.ymax - this.ymin);
+										  }
+								}
 
+								if(d3.min(lastData.donnees, lastData.fy) < this.ymin){
+										  this.ymin = d3.min(lastData.donnees, lastData.fy);
+										  if(this.padB != 0){
+													 this.ymin += this.padH * (this.ymin - this.ymax);
+										  }
+								}
+
+								 this.redessiner();
+					  }
+			}
 		  tracer (donnees, fonctionx, fonctiony){
-					 this.donnees.push({donnees: donnees, fx: fonctionx, fy: fonctiony});
-
+					this.donnees.push({donnees: donnees, fx: fonctionx, fy: fonctiony});
+					if(this.autoScale){
+							  this.Autoscale();
+					}
 					 this.drawgrids();
 
 					 this.getsf(donnees, fonctionx, fonctiony);
@@ -245,15 +274,20 @@ gs.graph = class {
 
 					 this.axes()
 
+					 /*
 					 if(!('waveformGroup' in this)){
 								this.waveformGroup = this.svg.append("g")
 										  .attr("id", "waveformGroup");
 					 }
+					 */
 
-					 this.Tracer(donnees, fonctionx, fonctiony);
+					if(!this.autoScale){
+							  this.Tracer(donnees, fonctionx, fonctiony);
+					}
 					 //this.playSimb();
 					 return this;
 		  }
+
 		  Tracer(d, fx, fy){
 					 this.getlf(fx, fy);
 					 var coord = this.lf(d);
@@ -280,8 +314,13 @@ gs.graph = class {
 					 for(var p of this.plagesx){this.plagexDraw(p)}
 					 for(var p of this.pointsy){this.pointyDraw(p)}
 
+					 /*
 					 var d = this.donnees[this.donnees.length - 1];
 					 this.Tracer(d.donnees, d.fx, d.fy);
+					 */
+					 for(var d of this.donnees){
+								this.Tracer(d.donnees, d.fx, d.fy);
+					 }
 		  }
 
 		  ajouter (donnees, fonctionx, fonctiony){
@@ -630,6 +669,7 @@ gs.graph = class {
 					 this.gridY = d3.svg.axis()
 								.orient("left")
 								.tickSize(- (this.width - this.margeG - this.margeD))
+					 			.ticks(this.nticksY)
 								.scale(this.echelley);
 
 					 this.gridYGroup = this.gridGroup.append("g")
