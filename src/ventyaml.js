@@ -26,6 +26,8 @@ class ventyaml {
 		this.textarea.classList.add("ventyamlSource");
 		this.container.classList.add("hidden");
 		this.textarea.value = this.textarea.value.trim();
+		addEventListener('keyup', this.handleKeyup.bind(this));
+		addEventListener('keydown', this.handleKeydown.bind(this));
 		//this.createCM();
 
 
@@ -44,6 +46,15 @@ class ventyaml {
 		// Operate the magic
 
 		this.update();
+	}
+
+	handleKeydown(e){
+		  if(e.key == 'Control'){this.ctrlDown = true}
+		  if(e.key == 'Enter' && this.ctrlDown){this.update();}
+	}
+
+	handleKeyup(e){
+		  if(e.key == 'Control'){this.ctrlDown = false}
 	}
 
 	setValue(value){
@@ -169,10 +180,8 @@ class ventyaml {
 
 	run(){
 		this.data = [];
-		//var downloadLinks = document.querySelectorAll('#downloads>a');
-		var downloadLinks = this.downloadsDiv.children;
-		for(var i = 0; i<downloadLinks.length; i ++){
-			this.downloadsDiv.removeChild(downloadLinks[i]);
+		while(this.downloadsDiv.firstChild){
+				  this.downloadsDiv.removeChild(this.downloadsDiv.firstChild);
 		}
 
 		for(var i in this.vents){
@@ -255,7 +264,7 @@ class ventyaml {
 		if(typeof courbe == "string"){
 			function fx(d){return d.time;}
 			function fy(d){return d[courbe];}
-			var graph = gs.addGraph(this.waveformContainer.id, this.data[0], fx, fy)
+			var graph = gs.addGraph(this.waveformContainer.id, this.data[0], fx, fy, {autoScale: true})
 				.setidx('Temps (s)')
 				.setidy(courbe);
 			if(this.data.length>1){

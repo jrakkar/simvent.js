@@ -11,11 +11,6 @@ var ventyaml = function () {
 		_classCallCheck(this, ventyaml);
 
 		this.clsList = sourceNode.classList;
-		/***
-  for(var cls in sourceNode.classList.keys()){
-  	console.log(cls);
-  }
-  ***/
 
 		if (!YAML) {
 			throw "ventyaml: YAML library not loaded.";
@@ -42,6 +37,8 @@ var ventyaml = function () {
 		this.textarea.classList.add("ventyamlSource");
 		this.container.classList.add("hidden");
 		this.textarea.value = this.textarea.value.trim();
+		addEventListener('keyup', this.handleKeyup.bind(this));
+		addEventListener('keydown', this.handleKeydown.bind(this));
 		//this.createCM();
 
 
@@ -63,6 +60,23 @@ var ventyaml = function () {
 	}
 
 	_createClass(ventyaml, [{
+		key: "handleKeydown",
+		value: function handleKeydown(e) {
+			if (e.key == 'Control') {
+				this.ctrlDown = true;
+			}
+			if (e.key == 'Enter' && this.ctrlDown) {
+				this.update();
+			}
+		}
+	}, {
+		key: "handleKeyup",
+		value: function handleKeyup(e) {
+			if (e.key == 'Control') {
+				this.ctrlDown = false;
+			}
+		}
+	}, {
 		key: "setValue",
 		value: function setValue(value) {
 			this.textarea.value = value;
@@ -189,10 +203,8 @@ var ventyaml = function () {
 		key: "run",
 		value: function run() {
 			this.data = [];
-			//var downloadLinks = document.querySelectorAll('#downloads>a');
-			var downloadLinks = this.downloadsDiv.children;
-			for (var i = 0; i < downloadLinks.length; i++) {
-				this.downloadsDiv.removeChild(downloadLinks[i]);
+			while (this.downloadsDiv.firstChild) {
+				this.downloadsDiv.removeChild(this.downloadsDiv.firstChild);
 			}
 
 			for (var i in this.vents) {
@@ -278,7 +290,7 @@ var ventyaml = function () {
 					return d[courbe];
 				};
 
-				var graph = gs.addGraph(this.waveformContainer.id, this.data[0], fx, fy).setidx('Temps (s)').setidy(courbe);
+				var graph = gs.addGraph(this.waveformContainer.id, this.data[0], fx, fy, { autoScale: true }).setidx('Temps (s)').setidy(courbe);
 				if (this.data.length > 1) {
 					for (var i = 1; i < this.data.length; i++) {
 						graph.tracer(this.data[i], fx, fy);
