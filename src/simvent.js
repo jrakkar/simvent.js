@@ -576,6 +576,34 @@ sv.Ventilator = class Ventilator{
 
 	updateCalcParams(){ console.log("updateCalcParams is deprecated"); }
 
+	log (lung){
+		this.timeData.push( {
+			
+			// Ventilator variables
+
+			time  : this.time,
+			Pao    : this.Pao,
+			Fip    : this.Fip,
+			Fop    : this.Fop,
+			stateP : this.stateP,
+
+			// Lung variables
+
+			Flung : lung.flow,
+			Palv  : lung.Palv,
+			Pel   : lung.Pel,
+			Pmus  : lung.Pmus,
+			Vabs  : lung.Vabs,
+			Vti   : lung.Vti,
+			Vte   : lung.Vte,
+			Vt	: lung.Vt,
+			Vtmax : lung.Vtmax,
+			PCO2  : lung.PCO2,
+			SCO2  : lung.SCO2,
+			VCO2  : lung.VtCO2
+
+		});
+}
 	/**
 	 * Ventilate a lung object by applying **ventilationCycle** algorythm for **Tvent** time.
 	 * @param {LungObject} lung lung object
@@ -583,38 +611,13 @@ sv.Ventilator = class Ventilator{
 	 */
 
 	ventilate(lung){
-
 		this.timeData = [];
 
 		for ( this.simulationStop = this.time + this.Tvent; this.time <= this.simulationStop; ){
-				  //console.log("simvent: starting vent cycle");
 			this.ventilationCycle(lung);
 		}
 
-		/*
-		if(this.lowPass > 1){
-
-			for (var index in this.dataToFilter){
-				var id = this.dataToFilter[index];
-				var smoothed = this.timeData[0][id];
-				for (var jndex = 1, len = this.timeData.length; jndex<len; ++jndex){
-					var currentValue = this.timeData[jndex][id];
-					smoothed += (currentValue - smoothed) / this.lowPass;
-					this.timeData[jndex][id] = smoothed;
-				}
-			}
-		}
-
-		if(this.rAvg >= 2){
-
-			for (var index in this.dataToFilter){
-				sv.avg(this.timeData, this.dataToFilter[index], this.rAvg);
-			}
-		}
-		*/
-		return {
-			timeData: this.timeData
-		};
+		return { timeData: this.timeData };
 	}
 
 	/**
@@ -760,6 +763,62 @@ sv.PressureControler = class PressureControler extends sv.Ventilator {
 };
 
 /**
+ * Time trigered, flow controled, time cycled ventilator.
+ * @extends sv.Ventilator
+ */
+
+sv.FlowControler = class FlowControler extends sv.Ventilator{
+	
+	constructor(){
+		super();
+
+		this.Vt = 0.5;
+		this.PEEP = 5.0;
+		this.Ti = 1;
+		this.Fconv = 18;
+
+		this.ventParams = {
+										Vt:{unit: "l", step:0.01},
+			PEEP:{unit: "cmH₂O"},
+			Fconv:{unit:"/min."},
+			Ti:{unit: "cmH₂O"},
+			Te:{calculated: true, unit: "sec."},
+			Tcycle:{calculated: true, unit: "sec."}
+		};
+	}
+
+	get Tcycle(){return 60 / this.Fconv;}
+	get Te(){return (60 / this.Fconv) - this.Ti;}
+	get Flow(){return this.Vt / this.Ti;}
+
+	ventilationCycle(lung){
+
+			for(
+				var tStop=this.time+this.Ti; 
+				this.time < tStop && this.time <= this.simulationStop;
+				this.time += this.Tsampl
+			){
+				lung.appliquer_debit(this.Flow, this.Tsampl)
+				this.Pao = lung.Palv + (this.Flow * lung.Raw);
+				this.timeData.push(sv.log(lung, this));
+			}
+
+			this.Pao = this.PEEP
+
+			for(
+				var tStop = this.time + this.Te;
+				this.time < tStop && this.time <= this.simulationStop;
+				this.time += this.Tsampl
+			){
+				lung.appliquer_pression(this.Pao, this.Tsampl)
+				this.timeData.push(sv.log(lung, this));
+			}
+
+	}
+
+}
+
+/**
  * Quasi-static (low flow), stepwise, pressure - volume loop maneuver
  * @extends sv.Ventilator
  */
@@ -897,7 +956,7 @@ sv.IPV = class IPV extends sv.Ventilator{
 			this.Pao = this.Pao + (Pao - this.Pao)/this.lppe;
 			var flow = (this.Pao - lung.Palv)/lung.Raw;
 			lung.appliquer_debit(flow, this.Tsampl);
-			this.timeData.push(sv.log(lung, this));
+			this.log(lung);
 			this.time += this.Tsampl;
 		}
 	}
@@ -916,7 +975,7 @@ sv.IPV = class IPV extends sv.Ventilator{
 			this.Fop = this.Fop + (sv.Phasitron.Fop(this.Fip, this.Pao) - this.Fop)/this.lpop;
 			lung.appliquer_debit(this.Fop, this.Tsampl);
 			
-			this.timeData.push(sv.log(lung, this));
+			this.log(lung);
 			this.time += this.Tsampl;
 		}
 	}
@@ -999,54 +1058,6 @@ sv.VDR = class VDR extends sv.IPV{
 	}
 
 };
-
-/**
- * Time trigered, flow controled, time cycled ventilator.
- * @extends sv.Ventilator
- */
-
-sv.FlowControler = class FlowControler extends sv.Ventilator{
-	
-	constructor(){
-		super();
-
-		this.Vt = 0.5;
-		this.PEEP = 5.0;
-		this.Ti = 1;
-		this.Fconv = 18;
-
-		this.ventParams = {
-										Vt:{unit: "l", step:0.01},
-			PEEP:{unit: "cmH₂O"},
-			Fconv:{unit:"/min."},
-			Ti:{unit: "cmH₂O"},
-			Te:{calculated: true, unit: "sec."},
-			Tcycle:{calculated: true, unit: "sec."}
-		};
-	}
-
-	get Tcycle(){return 60 / this.Fconv;}
-	get Te(){return (60 / this.Fconv) - this.Ti;}
-	get Flow(){return this.Vt / this.Ti;}
-
-	ventilationCycle(lung){
-
-			for(var tStop=this.time+this.Ti; this.time<tStop && this.time<=this.simulationStop;this.time += this.Tsampl){
-				lung.appliquer_debit(this.Flow, this.Tsampl)
-				this.Pao = lung.Palv + (this.Flow * lung.Raw);
-				this.timeData.push(sv.log(lung, this));
-			}
-
-			this.Pao = this.PEEP
-			for(var tStop = this.time + this.Te; this.time < tStop && this.time<= this.simulationStop;this.time += this.Tsampl){
-				lung.appliquer_pression(this.Pao, this.Tsampl)
-				this.timeData.push(sv.log(lung, this));
-			}
-
-			//var pmeco2 = ((760-47) * lung.veco2/lung.vce);
-	}
-
-}
 
 sv.Protocol = class Protocol {
 
