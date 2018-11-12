@@ -18,6 +18,7 @@ var sim = new simulator();
 sim.vent = new sv.VDR();
 sim.debugMode = true;
 sim.vent.Tsampl = 0.02;
+sim.ventBufferFactor=0.1;
 sim.ventUpdate();
 sim.initPanel();
 sim.start();
