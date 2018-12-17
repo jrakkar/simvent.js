@@ -21,37 +21,6 @@ sv.translate = function(toTranslate, form, lang){
 	finally {return translated;}
 }
 
-/**
- * Allo
- * @function
- */
-sv.log = function(lung, vent){
-	return {
-		// Lung variables
-
-		time  : vent.time,
-		Flung : lung.flow,
-		Palv  : lung.Palv,
-		Pel   : lung.Pel,
-		Pmus  : lung.Pmus,
-		Vabs  : lung.Vabs,
-		Vti   : lung.Vti,
-		Vte   : lung.Vte,
-		Vt	: lung.Vt,
-		Vtmax : lung.Vtmax,
-		PCO2  : lung.PCO2,
-		SCO2  : lung.SCO2,
-		VCO2  : lung.VtCO2,
-
-		// Ventilator variables
-
-		Pao    : vent.Pao,
-		Fip    : vent.Fip,
-		Fop    : vent.Fop,
-		stateP : vent.stateP
-	};
-}
-
 sv.logPerc = function(lung, vent){
 	return {
 		time: vent.time,
@@ -432,18 +401,12 @@ sv.RLung = class RLung extends sv.Lung {
 		this.VmaxExp=this.Vmax;
 		this.VminInsp=this.Vmin;
 		this.Vabs = this.volume(0);
-		//console.log('Palv = ' + this.Palv);
-		//console.log('Palv = ' + this.Palv);
 		this.fitInsp();
-		//console.log('Palv = ' + this.Palv);
 		this.fitExp();
 		this.appliquer_pression(1,3);
 		this.appliquer_pression(-1,3);
 		this.appliquer_pression(1,3);
 		this.appliquer_pression(-1,3);
-		//console.log('Palv = ' + this.Palv);
-		//console.log('VminInsp = ' + this.VminInsp);
-		//console.log('VmaxExp = ' + this.VmaxExp);
 
 		this.mechParams = {
 			Vmax: {unit: "l"},
@@ -508,18 +471,6 @@ sv.RLung = class RLung extends sv.Lung {
 			this.lastPel = p;
 			return p;
 		}
-			/*
-		else {
-			var p = sv.sygX(
-					this.Vabs, 
-					this.Vmin, 
-					this.VmaxExp, 
-					this.Pid, 
-					this.Kid);
-			this.lastPel = p;
-			return p;
-		}
-		*/
 	}
 
 	get PidInsp() {return this.Pid + (this.Phister/2);}
@@ -689,7 +640,8 @@ sv.PressureAssistor = class PressureAssistor extends sv.Ventilator{
 		this.Pao = this.PEEP;
 		while (lung.flow < this.Ftrig && this.time <= this.simulationStop){
 			lung.appliquer_pression(this.PEEP, this.Tsampl);
-			this.timeData.push(sv.log(lung, this));
+			//this.timeData.push(sv.log(lung, this));
+			this.log(lung);
 			this.time += this.Tsampl;
 		}
 
@@ -697,7 +649,8 @@ sv.PressureAssistor = class PressureAssistor extends sv.Ventilator{
 		this.Pao = this.Passist + this.PEEP;
 		while (lung.flow > this.Fstop && this.time <= this.simulationStop){
 			lung.appliquer_pression(this.Passist, this.Tsampl);
-			this.timeData.push(sv.log(lung, this));
+			//this.timeData.push(sv.log(lung, this));
+			this.log(lung);
 			this.time += this.Tsampl;
 
 			if (lung.flow > this.Fmax) {this.Fmax = lung.flow;}
@@ -728,7 +681,8 @@ sv.Controler = class extends sv.Ventilator{
 			this.time += this.Tsampl
 		){
 			this.applyControledParameter(lung);
-			this.timeData.push(sv.log(lung, this));
+			//this.timeData.push(sv.log(lung, this));
+			this.log(lung);
 		}
 
 		// Expiration
@@ -914,7 +868,7 @@ sv.IPV = class IPV extends sv.Ventilator{
 
 		this.Fop=0; //Phasitron output flow
 		this.Fip=0; //Phasitron output flow
-		this.Pao=0;//Presure at the ariway openning (phasitron output)
+		this.Pao=0; //Presure at the ariway openning (phasitron output)
 
 		this.ventParams = {
 			Fperc: {unit: "/min"},
@@ -1055,18 +1009,3 @@ sv.Protocol = class Protocol {
 		  
 	}
 }
-
-sv.ventilators = [
-	sv.PressureControler,
-	sv.FlowControler,
-	sv.PressureAssistor,
-	sv.VDR,
-	sv.PVCurve
-];
-
-sv.lungs = [
-	sv.SimpleLung,
-	sv.SptLung,
-	sv.SygLung,
-	sv.RLung
-];

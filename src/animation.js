@@ -132,6 +132,8 @@ class simulator {
 		this.ventBufferFactor = 2;
 		this.Tsampl = 20;
 		this.ventTsampl = 0.005;
+		this.ventLoopInt = 5;
+		this.graphLoopInt = 5;
 		this.target = d3.select(document.body);
 
 		this.datasets = [
@@ -228,7 +230,6 @@ class simulator {
 		document.body.appendChild(this.panelDiv);
 
 		this.panelTitle('Ventilateur');
-
 		this.ventMenu();
 		this.ventTable = document.createElement('table');
 		this.panelDiv.appendChild(this.ventTable);
@@ -239,42 +240,30 @@ class simulator {
 		this.lungTable = document.createElement('table');
 		this.panelDiv.appendChild(this.lungTable);
 		this.fillParamTable(this.lung, 'mechParams', this.lungTable);
-	
-		/*
-					 this.panelTitle('Monitorage');
-					 var text = document.createTextNode('Temps en réserve: ');
-					 this.panelDiv.append(text);
-					 this.spanDataMon = document.createElement('span');
-					 this.panelDiv.append(this.spanDataMon);
-					 var text = document.createTextNode('s');
-					 this.panelDiv.append(text);
-					 */
 
-		/*
-					 this.panelTitle('Simulation');
-					 this.paramTable(this.ventilator, 'simParams', this.paramContainer, "Simulation"); 
+		if(this.debugMode == true){
+			this.panelTitle('Monitorage');
+			var text = document.createTextNode('Temps en réserve: ');
+			this.panelDiv.append(text);
+			this.spanDataMon = document.createElement('span');
+			this.panelDiv.append(this.spanDataMon);
+			var text = document.createTextNode('s');
+			this.panelDiv.append(text);
+		}
 
-*/
+		if(this.displaySimParams == true){
+			this.panelTitle('Simulation');
+			this.simTable = document.createElement('table');
+			this.panelDiv.appendChild(this.simTable);
+			this.fillParamTable(this.vent, 'simParams', this.simTable);
+		}
+
 		this.buttonValidate = document.createElement('button');
 		this.buttonValidate.textContent = 'Valider';
 		this.buttonValidate.onclick = ()=>this.validate();
 		this.buttonValidate.disabled = true;
 		this.panelDiv.appendChild(this.buttonValidate);
 
-		// Gestion des racourcis clavier
-		/*
-		 $("#panel input").keypress(function(event){
-					if (event.which == 13){ $("#ventiler").click(); }
-			 });
-
-			 $("input").change(function(){
-						this.updateModels();
-			 });
-
-			 $("input").keyup(function(){
-						this.updateModels();
-			 });
-					 */
 	}
 
 	fillParamTable(object, paramSet, table){
@@ -388,8 +377,11 @@ class simulator {
 	}
 
 	ventLoop(){
-		//this.spanDataMon.textContent = Math.round(this.data.length * this.vent.Tsampl * 10 )/10;
-		if(this.data.length <= this.ventBufferFactor/this.vent.Tsampl){
+		if(this.spanDataMon){
+			this.spanDataMon.textContent = Math.round(this.data.length * this.vent.Tsampl * 10 )/10;
+		}
+
+		if(this.data.length * this.vent.Tsampl * 1000 <= this.ventLoopInt){
 			this.ventilate();
 		}
 	}
@@ -404,7 +396,12 @@ class simulator {
 		this.buttonValidate.disabled = true;
 	}
 
-	graphLoopOld(){
+	graphLoop(){
+		if(!this.data){
+			this.stop();
+			throw 'Dooo, this is not supposed to hapen !!!.'
+		}
+
 		if(this.data.length == 0){
 			this.stop();
 			throw 'Stoped; no more data to plot.'
@@ -456,20 +453,14 @@ class simulator {
 	}
 
 	startLoops(){
-		this.ventInt = setInterval(()=>this.ventLoop(), 50);
+		this.ventInt = setInterval(()=>this.ventLoop(), this.ventLoopInt);
+
 		this.loopStartTime = new Date().getTime();
-		//this.tStartLoop = new Date().getTime();
-		//this.lastTime = new Date().getTime();
-		this.graphInt = setInterval(()=>this.graphLoopOld(), this.vent.Tsampl * 1000);
+		this.graphInt = setInterval(()=>this.graphLoop(), this.graphLoopInt);
 	}
 
 	stop(){
 		clearInterval(this.ventInt);
 		clearInterval(this.graphInt);
-		if(this.debugMode == true){
-			this.loopEndTime = new Date().getTime();
-			this.loopDuration = this.loopEndTime - this.loopStartTime;
-			console.log(this.graphData[this.graphData.length -1].time + 's plotted in ' +  this.loopDuration/1000 +'s');
-		}
 	}
 }
