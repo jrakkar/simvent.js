@@ -26,7 +26,8 @@ gs.defaults = {
 			debugMode: false,
 			durAnim: 1500,
 			padPlage: 5,
-			nticksY: 6
+			nticksY: 6,
+			nticksX: 10
 };
 
 gs.animer = function (graph) {
@@ -656,7 +657,7 @@ gs.graph = function () {
 									if (p.ligne) {
 												p.ligne.remove();
 									};
-									p.ligne = this.svg.append("line").attr("x1", this.margeG).attr("x2", this.width - this.margeD).attr("y1", this.echelley(p.val)).attr("y2", this.echelley(p.val)).attr("class", "help");
+									p.ligne = this.svg.append("line").attr("x1", this.margeG).attr("x2", this.width - this.margeD).attr("y1", this.echelley(p.val)).attr("y2", this.echelley(p.val)).attr("class", "pointy");
 
 									/*
          var texte = this.svg.append("text")
@@ -690,9 +691,8 @@ gs.graph = function () {
 			}, {
 						key: 'pointx',
 						value: function pointx(val, id) {
-									var an = this.svg.append("line").attr("x1", this.echellex(val)).attr("x2", this.echellex(val)).attr("y1", this.echelley(this.ymax)).attr("y2", this.echelley(this.ymax)).attr("class", "help");
-									an.transition().duration(this.durAnim).attr("y1", this.echelley(this.ymin) - 5);
-									this.anotations.push(an);
+									var an = this.svg.append("line").attr("x1", this.echellex(val)).attr("x2", this.echellex(val)).attr("y1", this.echelley(this.ymin)).attr("y2", this.echelley(this.ymax)).attr("class", "pointx");
+									this.pointsx.push(an);
 
 									var an = this.svg.append("text").attr("y", this.height - this.margeB / 3).attr("x", this.echellex(val)).attr("text-anchor", "middle").text(id);
 									this.anotations.push(an);
@@ -718,7 +718,7 @@ gs.graph = function () {
 									if (this.gridXGroup) {
 												this.gridXGroup.remove();
 									}
-									this.gridX = d3.svg.axis().tickSize(-(this.height - this.margeH - this.margeB - this.padH)).scale(this.echellex);
+									this.gridX = d3.svg.axis().tickSize(-(this.height - this.margeH - this.margeB - this.padH)).ticks(this.nticksX).scale(this.echellex);
 
 									this.gridXGroup = this.gridGroup.append("g").attr("class", "gridX").attr("transform", "translate(0, " + this.echelley(this.ymin) + ")").call(this.gridX);
 
