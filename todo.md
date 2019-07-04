@@ -1,6 +1,3 @@
-- [X] Ajouter des icones aux pages
-  - [X] Menu
-  - [X] frontPanel (sections du paneau des paramètres)
-  - [X] Barre de menu
-- [ ] Transformer les figures du dossier *test* en *posts*
-- [X] Faire un liste des *posts* avec leur contenu  
+-[ ] Implémenter la taxonomie de chatburn
+	-[ ] Traduire en français
+	-[ ] Réorganiser les modèles de ventilateurs en conséquence
