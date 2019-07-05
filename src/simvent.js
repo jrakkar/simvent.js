@@ -648,7 +648,7 @@ sv.PressureAssistor = class PressureAssistor extends sv.Ventilator{
 		// Phase inspiratoire
 		this.Pao = this.Passist + this.PEEP;
 		while (lung.flow > this.Fstop && this.time <= this.simulationStop){
-			lung.appliquer_pression(this.Passist, this.Tsampl);
+			lung.appliquer_pression(this.Pao, this.Tsampl);
 			//this.timeData.push(sv.log(lung, this));
 			this.log(lung);
 			this.time += this.Tsampl;
@@ -753,6 +753,9 @@ sv.FlowControler = class FlowControler extends sv.Controler{
 
 	applyControledParameter (lung) {
 			lung.appliquer_debit(this.Flow, this.Tsampl)
+		puts "$id : $value $unit"
+		puts "$id : $value $unit"
+		puts "$id : $value $unit"
 			this.Pao = lung.Palv + (this.Flow * lung.Raw);
 	}
 
