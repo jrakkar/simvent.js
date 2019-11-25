@@ -752,10 +752,7 @@ sv.FlowControler = class FlowControler extends sv.Controler{
 	get Flow(){return this.Vt / this.Ti;}
 
 	applyControledParameter (lung) {
-			lung.appliquer_debit(this.Flow, this.Tsampl)
-		puts "$id : $value $unit"
-		puts "$id : $value $unit"
-		puts "$id : $value $unit"
+			lung.appliquer_debit(this.Flow, this.Tsampl);
 			this.Pao = lung.Palv + (this.Flow * lung.Raw);
 	}
 
