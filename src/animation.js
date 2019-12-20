@@ -431,10 +431,10 @@ class simulator {
 			this.graphData.push(this.data.shift());
 			for(var gr of this.graphStack){
 				if(gr.coord == null){gr.coord = ''}
-				var coord = gr.lf(this.graphData);
-				gr.coord = gr.coord + coord;
+				gr.coord = gr.coord + gr.lf(this.graphData);
 			}
 		}
+
 		for(var gr of this.graphStack){
 			gr.path.attr('d', gr.coord);
 		}

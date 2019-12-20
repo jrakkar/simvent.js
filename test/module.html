@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<meta charset="utf-8"/>
+
+<!--
+<script src="../lib/d3.v3.min.js" charset="utf-8"></script>
+-->
+
+<link rel="stylesheet" type="text/css" href="../css/gs.css" charset="utf-8"/>
+
+<style>
+body {
+	box-sizing: border-box;
+	padding: none;
+	margin-top: none;
+}
+
+html {
+	box-sizing: border-box;
+	height: 100%;
+	padding: 0px;
+	margin: 0px;
+}
+
+svg.gs {
+	/*border: 1px solid gray;*/
+	display: block;
+	width: 100vw;
+	height: 25vh;
+	margin-left: auto;
+	margin-right: auto;
+}
+</style>
+
+<body>
+
+<script type=module>
+	import {FlowControler} from '../src/simvent-ventilators.js';
+	import {SimpleLung} from '../src/simvent-lungs.js';
+	import  {scaleLinear} from './d3-scale.js';
+	import gs from '../src/graphsimple.js';
+	
+gs.defaults.padH = .25;
+gs.defaults.margeG = 80;
+gs.defaults.margeB = 30;
+gs.defaults.margeB = 30;
+gs.defaults.margeH = 10;
+gs.defaults.padPlage = 1;
+gs.defaults.yticks = 2;
+gs.defaults.xticks = 20;
+
+var vent = new FlowControler();
+var lung = new SimpleLung();
+var data = vent.ventilate(lung).timeData;
+
+var fx = d=>d.time;
+var fy = d=>d.PCO2;
+
+
+var graph = new gs.graph();
+graph.setscale(data, fx, fy)
+	.tracer(data, fx, fy)
+	.setidy('Pao');
+		  </script>
+</body>

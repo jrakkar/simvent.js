@@ -785,3 +785,4 @@ gs.randomHue = function(saturation, lightnes){
 		  var color = "hsl( " + hue + ", " + saturation + "%, " + lightnes + "% )";
 		  return color;
 }
+export default gs;
