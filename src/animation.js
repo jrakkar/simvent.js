@@ -1,4 +1,6 @@
-class graph {
+import {SimpleLung} from "simvent-lungs.js";
+
+export class graph {
 	constructor(dataName, timePerScreen, target){
 		this.timePerScreen = timePerScreen;
 		this.dataName = dataName;
@@ -126,7 +128,7 @@ class graph {
 
 }
 
-class simulator {
+export class simulator {
 	constructor(){
 		this.debugMode = false;
 		this.ventBufferFactor = 2;
@@ -164,8 +166,8 @@ class simulator {
 		this.graphStack = [];
 		this.tStart = 0;
 
-		this.lung = new sv.SimpleLung();
-		this.vent = new sv.FlowControler();	
+		this.lung = new SimpleLung();
+		this.vent = new FlowControler();	
 
 		this.ventUpdate();
 

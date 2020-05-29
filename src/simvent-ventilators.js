@@ -3,16 +3,6 @@
 //******************************
 
 /**
- * Lung object created with one of the simvent.js lung classes :
- * 
- * - {@link sv.SimpleLung}
- * - {@link sv.SptLung}
- * - {@link sv.SygLung}
- * - {@link sv.RLung}
- * @typedef LungObject
- */
-
-/**
  * Base ventilator class uppon wich ventilator models are built
  */
 
@@ -54,7 +44,7 @@ class Ventilator{
 			
 			// Ventilator variables
 
-			time  : this.time,
+			time   : this.time,
 			Pao    : this.Pao,
 			Fip    : this.Fip,
 			Fop    : this.Fop,
@@ -69,7 +59,7 @@ class Ventilator{
 			Vabs  : lung.Vabs,
 			Vti   : lung.Vti,
 			Vte   : lung.Vte,
-			Vt	: lung.Vt,
+			Vt    : lung.Vt,
 			Vtmax : lung.Vtmax,
 			PCO2  : lung.PCO2,
 			SCO2  : lung.SCO2,
@@ -102,26 +92,6 @@ class Ventilator{
 	ventilationCycle(){
 		throw "ventilationCycle() must be implemented i high level ventilator model.";
 	}
-
-	/**
-	sampleWaveform(){
-		var lung = new this.demoLung();
-		var data = this.ventilate(lung).timeData;
-
-		var params = ["Pao"];
-		for(var i in params){
-			var idsvg = "svg" + document.querySelectorAll("svg").length;
-			document.write("<svg id='" + idsvg +"' class='ventSample'></svg>");
-			function fx(d){return d.time;}
-			function fy(d){return d[params[i]];}
-			var graph = new gs.graph("#"+idsvg); 
-			graph.setscale(data, fx, fy);
-			graph.tracer(data, fx, fy);
-			graph.setidx("Time (s)");
-			graph.setidy(params[i]);
-		}
-	}
-	**/
 
 	defaultsTable(){
 		sv.defaultsTable.call(this,this.ventParams);
@@ -351,7 +321,6 @@ export class PVCurve extends Ventilator{
 
 };
 
-
 function phasitron(Fip, Pao){
 	if(Pao >= 0 && Pao <=40){
 		return Fip + (Fip * (5 -(Pao/8)));
@@ -414,9 +383,7 @@ class IPV extends Ventilator{
 	get Fhz(){return this.Fperc / 60;}
 	get Tip(){return (60/this.Fperc)*this.Rit;}
 	get Tep(){return (60/this.Fperc)-this.Tip;}
-	calcFop() {
-		return this.Fop + (phasitron(this.Fip, this.Pao) - this.Fop)/this.lpop;
-	}
+	calcFop(){return this.Fop + (phasitron(this.Fip, this.Pao) - this.Fop)/this.lpop;}
 
 	percussiveExpiration (lung, Rexp){
 		// Must be executed in a scope where the timeData container is defined

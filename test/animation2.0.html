@@ -4,7 +4,9 @@
 
 <script src="../lib/d3.v3.min.js" charset="utf-8"></script>
 <script src="../src/simvent.js" charset="utf-8"></script>
+<!--
 <script src="../src/animation.js" charset="utf-8"></script>
+-->
 <script src="../src/swipe.js" charset="utf-8"></script>
 
 <link rel="stylesheet" type="text/css" href="../css/gs-scratch.css" charset="utf-8"/>
@@ -12,8 +14,9 @@
 
 <body>
 
-		  <script>
+		  <script type=module>
 
+				import {simulator} from "../src/animation.js"
 var sim = new simulator();
 sim.vent = new sv.VDR();
 sim.debugMode = true;

@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8"/>
 
-<!--
 <script src="../lib/d3.v3.min.js" charset="utf-8"></script>
--->
 
 <link rel="stylesheet" type="text/css" href="../css/gs.css" charset="utf-8"/>
 
@@ -36,7 +34,6 @@ svg.gs {
 <script type=module>
 	import {FlowControler} from '../src/simvent-ventilators.js';
 	import {SimpleLung} from '../src/simvent-lungs.js';
-	import  {scaleLinear} from './d3-scale.js';
 	import gs from '../src/graphsimple.js';
 	
 gs.defaults.padH = .25;
@@ -53,12 +50,12 @@ var lung = new SimpleLung();
 var data = vent.ventilate(lung).timeData;
 
 var fx = d=>d.time;
-var fy = d=>d.PCO2;
+var fy = d=>d.Pao;
 
 
 var graph = new gs.graph();
 graph.setscale(data, fx, fy)
 	.tracer(data, fx, fy)
 	.setidy('Pao');
-		  </script>
+</script>
 </body>

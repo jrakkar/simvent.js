@@ -24,26 +24,8 @@ gs.defaults = {
 		  nticksX:10
 };
 
-gs.animer = function(graph){
-		  if(graph.curAnim < graph.animations.length){
-					 graph.animations[graph.curAnim]();
-					 graph.curAnim ++;
-		  }
-};
-
-gs.stat = function(iddiv, respd){
-		  var tableau = "<table style='float:top'6>";
-		  tableau += "<tr><td>P<small>A</small>CO₂:</td><td>" + Math.round(10*respd[0].pAco2)/10 +" mmHg</td></tr>";
-		  tableau += "<tr><td>P<small>E</small>CO₂:</td><td>" + Math.round(10*respd[0].pmeco2)/10 +" mmHg</td></tr>";
-		  tableau += '<tr><td>$\\frac{V_{EM}}{Vc}$ (Fowler):</td><td>' + Math.round(1000* respd[0].fowler)/10 +" %</td></tr>";
-		  tableau += '<tr><td>$\\frac{V_{EM}}{Vc}$ (Bohr):</td><td>' + Math.round(1000* respd[0].bohr)/10 +" %</td></tr>";
-		  tableau += "</table>";
-		  $(iddiv).append(tableau);
-};
-
 gs.graph = class {
 		  constructor(idsvg, conf){
-
 
 					 for(var index in gs.defaults){
 								this[index] = gs.defaults[index];
