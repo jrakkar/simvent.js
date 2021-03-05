@@ -65,6 +65,9 @@ gs.graph = class {
 					 if('class' in this){
 								this.svg.classed(this.class, true);
 					 }
+					 if('viewBox' in this){
+								this.svg.attr('viewBox', this.viewBox);
+					 }
 					 this.gridGroup = this.svg.append("g")
 								.attr("id", "gridGroup");
 
@@ -135,8 +138,8 @@ gs.graph = class {
 								.attr("markerWidth", "21")
 								.attr("markerHeight", "18")
 								.attr("orient", "auto")
-								.attr("markerUnits", "userSpaceOnUse")
-					 .attr('stroke', 'cntext-stroke')
+								.attr("markerUdivnits", "userSpaceOnUse")
+								.attr('stroke', 'context-stroke')
 								.append("path")
 								.attr("d", "M3,5 L9,10 L3,15");
 
@@ -258,47 +261,76 @@ gs.graph = class {
 								 this.redessiner();
 					  }
 			}
-		  tracer (donnees, fonctionx, fonctiony){
-					this.donnees.push({donnees: donnees, fx: fonctionx, fy: fonctiony});
-					if(this.autoScale){
-							  this.Autoscale();
-					}
-					 this.drawgrids();
+	AutoscaleAll (){
+		var lastData = this.donnees[this.donnees.length -1];
+		if('xmin' in this){
+			if(d3.max(lastData.donnees, lastData.fy) > this.ymax){
+				this.ymax = d3.max(lastData.donnees, lastData.fy);
+				if(this.padH != 0){
+					this.ymax += this.padH * (this.ymax - this.ymin);
+				}
+			}
 
-					 this.getsf(donnees, fonctionx, fonctiony);
-					 var surface = this.sf(donnees, fonctionx, fonctiony);
-					 this.surface = this.svg.append("path")
-								.attr("d", surface)
-								.attr("class", "surface")
-								.style("clip-path", "url(" + this.idsvg + "clip)")
-					 ;	
+			if(d3.min(lastData.donnees, lastData.fy) < this.ymin){
+				this.ymin = d3.min(lastData.donnees, lastData.fy);
+				if(this.padB != 0){
+					this.ymin += this.padH * (this.ymin - this.ymax);
+				}
+			}
 
-					 this.axes()
+			if(d3.max(lastData.donnees, lastData.fx) > this.xmax){
+				this.xmax = d3.max(lastData.donnees, lastData.fx);
+				if(this.padD != 0){
+					this.xmax += this.padD * (this.xmax - this.xmin);
+				}
+			}
 
-					 /*
-					 if(!('waveformGroup' in this)){
-								this.waveformGroup = this.svg.append("g")
-										  .attr("id", "waveformGroup");
-					 }
-					 */
+			if(d3.min(lastData.donnees, lastData.fx) < this.xmin){
+				this.xmin = d3.min(lastData.donnees, lastData.fx);
+				if(this.padG != 0){
+					this.xmin += this.padG * (this.xmin - this.xmax);
+				}
+			}
+			this.redessiner();
+		}
+	}
 
-					if(!this.autoScale){
-							  this.Tracer(donnees, fonctionx, fonctiony);
-					}
-					 //this.playSimb();
-					 return this;
-		  }
+	tracer (donnees, fonctionx, fonctiony, attr){
+		this.donnees.push({donnees: donnees, fx: fonctionx, fy: fonctiony});
+		if(this.autoScale){
+			this.Autoscale();
+		}
 
-		  Tracer(d, fx, fy){
-					 this.getlf(fx, fy);
-					 var coord = this.lf(d);
-					 var courbe = this.waveformGroup.append("path")
-								.attr("d", coord)
-								.style("clip-path", "url(" + this.idsvg + "clip)")
-								.classed('dataPath', true);
-					 this.courbes.push(courbe);
-					 return this;
-		  }
+		this.drawgrids();
+
+		this.getsf(donnees, fonctionx, fonctiony);
+		var surface = this.sf(donnees, fonctionx, fonctiony);
+		this.surface = this.svg.append("path")
+			.attr("d", surface)
+			.attr("class", "surface")
+			.style("clip-path", "url(" + this.idsvg + "clip)")
+		;	
+
+		this.axes()
+
+		if(!this.autoScale){
+			this.Tracer(donnees, fonctionx, fonctiony, attr);
+		}
+		//this.playSimb();
+		return this;
+	}
+
+	Tracer(d, fx, fy, attr){
+		this.getlf(fx, fy);
+		var coord = this.lf(d);
+		var courbe = this.waveformGroup.append("path")
+			.attr("d", coord)
+			.style("clip-path", "url(" + this.idsvg + "clip)")
+			.classed('dataPath', true);
+		this.courbes.push(courbe);
+
+		return this;
+	}
 
 		  redessiner(){
 					 this.setRanges();
@@ -743,7 +775,7 @@ gs.graph = class {
 }
 
 gs.quickGraph = function(div, data, fx, fy, conf){
-		  return new gs.graph(div, conf)
+		  return new gs.raph(div, conf)
 					 .setscale(data, fx, fy)
 					 .tracer(data, fx, fy);
 }

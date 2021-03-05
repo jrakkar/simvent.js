@@ -18,7 +18,7 @@ g#annotationsGroup line, g#plageGroup line {
     stroke: none;
     fill: none; }
   .gs #waveformGroup path {
-    display: visible;
+    /*display: visible;*/
     stroke-width: 1.5px;
     fill: none;
     stroke: black; }
