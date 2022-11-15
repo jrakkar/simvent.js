@@ -377,7 +377,7 @@ logPerc = function(lung, vent){
 }
 */
 
-class IPV extends Ventilator{
+export class IPV extends Ventilator{
 
 	constructor(){
 		super();

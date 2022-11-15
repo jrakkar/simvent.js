@@ -2,9 +2,7 @@ if(typeof d3 == 'undefined'){
 		  throw 'graphsimple.js: d3 library not loaded.';
 }
 
-var gs = {};
-
-gs.defaults = {
+const defaults = {
 		  margeG: 20,
 		  margeD: 20,
 		  margeH: 20,
@@ -24,7 +22,7 @@ gs.defaults = {
 		  nticksX:10
 };
 
-gs.graph = class {
+export class graph {
 		  constructor(idsvg, conf){
 
 					 for(var index in gs.defaults){
@@ -724,13 +722,13 @@ gs.graph = class {
 		  //	return this;
 }
 
-gs.quickGraph = function(div, data, fx, fy, conf){
+export function quickGraph(div, data, fx, fy, conf){
 		  return new gs.graph(div, conf)
 					 .setscale(data, fx, fy)
 					 .tracer(data, fx, fy);
 }
 
-gs.addGraph = function(target, data, fx, fy, conf){
+export function addGraph(target, data, fx, fy, conf){
 		  var numSVG = document.getElementsByTagName("svg").length + 1; 
 		  var newSVGid = target + "SVG" + numSVG;
 		  var newsvg = d3.select("#" + target)
@@ -743,7 +741,7 @@ gs.addGraph = function(target, data, fx, fy, conf){
 		  return gs.quickGraph("#" + newSVGid, data, fx, fy, conf);
 }
 
-gs.newSvg = function(){
+function newSvg (){
 		  var scriptParent = document.scripts[document.scripts.length - 1].parentNode;
 		  var numSVG = document.getElementsByTagName("svg").length + 1; 
 		  var newSVGid = "svg" + numSVG;
@@ -753,7 +751,7 @@ gs.newSvg = function(){
 		  return newSVGid;
 }
 
-gs.newDiv = function(){
+function newDiv (){
 		  var scriptParent = document.scripts[document.scripts.length - 1].parentNode;
 		  var divNum = document.querySelectorAll("div").length + 1;
 		  var newDiv = document.createElement("div");
@@ -762,9 +760,8 @@ gs.newDiv = function(){
 		  return newDiv.id;
 }
 
-gs.randomHue = function(saturation, lightnes){
+function randomHue (saturation, lightnes){
 		  var hue = Math.random() * 360;
 		  var color = "hsl( " + hue + ", " + saturation + "%, " + lightnes + "% )";
 		  return color;
 }
-export default gs;
