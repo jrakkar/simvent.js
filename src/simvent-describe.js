@@ -58,14 +58,14 @@ function download(objArray) {
         for (var index in array[i]) {
             if(line != '') line += '\t '
          
-            line += array[i][index];
-        }
- 
-        str += line + '\r\n';
-    }
- 
-    var link = document.createElement('a');
-    link.download = 'simvent.dat';
+					line += array[i][index];
+			}
+
+			str += line + '\r\n';
+	}
+
+	var link = document.createElement('a');
+	link.download = 'simvent.dat';
     link.href = 'data:text/tsv;charset=utf-8,' + escape(str);
     document.body.appendChild(link);
     setTimeout(function(){

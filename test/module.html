@@ -32,30 +32,30 @@ svg.gs {
 <body>
 
 <script type=module>
-	import {FlowControler} from '../src/simvent-ventilators.js';
+
+	import {PressureControler} from '../src/simvent-ventilators.js';
 	import {SimpleLung} from '../src/simvent-lungs.js';
 	import gs from '../src/graphsimple.js';
-	
-gs.defaults.padH = .25;
-gs.defaults.margeG = 80;
-gs.defaults.margeB = 30;
-gs.defaults.margeB = 30;
-gs.defaults.margeH = 10;
-gs.defaults.padPlage = 1;
-gs.defaults.yticks = 2;
-gs.defaults.xticks = 20;
 
-var vent = new FlowControler();
-var lung = new SimpleLung();
-var data = vent.ventilate(lung).timeData;
+	const graphParam = {
+		padH: .25,
+		margeG: 80,
+		margeB: 30,
+		margeH: 10,
+	};
 
-var fx = d=>d.time;
-var fy = d=>d.Pao;
+	var vent = new PressureControler({PEEP: 10, Fconv: 40});
+	var lung = new SimpleLung();
+	var data = vent.ventilate(lung).timeData;
+
+	const fx = d=>d.time;
+	const fy = d=>d.Pao;
 
 
-var graph = new gs.graph();
-graph.setscale(data, fx, fy)
-	.tracer(data, fx, fy)
-	.setidy('Pao');
+	var graph = new gs.graph(null, graphParam);
+	graph.setscale(data, fx, fy)
+		.tracer(data, fx, fy)
+		.setidy('Pao');
+
 </script>
 </body>

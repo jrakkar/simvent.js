@@ -3,13 +3,17 @@
 //******************************
 
 /**
+ * @module simvent-ventilators
+ */
+
+/**
  * Base ventilator class uppon wich ventilator models are built
  */
 
 class Ventilator{
 
-	constructor() {
-	
+	constructor(params) {
+
 		this.time = 0;
 
 		/**
@@ -17,7 +21,8 @@ class Ventilator{
 		 * @type {number}
 		 */
 
-		this.Tvent= 12;
+		//this.Tvent = 12;
+		this.Tvent = 0
 
 		/** 
 		 * Time in seconds between each iteration. 
@@ -26,20 +31,31 @@ class Ventilator{
 		 * @type {number}
 		 * */
 
-		this.Tsampl = 0.003;
-
-		//this.demoLung = SimpleLung;
+		//this.Tsampl = 0.003;
+		this.Tsampl = 0;
 
 		this.simParams = {
-			Tsampl:{unit: "s"},
-			Tvent: {uni: "s"}
+			Tsampl:{unit: "s", init: .003},/** Will this comment be parsed ? **/
+			Tvent: {unit: "s", init: 12},
 		};
+
+		if(typeof params != 'undefined'){
+			for(const index in this.simParams){
+				this[index] = typeof params[index] != 'undefined' ? param[index] : this.simParams[index].init;
+			}
+		}	
+		else{
+			for(const index in this.simParams){
+				this[index] = this.simParams[index].init;
+			}
+		}
+
 
 	}
 
 	updateCalcParams(){ console.log("updateCalcParams is deprecated"); }
 
-	log (lung){
+	log(lung){
 		this.timeData.push( {
 			
 			// Ventilator variables
@@ -115,6 +131,7 @@ export class PressureAssistor extends Ventilator{
 		this.PEEP = 5.0;
 		this.Cycling = 25;
 		this.Ftrig = 0.1;
+
 		//this.demoLung = SptLung;
 
 		this.ventParams = {
@@ -156,11 +173,31 @@ export class PressureAssistor extends Ventilator{
 }
 
 class Controler extends Ventilator{
-	constructor () {
-		super();
-		this.PEEP = 5.0;
-		this.Ti = 1;
-		this.Fconv = 12;
+	constructor (params) {
+		super(params);
+
+		//this.ventParams = {
+		//	PEEP:{unit: "cmH₂O", init: 5},
+		//	Ti:{unit:"s", init: 1},
+		//	Fconv:{unit: "/min", init: 12},
+		//};
+
+		this.ventParams = {};
+		this.ventParams['PEEP'] = {unit: "cmH₂O", init: 5};
+		this.ventParams['Ti'] = {unit:"s", init: 1};
+		this.ventParams['Fconv'] = {unit: "/min", init: 12};
+
+
+		if(typeof params != 'undefined'){
+			for(const key in this.ventParams){
+				this[key] = key in params ? params[key] : this.ventParams[key].init;
+			}
+		}
+		else{
+			for(const key in this.ventParams){
+				this[key] = this.ventParams[key].init;
+			}
+		}
 	}
 
 	get Tcycle() { return 60 / this.Fconv; }
@@ -198,8 +235,8 @@ class Controler extends Ventilator{
 
 export class PressureControler extends Controler {
 	
-	constructor(){
-		super();
+	constructor(params){
+		super(params);
 
 		this.Pinspi = 10.0;
 
@@ -227,19 +264,14 @@ export class PressureControler extends Controler {
 
 export class FlowControler extends Controler{
 	
-	constructor(){
-		super();
+	constructor(params){
+		super(params);
 
 		this.Vt = 0.5;
-
-		this.ventParams = {
-										Vt:{unit: "l", step:0.01},
-			PEEP:{unit: "cmH₂O"},
-			Fconv:{unit:"/min."},
-			Ti:{unit: "cmH₂O"},
-			Te:{calculated: true, unit: "sec."},
-			Tcycle:{calculated: true, unit: "sec."}
-		};
+		this.ventParams['Vt']={unit: "l", step:0.01};
+		this.ventParams['Te']={calculated: true, unit: "sec."};
+		this.ventParams['Tcycle']={calculated: true, unit: "sec."};
+		console.table(this.ventParams)
 	}
 
 	get Flow(){return this.Vt / this.Ti;}
