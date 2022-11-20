@@ -2,9 +2,7 @@ if(typeof d3 == 'undefined'){
 		  throw 'graphsimple.js: d3 library not loaded.';
 }
 
-var gs = {};
-
-gs.defaults = {
+const defaults = {
 		  margeG: 20,
 		  margeD: 20,
 		  margeH: 20,
@@ -24,29 +22,11 @@ gs.defaults = {
 		  nticksX:10
 };
 
-gs.animer = function(graph){
-		  if(graph.curAnim < graph.animations.length){
-					 graph.animations[graph.curAnim]();
-					 graph.curAnim ++;
-		  }
-};
-
-gs.stat = function(iddiv, respd){
-		  var tableau = "<table style='float:top'6>";
-		  tableau += "<tr><td>P<small>A</small>CO₂:</td><td>" + Math.round(10*respd[0].pAco2)/10 +" mmHg</td></tr>";
-		  tableau += "<tr><td>P<small>E</small>CO₂:</td><td>" + Math.round(10*respd[0].pmeco2)/10 +" mmHg</td></tr>";
-		  tableau += '<tr><td>$\\frac{V_{EM}}{Vc}$ (Fowler):</td><td>' + Math.round(1000* respd[0].fowler)/10 +" %</td></tr>";
-		  tableau += '<tr><td>$\\frac{V_{EM}}{Vc}$ (Bohr):</td><td>' + Math.round(1000* respd[0].bohr)/10 +" %</td></tr>";
-		  tableau += "</table>";
-		  $(iddiv).append(tableau);
-};
-
-gs.graph = class {
+export class graph {
 		  constructor(idsvg, conf){
 
-
-					 for(var index in gs.defaults){
-								this[index] = gs.defaults[index];
+					 for(var index in defaults){
+								this[index] = defaults[index];
 					 }
 
 					 for(var index in conf){
@@ -54,7 +34,7 @@ gs.graph = class {
 					 }
 
 					 if(idsvg == null){
-								this.idsvg = "#" + gs.newSvg();
+								this.idsvg = "#" + newSvg();
 					 }
 					 else{
 								this.idsvg = idsvg;
@@ -774,13 +754,13 @@ gs.graph = class {
 		  //	return this;
 }
 
-gs.quickGraph = function(div, data, fx, fy, conf){
-		  return new gs.raph(div, conf)
+export function quickGraph(div, data, fx, fy, conf){
+		  return new graph(div, conf)
 					 .setscale(data, fx, fy)
 					 .tracer(data, fx, fy);
 }
 
-gs.addGraph = function(target, data, fx, fy, conf){
+export function addGraph(target, data, fx, fy, conf){
 		  var numSVG = document.getElementsByTagName("svg").length + 1; 
 		  var newSVGid = target + "SVG" + numSVG;
 		  var newsvg = d3.select("#" + target)
@@ -790,10 +770,10 @@ gs.addGraph = function(target, data, fx, fy, conf){
 		  if (typeof conf != "undefined" && 'class' in conf){
 					 newsvg.classed(conf.class, true);
 		  }
-		  return gs.quickGraph("#" + newSVGid, data, fx, fy, conf);
+		  return quickGraph("#" + newSVGid, data, fx, fy, conf);
 }
 
-gs.newSvg = function(){
+function newSvg (){
 		  var scriptParent = document.scripts[document.scripts.length - 1].parentNode;
 		  var numSVG = document.getElementsByTagName("svg").length + 1; 
 		  var newSVGid = "svg" + numSVG;
@@ -803,7 +783,7 @@ gs.newSvg = function(){
 		  return newSVGid;
 }
 
-gs.newDiv = function(){
+function newDiv (){
 		  var scriptParent = document.scripts[document.scripts.length - 1].parentNode;
 		  var divNum = document.querySelectorAll("div").length + 1;
 		  var newDiv = document.createElement("div");
@@ -812,7 +792,7 @@ gs.newDiv = function(){
 		  return newDiv.id;
 }
 
-gs.randomHue = function(saturation, lightnes){
+function randomHue (saturation, lightnes){
 		  var hue = Math.random() * 360;
 		  var color = "hsl( " + hue + ", " + saturation + "%, " + lightnes + "% )";
 		  return color;

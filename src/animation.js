@@ -1,132 +1,7 @@
-class graph {
-	constructor(dataName, timePerScreen, target){
-		this.timePerScreen = timePerScreen;
-		this.dataName = dataName;
+import * as simventLungs from "./simvent-lungs.js";
+import * as simventVentilators from "./simvent-ventilators.js";
 
-		this.svg = target.append('svg');
-		this.svg.attr('class', 'gs');
-		this.path = this.svg.append('path');
-		this.path.attr('class', 'gsPlotLine');
-		this.coord = '';
-
-		this.setXscale();	
-		this.drawID();
-	}
-
-	setXscale(){
-		this.margeG = this.svg.style('font-size').slice(0,-2) * 2.1;
-		this.margeD = this.svg.style('font-size').slice(0,-2) * .8;
-		this.width = this.svg.style('width').slice(0, -2);
-
-		this.echellex = d3.scale.linear()
-			.domain([0, this.timePerScreen])
-			.range([this.margeG, this.width - this.margeD]);
-	}
-
-	setYscale(dataSet){
-		var dsMin = d3.min(dataSet, d => d[this.dataName]);
-		var dsMax = d3.max(dataSet, d => d[this.dataName]);
-
-		var ymin = Math.min(0,dsMin);
-		var ymax = Math.max(dsMax , - dsMin);
-
-		if(ymax > 10){ymax = Math.ceil(ymax/5)*5}
-		if(ymax < 10){ymax = Math.ceil(ymax)}
-		if(ymin < 0 && ymin > -10){ymin = Math.floor(ymin)}
-		if(ymin < -10){ymin = Math.floor(ymin/5)*5}
-
-		this.margeB = this.svg.style('font-size').slice(0,-2) * 2;
-		this.margeH = this.svg.style('font-size').slice(0,-2) * 1;
-		this.height = this.svg.style('height').slice(0, -2);
-
-		this.echelley = d3.scale.linear()
-			.domain([ymin, ymax])
-			.range([this.height - this.margeB, this.margeH]);
-	}
-
-	drawID(){
-		this.id = this.svg.append('text')
-			.attr('x', this.margeG + 5)
-			.attr('y', 18)
-			.attr('text-anchor', 'start')
-			.text(this.dataName)
-		;
-	}
-
-	setNLf(){
-		this.lf = function(d){
-			var l = d.length;
-			if(l == 0){throw 'graph.lf: no data to plot'}
-			var point = d[l -1];
-			if(l == 0){
-				console.log('NLF: no data to plot');
-			}
-			else if (l == 1){
-				var string = 'M' + this.echellex(point.time - this.tStart) + ',' + this.echelley(point[this.dataName]);
-			}
-			else {
-				var string = 'L' + this.echellex(point.time - this.tStart) + ',' + this.echelley(point[this.dataName]);
-			}
-			return string;
-		}
-	}
-
-	drawGradY (){
-
-		if(this.gradYGroup){this.gradYGroup.remove()}
-		this.gradY = d3.svg.axis()
-			.ticks(4)
-			.tickSize(5)
-			.orient("left")
-			.scale(this.echelley);
-
-		this.gradYGroup = this.svg.append("g")
-			.attr("class", "gradY")
-			.attr("transform", "translate(" + this.margeG + ", 0)")
-			.call(this.gradY)
-		;
-
-		return this;
-	}
-
-	drawGradX (){
-
-		if(this.gradXGroup){this.gradXGroup.remove()}
-		this.gradX = d3.svg.axis()
-			.scale(this.echellex)
-			.orient('bottom')
-		//.ticks(2)
-			.tickValues(d3.range(2,this.timePerScreen, 2))
-		;
-
-		this.gradXGroup = this.svg.append("g")
-			.attr("class", "gradX")
-			.attr("transform", "translate(0, " + this.echelley(0) + ")")
-			.call(this.gradX)
-		;
-
-	}
-
-	replot(data){
-		var lf = d3.svg.line()
-			.x((d)=> this.echellex(d['time']-this.tStart))
-			.y((d)=> this.echelley(d[this.dataName]))
-			.interpolate("linear");
-		this.coord = lf(data);
-		this.path.attr('d', this.coord);
-	}
-
-	redraw(scalingData, plotData){
-		this.setXscale();
-		this.setYscale(scalingData);
-		this.drawGradX();
-		this.drawGradY();
-		this.replot(plotData);
-	}
-
-}
-
-class simulator {
+export class simulator {
 	constructor(){
 		this.debugMode = false;
 		this.ventBufferFactor = 2;
@@ -164,8 +39,8 @@ class simulator {
 		this.graphStack = [];
 		this.tStart = 0;
 
-		this.lung = new sv.SimpleLung();
-		this.vent = new sv.FlowControler();	
+		this.lung = new simventLungs.SimpleLung();
+		this.vent = new simventVentilators.FlowControler();	
 
 		this.ventUpdate();
 
@@ -210,7 +85,7 @@ class simulator {
 	}
 
 	ventChange(){
-		this.nextVent = new sv[this.ventList[this.ventSelect.selectedIndex]]();
+		this.nextVent = new simventVentilators[this.ventList[this.ventSelect.selectedIndex]]();
 		this.nextVent.time = this.vent.time;
 		this.vent = this.nextVent;
 		this.ventUpdate();
@@ -218,7 +93,7 @@ class simulator {
 	}
 
 	lungChange(){
-		this.lung = new sv[this.lungList[this.lungSelect.selectedIndex]]();
+		this.lung = new simventLungs[this.lungList[this.lungSelect.selectedIndex]]();
 		this.fillParamTable(this.lung, 'mechParams', this.lungTable);
 	}
 
@@ -360,19 +235,19 @@ class simulator {
 	setYscale(){
 		var dataSet = this.data.concat(this.graphData);
 
-		for(graph of this.graphStack){
-			graph.setYscale(dataSet);
-			graph.drawGradY();
-			graph.drawGradX();
-			graph.setNLf();
+		for(const g of this.graphStack){
+			g.setYscale(dataSet);
+			g.drawGradY();
+			g.drawGradX();
+			g.setNLf();
 		}
 	}
 
 	redraw(){
 		var scalingData = this.data.concat(this.graphData);
 
-		for(var graph of this.graphStack){
-			graph.redraw(scalingData, this.graphData);
+		for(var g of this.graphStack){
+			g.redraw(scalingData, this.graphData);
 		}
 	}
 
@@ -415,9 +290,9 @@ class simulator {
 			if(this.debugMode == true){ console.log(this.timePerScreen + 's plotted in ' +  this.loopDuration/1000 +'s'); }
 			this.setYscale();
 			this.tStart = this.data[0].time;
-			for(graph of this.graphStack){
-				graph.tStart = this.tStart;
-				graph.coord = '';
+			for(const g of this.graphStack){
+				g.tStart = this.tStart;
+				g.coord = '';
 			}
 			this.graphData = [];
 		}
@@ -431,10 +306,10 @@ class simulator {
 			this.graphData.push(this.data.shift());
 			for(var gr of this.graphStack){
 				if(gr.coord == null){gr.coord = ''}
-				var coord = gr.lf(this.graphData);
-				gr.coord = gr.coord + coord;
+				gr.coord = gr.coord + gr.lf(this.graphData);
 			}
 		}
+
 		for(var gr of this.graphStack){
 			gr.path.attr('d', gr.coord);
 		}
@@ -443,7 +318,7 @@ class simulator {
 	start(){
 		for(var ds of this.datasets){
 			var gr = new graph(ds.name, this.timePerScreen, this.target);
-			if(this.debugMode == true){gr.debugMode = true}
+			gr.debugMode = this.debugMode;
 			gr.tStart = 0;
 			this.graphStack.push(gr);
 		}
@@ -463,4 +338,132 @@ class simulator {
 		clearInterval(this.ventInt);
 		clearInterval(this.graphInt);
 	}
+}
+
+class graph {
+	constructor(dataName, timePerScreen, target){
+		this.timePerScreen = timePerScreen;
+		this.dataName = dataName;
+
+		this.svg = target.append('svg');
+		this.svg.attr('class', 'gs');
+		this.path = this.svg.append('path');
+		this.path.attr('class', 'gsPlotLine');
+		this.coord = '';
+
+		this.setXscale();	
+		this.drawID();
+	}
+
+	setXscale(){
+		this.margeG = this.svg.style('font-size').slice(0,-2) * 2.1;
+		this.margeD = this.svg.style('font-size').slice(0,-2) * .8;
+		this.width = this.svg.style('width').slice(0, -2);
+
+		this.echellex = d3.scale.linear()
+			.domain([0, this.timePerScreen])
+			.range([this.margeG, this.width - this.margeD]);
+	}
+
+	setYscale(dataSet){
+		var dsMin = d3.min(dataSet, d => d[this.dataName]);
+		var dsMax = d3.max(dataSet, d => d[this.dataName]);
+
+		var ymin = Math.min(0,dsMin);
+		var ymax = Math.max(dsMax , - dsMin);
+
+		if(ymax > 10){ymax = Math.ceil(ymax/5)*5}
+		if(ymax < 10){ymax = Math.ceil(ymax)}
+		if(ymin < 0 && ymin > -10){ymin = Math.floor(ymin)}
+		if(ymin < -10){ymin = Math.floor(ymin/5)*5}
+
+		this.margeB = this.svg.style('font-size').slice(0,-2) * 2;
+		this.margeH = this.svg.style('font-size').slice(0,-2) * 1;
+		this.height = this.svg.style('height').slice(0, -2);
+
+		this.echelley = d3.scale.linear()
+			.domain([ymin, ymax])
+			.range([this.height - this.margeB, this.margeH]);
+	}
+
+	drawID(){
+		this.id = this.svg.append('text')
+			.attr('x', this.margeG + 5)
+			.attr('y', 18)
+			.attr('text-anchor', 'start')
+			.text(this.dataName)
+		;
+	}
+
+	setNLf(){
+		this.lf = function(d){
+			var l = d.length;
+			if(l == 0){throw 'graph.lf: no data to plot'}
+			var point = d[l -1];
+			if(l == 0){
+				console.log('NLF: no data to plot');
+			}
+			else if (l == 1){
+				var string = 'M' + this.echellex(point.time - this.tStart) + ',' + this.echelley(point[this.dataName]);
+			}
+			else {
+				var string = 'L' + this.echellex(point.time - this.tStart) + ',' + this.echelley(point[this.dataName]);
+			}
+			return string;
+		}
+	}
+
+	drawGradY (){
+
+		if(this.gradYGroup){this.gradYGroup.remove()}
+		this.gradY = d3.svg.axis()
+			.ticks(4)
+			.tickSize(5)
+			.orient("left")
+			.scale(this.echelley);
+
+		this.gradYGroup = this.svg.append("g")
+			.attr("class", "gradY")
+			.attr("transform", "translate(" + this.margeG + ", 0)")
+			.call(this.gradY)
+		;
+
+		return this;
+	}
+
+	drawGradX (){
+
+		if(this.gradXGroup){this.gradXGroup.remove()}
+		this.gradX = d3.svg.axis()
+			.scale(this.echellex)
+			.orient('bottom')
+		//.ticks(2)
+			.tickValues(d3.range(2,this.timePerScreen, 2))
+		;
+
+		this.gradXGroup = this.svg.append("g")
+			.attr("class", "gradX")
+			.attr("transform", "translate(0, " + this.echelley(0) + ")")
+			.call(this.gradX)
+		;
+
+	}
+
+	replot(data){
+		var lf = d3.svg.line()
+			.x((d)=> this.echellex(d['time']-this.tStart))
+			.y((d)=> this.echelley(d[this.dataName]))
+			.interpolate("linear");
+		this.coord = lf(data);
+		this.path.attr('d', this.coord);
+	}
+
+	redraw(scalingData, plotData){
+		this.setXscale();
+		this.setYscale(scalingData);
+		this.drawGradX();
+		this.drawGradY();
+		this.replot(plotData);
+	}
+
 }
