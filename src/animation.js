@@ -1,7 +1,6 @@
 import * as simventLungs from "./simvent-lungs.js";
 import * as simventVentilators from "./simvent-ventilators.js";
 
-
 export class simulator {
 	constructor(){
 		this.debugMode = false;
@@ -236,19 +235,19 @@ export class simulator {
 	setYscale(){
 		var dataSet = this.data.concat(this.graphData);
 
-		for(graph of this.graphStack){
-			graph.setYscale(dataSet);
-			graph.drawGradY();
-			graph.drawGradX();
-			graph.setNLf();
+		for(const g of this.graphStack){
+			g.setYscale(dataSet);
+			g.drawGradY();
+			g.drawGradX();
+			g.setNLf();
 		}
 	}
 
 	redraw(){
 		var scalingData = this.data.concat(this.graphData);
 
-		for(var graph of this.graphStack){
-			graph.redraw(scalingData, this.graphData);
+		for(var g of this.graphStack){
+			g.redraw(scalingData, this.graphData);
 		}
 	}
 
@@ -291,9 +290,9 @@ export class simulator {
 			if(this.debugMode == true){ console.log(this.timePerScreen + 's plotted in ' +  this.loopDuration/1000 +'s'); }
 			this.setYscale();
 			this.tStart = this.data[0].time;
-			for(graph of this.graphStack){
-				graph.tStart = this.tStart;
-				graph.coord = '';
+			for(const g of this.graphStack){
+				g.tStart = this.tStart;
+				g.coord = '';
 			}
 			this.graphData = [];
 		}
@@ -319,7 +318,7 @@ export class simulator {
 	start(){
 		for(var ds of this.datasets){
 			var gr = new graph(ds.name, this.timePerScreen, this.target);
-			if(this.debugMode == true){gr.debugMode = true}
+			gr.debugMode = this.debugMode;
 			gr.tStart = 0;
 			this.graphStack.push(gr);
 		}

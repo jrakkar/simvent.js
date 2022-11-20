@@ -271,7 +271,6 @@ export class FlowControler extends Controler{
 		this.ventParams['Vt']={unit: "l", step:0.01};
 		this.ventParams['Te']={calculated: true, unit: "sec."};
 		this.ventParams['Tcycle']={calculated: true, unit: "sec."};
-		console.table(this.ventParams)
 	}
 
 	get Flow(){return this.Vt / this.Ti;}

@@ -25,8 +25,8 @@ const defaults = {
 export class graph {
 		  constructor(idsvg, conf){
 
-					 for(var index in gs.defaults){
-								this[index] = gs.defaults[index];
+					 for(var index in defaults){
+								this[index] = defaults[index];
 					 }
 
 					 for(var index in conf){
@@ -34,7 +34,7 @@ export class graph {
 					 }
 
 					 if(idsvg == null){
-								this.idsvg = "#" + gs.newSvg();
+								this.idsvg = "#" + newSvg();
 					 }
 					 else{
 								this.idsvg = idsvg;
@@ -723,7 +723,7 @@ export class graph {
 }
 
 export function quickGraph(div, data, fx, fy, conf){
-		  return new gs.graph(div, conf)
+		  return new graph(div, conf)
 					 .setscale(data, fx, fy)
 					 .tracer(data, fx, fy);
 }
@@ -738,7 +738,7 @@ export function addGraph(target, data, fx, fy, conf){
 		  if (typeof conf != "undefined" && 'class' in conf){
 					 newsvg.classed(conf.class, true);
 		  }
-		  return gs.quickGraph("#" + newSVGid, data, fx, fy, conf);
+		  return quickGraph("#" + newSVGid, data, fx, fy, conf);
 }
 
 function newSvg (){
