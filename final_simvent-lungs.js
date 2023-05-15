@@ -1,4 +1,4 @@
-import {sygX, sygY} from './simvent-math.js';
+import {sygX, sygY} from 'https://cdn.jsdelivr.net/gh/jrakkar/simvent.js@latest/simvent-math.js';
 //****************************
 // Lung models
 //****************************
