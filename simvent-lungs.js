@@ -12,40 +12,77 @@ import {sygX, sygY} from './simvent-math.js';
  * @memberof sv
  */
 
-export class Lung{
+class Lung{
+
+	static simParams = [
+		{id: 'Tsampl',   init: .001,  unit: 's'},
+	];
+
+	static carbParams = [
+		{id: 'Vdaw',   init: 0.1,   unit: 'l'},
+		{id: 'PiCO2',  init: 0.0,   unit: 'mmHg'},
+		{id: 'PACO2',  init: 35.0,  unit: 'mmHg'},
+		{id: 'Slope2', init: 0.003, unit: 'l'},
+		{id: 'Slope3', init: 5, unit: 'mmhg/l'},
+	];
+
+	static variables = [
+		{id: 'Vti',   init: 0,  unit: 'l'},
+		{id: 'Vte',   init: 0,  unit: 'l'},
+		{id: 'Vtmax', init: 0,  unit: 'l'},
+		{id: 'Vabs',  init: 0,  unit: 'l'},
+		{id: 'Flow',  init: 0,  unit: ''},
+	];
+
+	static mechParams = [
+		{id: 'Raw',   init: 5,  unit: 'hPa/l/s'},
+	];
+
+
 	constructor() {
 
-		this.defaults = {
-			Tsampl: 0.001,
-			Raw: 5,
-			// Gaz exchange parameters
-			Vdaw   : 0.1,
-			PiCO2  : 0.0,
-			PACO2  : 35.0,
-			Slope2 : 0.003,
-			Slope3 : 5,
-			// Variable parameters
-			Vti	:  0,
-			Vte	:  0,
-			Vtmax:0,
-			PCO2:0,
-			Vabs    : 0
-		};
+		this.parseDefaultsList([
+			...Lung.simParams,
+			...Lung.carbParams,
+			...Lung.variables,
+		]);
 
-		this.parseDefaults();
 	}
 
-	parseDefaults() {
-		for (var p in this.defaults) {
-			this[p] = this.defaults[p];
+	parseDefaultsList(list) {
+		for(let p of list){
+			this[p.id]=p.init;
 		}
 	}
 
-	get Palv() {return this.Pel - this.Pmus;}
+	parseParams(list) {
+		for(let p in list){
+			if(p in this){this[p] = list[p]}
+			else{console.log(`No parameter _${p}_ in lung _${this.constructor.name}_`)}
+		}
+	}
+
+	get Palv() {return this.Pel - this.Pmus}
+	get Pmus() {return 0}
 	get Vt() {return this.Vtmax -this.Vte;}
 	get SCO2() { return this.PCO2/(760-47); }
 	get VcAlv() { return this.Vtmax - this.Vdaw; }
 	get PplCO2() { return this.PACO2 - (this.Slope3 * (this.VcAlv / 2)); }
+
+	get PCO2() {
+		var PCO2 = sygY(
+				this.Vte,
+				this.PiCO2, 
+				this.PplCO2, 
+				this.Vdaw, //Pid / ou Vid 
+				this.Slope2); // Kid
+
+		if (this.Vte > this.Vdaw) {
+			PCO2 += this.Slope3 * (this.Vte - this.Vdaw);
+		}
+		
+		return PCO2;
+	}
 
 	/**
 	 * Simulate a pressure being applied to airway openning of the lung
@@ -60,9 +97,9 @@ export class Lung{
 		var deltaVolume = 0.0;
 
 		while (time < duree){
+			//console.log(`appliquer_pression: this.Palv = ${this.Palv}`);
 			var deltaP = pression - this.Palv;
 			var flow = deltaP / this.Raw;
-			//this.flow = deltaP / this.Raw;
 			this.appliquer_debit(flow, this.Tsampl);
 
 			time += this.Tsampl;
@@ -72,20 +109,18 @@ export class Lung{
 	appliquer_debit (flow, duration){
 
 		if(isNaN(flow)){
-			throw "sv.SimpleLung.appliquer_debit: NaN value passed as flow";
+			throw "Lung.appliquer_debit: NaN value passed as flow";
 		}
 
 		this.flow = flow ; // l/s
 		var deltaVolume = this.flow * duration; // l
 		this.Vabs+= deltaVolume; // l
-		// this.Vti += deltaVolume;
 
 		if (this.flow > 0){
 			// We are inhaling
 
 			this.Vti += deltaVolume;
 			this.Vtmax = this.Vti;
-			this.PCO2 = 0;
 			this.Vte = 0;
 			this.VtCO2 = 0;
 		}
@@ -93,67 +128,34 @@ export class Lung{
 		else {
 			this.Vti = 0;
 			this.Vte -= deltaVolume;
-			this.updateCO2();
 			this.VtCO2 += this.SCO2 * (-deltaVolume);
 		}
 		this.time += duration;
 	}
 
-	updateCO2() {
-		var co2 = sygY(
-				this.Vte,
-				this.PiCO2, 
-				this.PplCO2, 
-				this.Vdaw, 
-				this.Slope2);
-
-		if (this.Vte > this.Vdaw) {
-			co2 += this.Slope3 * (this.Vte - this.Vdaw);
-		}
-
-		this.PCO2 = co2;
-	};
-
-	complianceCurve(){
-		var vent = new sv.PVCurve;
-		var data = vent.ventilate(this).timeData;
-		var idsvg = "svg" + document.querySelectorAll("svg").length;
-		document.write("<svg id='" + idsvg +"'></svg>");
-		function fx(d){return d.Pel;}
-		function fy(d){return d.Vabs;}
-		var graph = new gs.graph("#"+idsvg); 
-		graph.setscale(data, fx, fy);
-		graph.tracer(data, fx, fy);
-		graph.setidx("Elastic recoil pressure (cmH₂O)");
-		graph.setidy("Volume (l)");
-	}
-
-	defaultsTable(){
-		sv.defaultsTable.call(this,this.mechParams);
-	}
 }
 
 /** 
  * Basic lung model with linear compliance.
- * @extends sv.Lung
+ * @extends Lung
  */
 
 export class SimpleLung extends Lung {
+
+	static mechParams = [
+		...Lung.mechParams,
+		{id: 'Crs',   init: 50,  unit: 'ml/hPa'},
+		{id: 'Vfrc',   init: 2.5,  unit: 'l'},
+	];
+
 	constructor(params) {
+
 		super();
 
-		this.defaults = {
-			Crs : 50.0,// ml/cmH2O
-			Pmus   : 0,// cmH2O/l/s
-			Vfrc: 2.5
-			};
+		this.parseDefaultsList(SimpleLung.mechParams);
+		this.parseParams(params);
 
-		this.parseDefaults();
 		this.Vabs = this.Vfrc;
-		this.mechParams = {
-			Crs: {unit: "ml/cmH₂O"},
-			Raw: {unit: "cmH₂O/l/s"}
-		}
 
 	}
 	get Pel() {return 1000 * (this.Vabs - this.Vfrc)/ this.Crs;}
@@ -165,28 +167,21 @@ export class SimpleLung extends Lung {
  * @extends sv.Lung
  */
 
-export class SptLung extends Lung{
+export class SptLung extends SimpleLung{
 
-	constructor() {
+	static respParams = [
+		{id: 'Fspt',   init: 14,  unit: '/min'},
+		{id: 'Pmax',   init: 6.5, unit: 'hPa'},
+		{id: 'Ti',     init: 1,   unit: 's'},
+	];
+
+	constructor(params) {
 
 		super();
-		this.defaults = {
-			Crs : 50.0 ,// ml/cmH2O
-			Fspt : 14.0 ,// c/min
-			Ti : 1 , // sec
-			Pmax : 6.5, // cmH20
-			Vabs: 0, // Have to be initialised
-			time : 0 // Have to be initialised
-		};
 
-		this.parseDefaults();
-		this.mechParams = {
-			Crs: {unit: "ml/cmH₂O"},
-			Raw: {unit: "cmH₂O/l/s"},
-			Fspt: {unit: "/min."},
-			Ti: {unit: "sec."},
-			Pmax: {unit: "cmH₂O"}
-		}
+		this.parseDefaultsList(SptLung.respParams);
+		this.parseParams(params);
+		this.time=0;
 	}
 
 	get Pmus(){
@@ -200,7 +195,6 @@ export class SptLung extends Lung{
 		else{ return 0; }
 	}
 
-	get Pel() {return 1000 * this.Vabs/ this.Crs;}
 }
 
 /** 
@@ -209,29 +203,21 @@ export class SptLung extends Lung{
  */
 
 export class SygLung extends Lung{
-	constructor() {
+
+	static mechParams = [
+		...Lung.mechParams,
+		{id: 'Vmax', init: 4, unit: "l"},
+		{id: 'Vmin', init: 0, unit: "l"},
+		{id: 'Pid', init: 5, unit: "cmH₂O"},
+		{id: 'Kid', init: 20, unit: "cmH₂O"},
+	] ;
+
+	constructor(params) {
 
 		super();
-		this.defaults = {
-			 // Mechanical parameters
-			 Vmax : 4.0,
-			 Vmin : 0.0,
-			 Pid : 5.0,
-			 Kid : 20.0,
-			 Pmus:0,
-		 };
+		this.parseDefaultsList(SygLung.mechParams);
+		this.parseParams(params);
 
-		this.parseDefaults();
-
-		this.mechParams = {
-			Vmax: {unit: "l"},
-			Vmin: {unit: "l"},
-			Pid: {unit: "cmH₂O"},
-			Kid: {unit: "cmH₂O"},
-			Raw: {unit: "cmH₂O/l/s"}
-		};
-
-		this.flow = 0.0;
 		this.Vabs = this.volume(0);
 	}
 
@@ -250,48 +236,51 @@ export class SygLung extends Lung{
  */
 
 export class RLung extends Lung {
-	constructor() {
+	static mechParams = [
+		...Lung.mechParams,
+		{id: 'Vmax', init: 4, unit: "l"},
+		{id: 'Vmin', init: 0, unit: "l"},
+		{id: 'Pid', init: 20, unit: "cmH₂O"},
+		{id: 'Kid', init: 20, unit: "cmH₂O"},
+		{id: 'Phister', init: 20, unit: "cmH₂O"},
+	];
+
+	static calcParams = [
+		{id: 'PidInsp', unit: "cmH₂O"},
+		{id: 'PidExp', unit: "cmH₂O"},
+	];
+
+	static variables = [
+		{id: 'lastFlow', init: 0},
+		{id: 'Vtmax', init: 0},
+		{id: 'lastPel', init: 0},
+	];
+
+	constructor(params) {
 		super();
-		this.defaults = {
-			// Mechanical parameters
-			Vmax : 4.0,
-			Vmin : 0.0,
-			Pid : 20,
-			Kid : 20.0,
-			Phister: 20,
 
-			flow : 0.0,
-			lastFlow : 0.0,
-			Pmus: 0,
-			Vtmax : 0,
-			lastPel: 0
-		};
-
-		this.parseDefaults();
+		this.parseDefaultsList(RLung.mechParams);
+		this.parseDefaultsList(RLung.variables);
+		this.parseParams(params);
 
 		this.VmaxExp=this.Vmax;
 		this.VminInsp=this.Vmin;
 		this.Vabs = this.volume(0);
+
 		this.fitInsp();
 		this.fitExp();
+
 		this.appliquer_pression(1,3);
 		this.appliquer_pression(-1,3);
 		this.appliquer_pression(1,3);
 		this.appliquer_pression(-1,3);
 
-		this.mechParams = {
-			Vmax: {unit: "l"},
-			Vmin: {unit: "l"},
-			PidInsp: {unit: "cmH₂O"},
-			PidExp: {unit: "cmH₂O"},
-			Kid: {unit: "cmH₂O"},
-			Raw: {unit: "cmH₂O/l/s"}
-		};
 	}
 
 	volume(P){
 		return sygY(P, this.Vmin, this.Vmax, this.Pid, this.Kid);
 	}
+
 
 	fitInsp(){
 		//console.log('fitInsp');
